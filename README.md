@@ -78,7 +78,7 @@ curl -X POST http://localhost:5000/api/v1/auth/signup \
   -d '{"name":"Demo User","email":"demo@example.com","password":"Demo1234"}'
 ```
 
-Then log in with **demo@example.com / Demo1234**.
+Then log in with **demo@example.com / Demopass@1234**.
 
 ---
 
