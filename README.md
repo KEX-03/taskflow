@@ -4,7 +4,7 @@ A full-stack web application featuring authentication, a task-management dashboa
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer      | Technology                          |
 |------------|-------------------------------------|
@@ -16,7 +16,7 @@ A full-stack web application featuring authentication, a task-management dashboa
 
 ---
 
-## 🚀 Setup & Run
+## Setup & Run
 
 ### Prerequisites
 - Node.js ≥ 18
@@ -68,7 +68,7 @@ npm start                     # starts on http://localhost:3000
 
 ---
 
-## 🔐 Demo Credentials / Seed
+## Demo Credentials / Seed
 
 No seed script is required — simply **sign up** via the UI or use the signup API:
 
@@ -82,7 +82,7 @@ Then log in with **demo@example.com / Demo1234**.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 taskflow/
@@ -111,7 +111,7 @@ taskflow/
 
 ---
 
-## 📬 API Endpoints
+## API Endpoints
 
 | Method | Endpoint               | Auth | Description            |
 |--------|------------------------|------|------------------------|
@@ -128,7 +128,7 @@ taskflow/
 
 ---
 
-## 📈 How Would I Scale This for Production?
+## How Would I Scale This for Production?
 
 1. **Deployment** — Containerise with Docker; deploy backend on Railway / Fly.io / AWS ECS; host React on Vercel / Netlify with env-based API URLs.
 2. **CORS & Security** — Lock `CORS origin` to the production domain; use `Helmet.js` for security headers; move secrets to a secrets manager (AWS SSM / Doppler).
