@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom base ──────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-slate-950 text-slate-100 min-h-screen;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  input, textarea, select {
+    @apply bg-slate-800 border border-slate-700 text-slate-100 rounded-lg;
+  }
+  input::placeholder, textarea::placeholder {
+    @apply text-slate-500;
+  }
+  input:focus, textarea:focus, select:focus {
+    @apply outline-none border-primary-500 ring-1 ring-primary-500;
+  }
+}
+
+/* ── Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-slate-600; }
