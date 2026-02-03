@@ -27,7 +27,7 @@ A full-stack web application featuring authentication, a task-management dashboa
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/your-username/taskflow.git
+git clone https://github.com/KEX-03/taskflow.git
 cd taskflow
 ```
 
