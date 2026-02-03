@@ -75,7 +75,7 @@ No seed script is required — simply **sign up** via the UI or use the signup A
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"name":"Demo User","email":"demo@example.com","password":"Demo1234"}'
+  -d '{"name":"Demo Gorgan","email":"demo@example.com","password":"Demopass@1234"}'
 ```
 
 Then log in with **demo@example.com / Demopass@1234**.
