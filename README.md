@@ -33,10 +33,10 @@ cd taskflow
 
 ---
 
-### 2. Backend Setup
+### 2. Backend Setup (`admin`)
 
 ```bash
-cd backend
+cd admin
 cp .env.example .env          # then edit .env with your values
 npm install
 npm run dev                   # starts on http://localhost:5000
@@ -53,15 +53,15 @@ npm run dev                   # starts on http://localhost:5000
 
 ---
 
-### 3. Frontend Setup
+### 3. Frontend Setup (`app`)
 
 ```bash
-cd ../frontend
+cd ../app
 npm install
 npm start                     # starts on http://localhost:3000
 ```
 
-> If your backend runs on a different port, create a `.env` file in `/frontend` with:
+> If your backend runs on a different port, create a `.env` file in `/app` with:
 > ```
 > REACT_APP_API_URL=http://localhost:5000/api/v1
 > ```
@@ -86,7 +86,7 @@ Then log in with **demo@example.com / Demopass@1234**.
 
 ```
 taskflow/
-├── backend/
+├── admin/
 │   ├── src/
 │   │   ├── app.js              # Entry point
 │   │   ├── config/db.js        # MongoDB connection
@@ -97,7 +97,7 @@ taskflow/
 │   │   └── utils/              # Helpers (token, errorHandler)
 │   ├── package.json
 │   └── .env.example
-├── frontend/
+├── app/
 │   ├── src/
 │   │   ├── App.js              # Root routes
 │   │   ├── context/            # React Context (Auth)
@@ -125,6 +125,23 @@ taskflow/
 | GET    | `/api/v1/tasks/:id`    | ✓    | Get single task        |
 | PUT    | `/api/v1/tasks/:id`    | ✓    | Update task            |
 | DELETE | `/api/v1/tasks/:id`    | ✓    | Delete task            |
+
+---
+
+## Deployment
+
+This project is live, deployed as follows:
+
+- **Frontend (`app`)** — deployed on **Vercel**. Connected directly to the `app` folder of this repo; every push to `main` triggers an automatic build and deploy. The `REACT_APP_API_URL` environment variable is set in the Vercel project settings to point at the production backend URL.
+- **Backend (`admin`)** — deployed on **Render** as a web service. Connected to the `admin` folder of this repo, with `npm install` as the build command and `npm run start` (or `npm run dev` equivalent for production) as the start command. All `.env` variables (`MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_ORIGIN`, `PORT`) are configured in Render's environment variable dashboard, with `FRONTEND_ORIGIN` set to the deployed Vercel URL for CORS.
+- **Database** — MongoDB Atlas, used as the production database for the Render-hosted backend.
+
+### Deployment steps (summary)
+1. Push the repo to GitHub.
+2. On **Render**: create a new Web Service, point it at the `admin` folder, set the build/start commands, and add the environment variables from `.env.example`.
+3. On **Vercel**: import the repo, set the root directory to `app`, and add `REACT_APP_API_URL` pointing to the Render backend's public URL.
+4. Update `FRONTEND_ORIGIN` on Render to match the live Vercel domain once it's issued.
+5. Redeploy both services to pick up the final environment variables.
 
 ---
 
