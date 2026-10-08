@@ -21,4 +21,19 @@ const getQueryString = (value) => {
  */
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-module.exports = { getQueryString, escapeRegex };
+/**
+ * Parse a query-string value as an integer for pagination.
+ * Non-numeric input (e.g. "abc") returns `fallback`; numbers outside
+ * [min, max] are clamped to the nearest bound.
+ *
+ * @param {unknown} value - A value from `req.query`.
+ * @param {{ fallback: number, min?: number, max?: number }} options
+ * @returns {number}
+ */
+const parsePositiveInt = (value, { fallback, min = 1, max = Infinity }) => {
+  const n = parseInt(getQueryString(value), 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
+module.exports = { getQueryString, escapeRegex, parsePositiveInt };

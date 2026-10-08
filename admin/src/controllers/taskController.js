@@ -1,5 +1,5 @@
 const Task = require("../models/Task");
-const { getQueryString, escapeRegex } = require("../utils/query");
+const { getQueryString, escapeRegex, parsePositiveInt } = require("../utils/query");
 
 const MAX_SEARCH_LENGTH = 100;
 
@@ -25,7 +25,6 @@ const createTask = async (req, res) => {
 // ── GET /api/v1/tasks ────────────────────────
 // Supports: ?search=, ?priority=, ?status=, ?page=, ?limit=
 const getTasks = async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
   const search = getQueryString(req.query.search);
   const priority = getQueryString(req.query.priority);
   const status = getQueryString(req.query.status);
@@ -44,8 +43,8 @@ const getTasks = async (req, res) => {
     filter.status = status;
   }
 
-  const p = Math.max(1, parseInt(page));
-  const l = Math.min(50, Math.max(1, parseInt(limit)));
+  const p = parsePositiveInt(req.query.page, { fallback: 1 });
+  const l = parsePositiveInt(req.query.limit, { fallback: 20, max: 50 });
 
   const total = await Task.countDocuments(filter);
   const tasks = await Task.find(filter)
