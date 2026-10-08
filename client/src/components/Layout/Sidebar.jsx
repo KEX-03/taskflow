@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const navItems = [
@@ -55,7 +55,7 @@ const Sidebar = () => {
     >
       {/* ── Logo ─────────────────────────── */}
       <div className="flex items-center gap-3 p-5 border-b border-slate-800">
-        <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
@@ -87,7 +87,7 @@ const Sidebar = () => {
       {/* ── User + Logout ────────────────── */}
       <div className="border-t border-slate-800 p-3">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
             {user?.name?.[0]?.toUpperCase() || "U"}
           </div>
           {!collapsed && (

@@ -1,6 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* ── Theme (custom colors, fonts, animations) ── */
+@theme {
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  --color-slate-850: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #0a0e1a;
+
+  /* Tailwind 3 values for the default colors we use, so the UI looks the same as before the v4 upgrade */
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+
+  --font-sans: "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --animate-fade-in: fadeIn 0.3s ease;
+  --animate-slide-up: slideUp 0.35s ease;
+  --animate-spin: spin 0.6s linear infinite;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
 
 /* ── Custom base ──────────────────────────── */
 @layer base {
@@ -18,7 +66,11 @@
     @apply text-slate-500;
   }
   input:focus, textarea:focus, select:focus {
-    @apply outline-none border-primary-500 ring-1 ring-primary-500;
+    @apply outline-hidden border-primary-500 ring-1 ring-primary-500;
+  }
+  /* Tailwind 4 no longer gives buttons a pointer cursor; keep the v3 behavior */
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 

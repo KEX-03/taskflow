@@ -115,8 +115,6 @@ taskflow/
 │   │   └── utils/              # Axios instance, validation helpers
 │   ├── index.html              # Vite HTML entry
 │   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
 │   ├── package.json
 │   └── .env.example
 └── README.md

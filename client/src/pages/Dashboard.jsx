@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import api from "../utils/api.js";
 import Spinner from "../components/Shared/Spinner.jsx";
 
@@ -85,7 +85,7 @@ const Dashboard = () => {
           <div className="flex flex-col gap-2">
             {recentTasks.map((task) => (
               <div key={task._id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800/50 transition-colors">
-                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${priorityDot[task.priority]}`} />
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${priorityDot[task.priority]}`} />
                 <p className="text-sm text-slate-200 flex-1 truncate">{task.title}</p>
                 <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${statusColor[task.status]}`}>
                   {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
