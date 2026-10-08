@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions and help
+    url: https://github.com/KEX-03/taskflow/discussions
+    about: Ask questions about setup, the code, or how to contribute in GitHub Discussions.
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/KEX-03/taskflow/security/advisories/new
+    about: Please report security problems privately, not in a public issue.

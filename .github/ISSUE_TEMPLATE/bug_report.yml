@@ -1,0 +1,104 @@
+name: 🐛 Bug report
+description: Something in TaskFlow isn't working as it should.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! The more detail you give, the faster it can be fixed.
+        Found a **security problem**? Please don't report it here. See [SECURITY.md](https://github.com/KEX-03/taskflow/blob/main/SECURITY.md) instead.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A short, clear description of the bug.
+      placeholder: When I delete a task, it still shows on the Dashboard until I refresh the page.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps that make the bug happen, starting from a fresh page load.
+      placeholder: |
+        1. Log in and go to the Tasks page
+        2. Delete any task
+        3. Click "Dashboard" in the sidebar
+        4. See the deleted task under "Recent Tasks"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: The deleted task should no longer appear on the Dashboard.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include any error messages.
+      placeholder: The deleted task is still listed until I reload the page.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of TaskFlow?
+      options:
+        - Frontend (client)
+        - Backend / API (server)
+        - Setup or documentation
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options:
+        - Running locally
+        - Live demo / a deployed copy
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Run `node --version` in a terminal to see your Node.js version.
+      value: |
+        - OS: <!-- e.g. Windows 11, macOS 15, Ubuntu 24.04 -->
+        - Browser: <!-- e.g. Chrome 130, Firefox 132 -->
+        - Node.js: <!-- only if running locally, e.g. v24.1.0 -->
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots or logs (optional)
+      description: |
+        Screenshots, errors from the browser console (F12 → Console), or output from the server terminal.
+        You can paste images directly into this box.
+        **Remove any passwords, tokens or other secrets first.**
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the [existing issues](https://github.com/KEX-03/taskflow/issues) and this bug hasn't been reported yet.
+          required: true
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/KEX-03/taskflow/blob/main/CODE_OF_CONDUCT.md).
+          required: true

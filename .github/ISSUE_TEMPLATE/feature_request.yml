@@ -1,0 +1,69 @@
+name: ✨ Feature request
+description: Suggest an idea or improvement for TaskFlow.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Describing the **problem** first helps everyone agree on the best solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation or frustration, not the solution yet.
+      placeholder: I have a lot of tasks and can't tell which ones are urgent at a glance.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to happen? Mockups or sketches are welcome (paste images here).
+      placeholder: Let me sort the task list by priority, with "high" at the top.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered (optional)
+      description: Other ways to solve the problem, or workarounds you use today.
+      placeholder: Filtering by "High" priority works, but then I can't see the other tasks.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of TaskFlow?
+      options:
+        - Frontend (client)
+        - Backend / API (server)
+        - Both
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you like to work on this?
+      description: No pressure! Ideas are welcome either way. See [CONTRIBUTING.md](https://github.com/KEX-03/taskflow/blob/main/CONTRIBUTING.md) to get started.
+      options:
+        - Yes, I'd like to build it
+        - Yes, with some guidance
+        - No, just suggesting it
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the [existing issues](https://github.com/KEX-03/taskflow/issues) and this hasn't been suggested yet.
+          required: true
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/KEX-03/taskflow/blob/main/CODE_OF_CONDUCT.md).
+          required: true
