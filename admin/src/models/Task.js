@@ -39,3 +39,6 @@ const taskSchema = new mongoose.Schema(
 taskSchema.index({ owner: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Task", taskSchema);
+// Shared enum values, e.g. for validating query params in controllers
+module.exports.PRIORITIES = PRIORITIES;
+module.exports.STATUSES = STATUSES;

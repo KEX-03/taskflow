@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const { PRIORITIES, STATUSES } = Task;
 const { getQueryString, escapeRegex, parsePositiveInt } = require("../utils/query");
 
 const MAX_SEARCH_LENGTH = 100;
@@ -36,10 +37,10 @@ const getTasks = async (req, res) => {
     const term = escapeRegex(search.slice(0, MAX_SEARCH_LENGTH));
     filter.title = { $regex: term, $options: "i" };
   }
-  if (priority && ["low", "medium", "high"].includes(priority)) {
+  if (priority && PRIORITIES.includes(priority)) {
     filter.priority = priority;
   }
-  if (status && ["todo", "in-progress", "done"].includes(status)) {
+  if (status && STATUSES.includes(status)) {
     filter.status = status;
   }
 
@@ -85,12 +86,12 @@ const updateTask = async (req, res) => {
   }
   if (description !== undefined) task.description = description.trim();
   if (priority !== undefined) {
-    if (!["low", "medium", "high"].includes(priority))
+    if (!PRIORITIES.includes(priority))
       return res.status(400).json({ success: false, message: "Invalid priority." });
     task.priority = priority;
   }
   if (status !== undefined) {
-    if (!["todo", "in-progress", "done"].includes(status))
+    if (!STATUSES.includes(status))
       return res.status(400).json({ success: false, message: "Invalid status." });
     task.status = status;
   }
