@@ -8,7 +8,7 @@ A full-stack web application featuring authentication, a task-management dashboa
 
 | Layer      | Technology                          |
 |------------|-------------------------------------|
-| Frontend   | React 18, React Router v6, TailwindCSS |
+| Frontend   | React 18, React Router v6, TailwindCSS, Vite |
 | Backend    | Node.js, Express.js                 |
 | Database   | MongoDB (Mongoose ODM)              |
 | Auth       | JWT (jsonwebtoken), bcryptjs        |
@@ -19,7 +19,7 @@ A full-stack web application featuring authentication, a task-management dashboa
 ## Setup & Run
 
 ### Prerequisites
-- Node.js ≥ 18
+- Node.js 20.19+ or 22.12+ (required by Vite)
 - MongoDB running locally **or** a MongoDB Atlas URI
 - npm / yarn
 
@@ -55,16 +55,24 @@ npm run dev                   # starts on http://localhost:5000
 
 ### 3. Frontend Setup (`app`)
 
+In a second terminal (keep the backend running):
+
 ```bash
-cd ../app
+cd app
+cp .env.example .env          # sets VITE_API_URL=http://localhost:5000/api/v1
 npm install
-npm start                     # starts on http://localhost:3000
+npm run dev                   # starts on http://localhost:3000
 ```
 
-> If your backend runs on a different port, create a `.env` file in `/app` with:
-> ```
-> REACT_APP_API_URL=http://localhost:5000/api/v1
-> ```
+`VITE_API_URL` is required — it's the backend's base URL including `/api/v1`. Change it if your backend runs elsewhere, then restart `npm run dev` (Vite only reads `.env` on startup).
+
+The dev server always uses port `3000` to match the backend's default `FRONTEND_ORIGIN`; if that port is taken it exits with an error instead of switching ports.
+
+| Script            | Description                                   |
+|-------------------|-----------------------------------------------|
+| `npm run dev`     | Start the dev server on http://localhost:3000 |
+| `npm run build`   | Build for production into `dist/`             |
+| `npm run preview` | Serve the `dist/` build locally               |
 
 ---
 
@@ -99,13 +107,18 @@ taskflow/
 │   └── .env.example
 ├── app/
 │   ├── src/
-│   │   ├── App.js              # Root routes
+│   │   ├── index.jsx           # Entry point
+│   │   ├── App.jsx             # Root routes
 │   │   ├── context/            # React Context (Auth)
 │   │   ├── pages/              # Login, Signup, Dashboard, Tasks, Profile
 │   │   ├── components/         # Sidebar, Toast, Spinner, ProtectedRoute
 │   │   └── utils/              # Axios instance, validation helpers
+│   ├── index.html              # Vite HTML entry
+│   ├── vite.config.js
 │   ├── tailwind.config.js
-│   └── package.json
+│   ├── postcss.config.js
+│   ├── package.json
+│   └── .env.example
 └── README.md
 ```
 
@@ -132,14 +145,14 @@ taskflow/
 
 This project is live, deployed as follows:
 
-- **Frontend (`app`)** — deployed on **Vercel**. Connected directly to the `app` folder of this repo; every push to `main` triggers an automatic build and deploy. The `REACT_APP_API_URL` environment variable is set in the Vercel project settings to point at the production backend URL.
+- **Frontend (`app`)** — deployed on **Vercel**. Connected directly to the `app` folder of this repo; every push to `main` triggers an automatic build and deploy. Vercel uses the **Vite** framework preset (build command `npm run build`, output directory `dist`). The `VITE_API_URL` environment variable is set in the Vercel project settings to point at the production backend URL; it is baked in at build time, so changing it requires a redeploy.
 - **Backend (`admin`)** — deployed on **Render** as a web service. Connected to the `admin` folder of this repo, with `npm install` as the build command and `npm run start` (or `npm run dev` equivalent for production) as the start command. All `.env` variables (`MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_ORIGIN`, `PORT`) are configured in Render's environment variable dashboard, with `FRONTEND_ORIGIN` set to the deployed Vercel URL for CORS.
 - **Database** — MongoDB Atlas, used as the production database for the Render-hosted backend.
 
 ### Deployment steps (summary)
 1. Push the repo to GitHub.
 2. On **Render**: create a new Web Service, point it at the `admin` folder, set the build/start commands, and add the environment variables from `.env.example`.
-3. On **Vercel**: import the repo, set the root directory to `app`, and add `REACT_APP_API_URL` pointing to the Render backend's public URL.
+3. On **Vercel**: import the repo, set the root directory to `app`, choose the **Vite** framework preset, and add `VITE_API_URL` pointing to the Render backend's public URL (including `/api/v1`).
 4. Update `FRONTEND_ORIGIN` on Render to match the live Vercel domain once it's issued.
 5. Redeploy both services to pick up the final environment variables.
 
