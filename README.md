@@ -46,7 +46,7 @@ npm run dev                   # starts on http://localhost:5000
 | Variable         | Description                              | Default               |
 |------------------|------------------------------------------|-----------------------|
 | `PORT`           | Server port                              | `5000`                |
-| `MONGO_URI`      | MongoDB connection string                | `mongodb://localhost:27017/auth_dashboard_db` |
+| `MONGO_URI`      | MongoDB connection string                | `mongodb://localhost:27017/taskflow` |
 | `JWT_SECRET`     | Secret key for signing JWTs              | *(must set)*          |
 | `JWT_EXPIRES_IN` | Token expiry (e.g. `7d`, `1h`)           | `7d`                  |
 | `FRONTEND_ORIGIN`| CORS allowed origin                      | `http://localhost:3000` |
