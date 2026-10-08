@@ -1,167 +1,174 @@
-# TaskFlow — Auth + Dashboard App
+# TaskFlow
 
-A full-stack web application featuring authentication, a task-management dashboard, and full CRUD — built with **React + Node.js + MongoDB**.
+**A clean, beginner-friendly full-stack task manager built with MongoDB, Express, React and Node, made for learning and first open-source contributions.**
 
----
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Good first issues](https://img.shields.io/github/issues/KEX-03/taskflow/good%20first%20issue?label=good%20first%20issues&color=7057ff)](https://github.com/KEX-03/taskflow/labels/good%20first%20issue)
+[![Live demo](https://img.shields.io/badge/demo-live-success.svg)](https://taskflow-plum-one.vercel.app)
 
-## Tech Stack
+![TaskFlow dashboard showing task statistics and recent tasks](docs/images/dashboard.png)
 
-| Layer      | Technology                          |
-|------------|-------------------------------------|
-| Frontend   | React 18, React Router v6, TailwindCSS, Vite |
-| Backend    | Node.js, Express.js                 |
-| Database   | MongoDB (Mongoose ODM)              |
-| Auth       | JWT (jsonwebtoken), bcryptjs        |
-| Logging    | Morgan                              |
+<p align="center"><a href="docs/images/demo.gif">▶ Watch a short demo (GIF)</a></p>
 
----
+## Live demo
 
-## Setup & Run
+**👉 [taskflow-plum-one.vercel.app](https://taskflow-plum-one.vercel.app)**: sign up with any email (it doesn't need to be real) and try it out.
 
-### Prerequisites
-- Node.js 20.19+ or 22.12+ (required by Vite)
-- MongoDB running locally **or** a MongoDB Atlas URI
-- npm / yarn
+> ⏳ **The first load can take up to a minute.** The API runs on a free hosting plan that goes to sleep when nobody is using it, and waking up takes a moment. After that it's fast.
 
----
+## Features
 
-### 1. Clone the repo
+- **Sign up and log in** with secure password hashing and JWT (token-based) authentication
+- **Dashboard** with task counts by status and your most recent tasks
+- **Tasks**: create, edit and delete, with search and filters by priority and status
+- **Profile**: update your name, bio and avatar, and change your password
+- **Protected pages**: logged-out visitors are sent to the login page
+- **Each user only sees their own tasks**, enforced by the API
+- **Clean, readable code** split into small files, with a [contributing guide](CONTRIBUTING.md) that explains where everything lives
+
+<details>
+<summary><b>More screenshots</b></summary>
+
+| Tasks | New task |
+|-------|----------|
+| ![Task list with status and priority badges](docs/images/tasks.png) | ![New task dialog](docs/images/task-form.png) |
+
+| Login | Profile |
+|-------|---------|
+| ![Login page](docs/images/login.png) | ![Profile page](docs/images/profile.png) |
+
+</details>
+
+## Tech stack
+
+| Part | Technology |
+|------|------------|
+| Frontend | [React 18](https://react.dev), [React Router 7](https://reactrouter.com), [Tailwind CSS 4](https://tailwindcss.com), [Axios](https://axios-http.com), built with [Vite](https://vite.dev) |
+| Backend | [Node.js](https://nodejs.org), [Express 4](https://expressjs.com) |
+| Database | [MongoDB](https://www.mongodb.com) with [Mongoose](https://mongoosejs.com) |
+| Auth | JSON Web Tokens ([jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)), password hashing with [bcryptjs](https://github.com/dcodeIO/bcrypt.js) |
+| Hosting (demo) | [Vercel](https://vercel.com) (frontend), [Render](https://render.com) (API), [MongoDB Atlas](https://www.mongodb.com/atlas) (database) |
+
+## Quick start
+
+### 1. What you need
+
+- [Node.js](https://nodejs.org) **22.12 or newer** (24 recommended). Check with `node --version`.
+- [Git](https://git-scm.com)
+- **MongoDB**, either one of:
+  - **Local:** install [MongoDB Community Server](https://www.mongodb.com/try/download/community). Nothing else to configure.
+  - **Cloud (free):** create a cluster on [MongoDB Atlas](https://www.mongodb.com/atlas) and copy its connection string (see [step 1 of the deployment guide](docs/DEPLOYMENT.md#1-database-mongodb-atlas)).
+
+### 2. Clone and install
+
 ```bash
 git clone https://github.com/KEX-03/taskflow.git
 cd taskflow
+npm run install:all
 ```
 
----
+Planning to contribute? [Fork the repository](https://github.com/KEX-03/taskflow/fork) first and clone your fork instead (see [CONTRIBUTING.md](CONTRIBUTING.md#fork-and-clone)).
 
-### 2. Backend Setup (`server`)
+### 3. Create your settings files
 
 ```bash
-cd server
-cp .env.example .env          # then edit .env with your values
-npm install
-npm run dev                   # starts on http://localhost:5000
+# macOS / Linux / Git Bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 ```
 
-#### `.env` variables
-| Variable         | Description                              | Default               |
-|------------------|------------------------------------------|-----------------------|
-| `PORT`           | Server port                              | `5000`                |
-| `MONGO_URI`      | MongoDB connection string                | `mongodb://localhost:27017/taskflow` |
-| `JWT_SECRET`     | Secret key for signing JWTs              | *(must set)*          |
-| `JWT_EXPIRES_IN` | Token expiry (e.g. `7d`, `1h`)           | `7d`                  |
-| `FRONTEND_ORIGIN`| CORS allowed origin                      | `http://localhost:3000` |
+```powershell
+# Windows PowerShell
+Copy-Item server/.env.example server/.env
+Copy-Item client/.env.example client/.env
+```
 
----
+The defaults work with a **local MongoDB**. Using **Atlas**? Open `server/.env` and replace `MONGO_URI` with your connection string. Every setting is explained in the `.env.example` files.
 
-### 3. Frontend Setup (`client`)
-
-In a second terminal (keep the backend running):
+### 4. Run it
 
 ```bash
-cd client
-cp .env.example .env          # sets VITE_API_URL=http://localhost:5000/api/v1
-npm install
-npm run dev                   # starts on http://localhost:3000
+npm run dev
 ```
 
-`VITE_API_URL` is required — it's the backend's base URL including `/api/v1`. Change it if your backend runs elsewhere, then restart `npm run dev` (Vite only reads `.env` on startup).
+This starts both parts together:
 
-Both `npm run dev` and `npm run preview` always use port `3000` to match the backend's default `FRONTEND_ORIGIN`; if that port is taken they exit with an error instead of switching ports (so stop one before starting the other).
+- **API** at http://localhost:5000 (health check: http://localhost:5000/api/v1/health)
+- **App** at **http://localhost:3000**: open it and sign up for an account
 
-| Script            | Description                                   |
-|-------------------|-----------------------------------------------|
-| `npm run dev`     | Start the dev server on http://localhost:3000 |
-| `npm run build`   | Build for production into `dist/`             |
-| `npm run preview` | Serve the `dist/` build on http://localhost:3000 |
+| Command (from the repository root) | What it does |
+|------------------------------------|--------------|
+| `npm run install:all` | Install dependencies for the root, server and client |
+| `npm run dev` | Start the API and the app together |
+| `npm run dev:server` | Start only the API |
+| `npm run dev:client` | Start only the app |
+| `npm run build` | Build the app for production (into `client/dist/`) |
 
----
+**Something not working?** The server prints a `❌` message explaining what's wrong, for example a missing setting or MongoDB not running.
 
-## Demo Credentials / Seed
-
-No seed script is required — simply **sign up** via the UI or use the signup API:
-
-```bash
-curl -X POST http://localhost:5000/api/v1/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Demo Gorgan","email":"demo@example.com","password":"Demopass@1234"}'
-```
-
-Then log in with **demo@example.com / Demopass@1234**.
-
----
-
-## Project Structure
+## Project structure
 
 ```
 taskflow/
-├── server/
+├── server/                  Express REST API
 │   ├── src/
-│   │   ├── app.js              # Entry point
-│   │   ├── config/db.js        # MongoDB connection
-│   │   ├── middleware/auth.js   # JWT protect middleware
-│   │   ├── models/             # Mongoose schemas (User, Task)
-│   │   ├── controllers/        # Business logic
-│   │   ├── routes/             # Express routers
-│   │   └── utils/              # Helpers (token, errorHandler)
-│   ├── package.json
-│   └── .env.example
-├── client/
+│   │   ├── app.js           Entry point: middleware, routes and startup
+│   │   ├── config/          MongoDB connection
+│   │   ├── models/          Mongoose schemas (User, Task)
+│   │   ├── controllers/     Request handlers: the logic for each endpoint
+│   │   ├── routes/          Maps URLs to controllers
+│   │   ├── middleware/      `protect`: checks the login token
+│   │   └── utils/           Helpers for tokens, errors and query parsing
+│   └── .env.example         Server settings, explained
+├── client/                  React app (Vite)
 │   ├── src/
-│   │   ├── index.jsx           # Entry point
-│   │   ├── App.jsx             # Root routes
-│   │   ├── context/            # React Context (Auth)
-│   │   ├── pages/              # Login, Signup, Dashboard, Tasks, Profile
-│   │   ├── components/         # Sidebar, Toast, Spinner, ProtectedRoute
-│   │   └── utils/              # Axios instance, validation helpers
-│   ├── index.html              # Vite HTML entry
-│   ├── vite.config.js
-│   ├── package.json
-│   └── .env.example
-└── README.md
+│   │   ├── App.jsx          All page routes
+│   │   ├── pages/           One file per page (Login, Dashboard, Tasks, ...)
+│   │   ├── components/      Shared UI (Sidebar, Toast, Spinner, ...)
+│   │   ├── context/         AuthContext: who is logged in
+│   │   └── utils/           Axios API client and form validation
+│   ├── vercel.json          Lets Vercel serve every page route
+│   └── .env.example         Client settings, explained
+├── docs/                    Deployment guide and images
+├── postman_collection.json  Ready-made API requests for Postman
+└── package.json             Helper scripts to run everything from the root
 ```
 
----
+## API overview
 
-## API Endpoints
+All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in the header: `Authorization: Bearer <token>`. You get a token from signup or login.
 
-| Method | Endpoint               | Auth | Description            |
-|--------|------------------------|------|------------------------|
-| POST   | `/api/v1/auth/signup`  | —    | Register               |
-| POST   | `/api/v1/auth/login`   | —    | Login → returns JWT    |
-| POST   | `/api/v1/auth/logout`  | ✓    | Logout (client-side)   |
-| GET    | `/api/v1/me`           | ✓    | Get current profile    |
-| PUT    | `/api/v1/me`           | ✓    | Update profile / pw    |
-| POST   | `/api/v1/tasks`        | ✓    | Create task            |
-| GET    | `/api/v1/tasks`        | ✓    | List tasks (search/filter) |
-| GET    | `/api/v1/tasks/:id`    | ✓    | Get single task        |
-| PUT    | `/api/v1/tasks/:id`    | ✓    | Update task            |
-| DELETE | `/api/v1/tasks/:id`    | ✓    | Delete task            |
+| Method | Endpoint | | Description |
+|--------|----------|---|-------------|
+| `POST` | `/auth/signup` | | Create an account, returns a token |
+| `POST` | `/auth/login` | | Log in, returns a token |
+| `POST` | `/auth/logout` | 🔒 | Log out (the app deletes its token) |
+| `GET` | `/me` | 🔒 | Get your profile |
+| `PUT` | `/me` | 🔒 | Update your profile or password |
+| `GET` | `/tasks` | 🔒 | List your tasks. Optional: `?search=`, `?status=`, `?priority=`, `?page=`, `?limit=` |
+| `POST` | `/tasks` | 🔒 | Create a task |
+| `GET` | `/tasks/:id` | 🔒 | Get one task |
+| `PUT` | `/tasks/:id` | 🔒 | Update a task |
+| `DELETE` | `/tasks/:id` | 🔒 | Delete a task |
+| `GET` | `/health` | | Check that the API is running |
 
----
+**Try it in Postman:** import [`postman_collection.json`](postman_collection.json). After you run *Signup* or *Login*, the token is saved and used by every other request automatically.
 
 ## Deployment
 
-This project is live, deployed as follows:
+TaskFlow runs on free plans of MongoDB Atlas, Render and Vercel. The [deployment guide](docs/DEPLOYMENT.md) walks through every setting and environment variable.
 
-- **Frontend (`client`)** — deployed on **Vercel**. Connected directly to the `client` folder of this repo; every push to `main` triggers an automatic build and deploy. Vercel uses the **Vite** framework preset (build command `npm run build`, output directory `dist`). The `VITE_API_URL` environment variable is set in the Vercel project settings to point at the production backend URL; it is baked in at build time, so changing it requires a redeploy.
-- **Backend (`server`)** — deployed on **Render** as a web service. Connected to the `server` folder of this repo, with `npm install` as the build command and `npm run start` (or `npm run dev` equivalent for production) as the start command. All `.env` variables (`MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_ORIGIN`, `PORT`) are configured in Render's environment variable dashboard, with `FRONTEND_ORIGIN` set to the deployed Vercel URL for CORS.
-- **Database** — MongoDB Atlas, used as the production database for the Render-hosted backend.
+## Contributing
 
-### Deployment steps (summary)
-1. Push the repo to GitHub.
-2. On **Render**: create a new Web Service, point it at the `server` folder, set the build/start commands, and add the environment variables from `.env.example`.
-3. On **Vercel**: import the repo, set the root directory to `client`, choose the **Vite** framework preset, and add `VITE_API_URL` pointing to the Render backend's public URL (including `/api/v1`).
-4. Update `FRONTEND_ORIGIN` on Render to match the live Vercel domain once it's issued.
-5. Redeploy both services to pick up the final environment variables.
+Contributions of all sizes are welcome, especially from **first-time contributors**! 🎉
 
----
+1. Pick an issue labelled [**good first issue**](https://github.com/KEX-03/taskflow/labels/good%20first%20issue) and comment that you'd like to work on it.
+2. Follow the [contributing guide](CONTRIBUTING.md): it covers setup, branches, commit messages, testing and opening a pull request, step by step.
+3. Questions? Ask in [Discussions](https://github.com/KEX-03/taskflow/discussions).
 
-## How Would I Scale This for Production?
+Please follow our [Code of Conduct](CODE_OF_CONDUCT.md). Found a security problem? See [SECURITY.md](SECURITY.md). Changes are listed in the [changelog](CHANGELOG.md).
 
-1. **Deployment** — Containerise with Docker; deploy backend on Railway / Fly.io / AWS ECS; host React on Vercel / Netlify with env-based API URLs.
-2. **CORS & Security** — Lock `CORS origin` to the production domain; use `Helmet.js` for security headers; move secrets to a secrets manager (AWS SSM / Doppler).
-3. **Database** — Add indexes on frequently queried fields (already done for `tasks.owner`); use MongoDB Atlas with connection pooling; consider read replicas at scale.
-4. **Caching** — Layer Redis in front of hot endpoints (e.g. profile fetch); cache task lists with short TTLs.
-5. **Auth Hardening** — Implement refresh-token rotation with httpOnly cookies; add rate-limiting (`express-rate-limit`) on auth routes.
-6. **Observability** — Swap `morgan` for structured JSON logs (Winston / Pino); integrate with a log aggregator (Datadog / Grafana Loki).
-7. **CI/CD** — GitHub Actions pipeline: lint → test → build → deploy on push to `main`.
+## License
+
+[MIT](LICENSE) © 2026 KEX-03
