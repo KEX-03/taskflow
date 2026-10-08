@@ -130,10 +130,12 @@ taskflow/
 │   │   └── utils/           Axios API client and form validation
 │   ├── vercel.json          Lets Vercel serve every page route
 │   └── .env.example         Client settings, explained
-├── docs/                    Deployment guide and images
+├── docs/                    Architecture overview, deployment guide and images
 ├── postman_collection.json  Ready-made API requests for Postman
 └── package.json             Helper scripts to run everything from the root
 ```
+
+**New to the code?** [How TaskFlow works](docs/ARCHITECTURE.md) is a five-minute tour of the request flow, login, data model and React app.
 
 ## API overview
 

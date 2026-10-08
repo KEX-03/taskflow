@@ -183,6 +183,8 @@ What to expect:
 
 ## 6. Where things live
 
+For the bigger picture (how a request flows, how login works, and how the data is stored), read [How TaskFlow works](docs/ARCHITECTURE.md) first.
+
 ```
 taskflow/
 ├── server/src/            Express API
