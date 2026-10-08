@@ -1,5 +1,5 @@
 {
-  "name": "auth-dashboard-frontend",
+  "name": "taskflow-client",
   "private": true,
   "version": "1.0.0",
   "type": "module",

@@ -1,7 +1,7 @@
 {
-  "name": "auth-dashboard-backend",
+  "name": "taskflow-server",
   "version": "1.0.0",
-  "description": "Backend API for Auth + Dashboard App",
+  "description": "TaskFlow REST API (Express + MongoDB)",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
