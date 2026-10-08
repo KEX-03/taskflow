@@ -1,5 +1,7 @@
 const Task = require("../models/Task");
-const { getQueryString } = require("../utils/query");
+const { getQueryString, escapeRegex } = require("../utils/query");
+
+const MAX_SEARCH_LENGTH = 100;
 
 // ── POST /api/v1/tasks ───────────────────────
 const createTask = async (req, res) => {
@@ -31,7 +33,9 @@ const getTasks = async (req, res) => {
   const filter = { owner: req.user._id };
 
   if (search) {
-    filter.title = { $regex: search, $options: "i" };
+    // Literal, case-insensitive match; extra characters beyond the cap are ignored
+    const term = escapeRegex(search.slice(0, MAX_SEARCH_LENGTH));
+    filter.title = { $regex: term, $options: "i" };
   }
   if (priority && ["low", "medium", "high"].includes(priority)) {
     filter.priority = priority;

@@ -12,4 +12,13 @@ const getQueryString = (value) => {
   return typeof first === "string" ? first.trim() : undefined;
 };
 
-module.exports = { getQueryString };
+/**
+ * Escape regex special characters so a string matches literally
+ * when used in a MongoDB `$regex` (e.g. "(" or ".*" from user input).
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+module.exports = { getQueryString, escapeRegex };
