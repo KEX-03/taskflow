@@ -8,6 +8,14 @@ const profileRoutes = require("./routes/profile");
 const taskRoutes = require("./routes/tasks");
 const { errorHandler } = require("./utils/errorHandler");
 
+// ── Required environment variables ───────────
+const missingEnv = ["MONGO_URI", "JWT_SECRET"].filter((name) => !process.env[name]);
+if (missingEnv.length) {
+  console.error(`❌  Missing required environment variable(s): ${missingEnv.join(", ")}`);
+  console.error("    Copy server/.env.example to server/.env and fill them in.");
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -53,9 +61,18 @@ app.use(errorHandler);
 
 // ── DB Connect & Server Start ────────────────
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`\n✅  Server running on http://localhost:${PORT}`);
     console.log(`📂  API base: http://localhost:${PORT}/api/v1\n`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`❌  Port ${PORT} is already in use. Stop the other process or set a different PORT.`);
+    } else {
+      console.error("❌  Server error:", err.message);
+    }
+    process.exit(1);
   });
 });
 
