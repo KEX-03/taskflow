@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const { getQueryString } = require("../utils/query");
 
 // ── POST /api/v1/tasks ───────────────────────
 const createTask = async (req, res) => {
@@ -22,12 +23,15 @@ const createTask = async (req, res) => {
 // ── GET /api/v1/tasks ────────────────────────
 // Supports: ?search=, ?priority=, ?status=, ?page=, ?limit=
 const getTasks = async (req, res) => {
-  const { search, priority, status, page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 20 } = req.query;
+  const search = getQueryString(req.query.search);
+  const priority = getQueryString(req.query.priority);
+  const status = getQueryString(req.query.status);
 
   const filter = { owner: req.user._id };
 
   if (search) {
-    filter.title = { $regex: search.trim(), $options: "i" };
+    filter.title = { $regex: search, $options: "i" };
   }
   if (priority && ["low", "medium", "high"].includes(priority)) {
     filter.priority = priority;
