@@ -10,4 +10,9 @@ export default defineConfig({
     // Fail instead of silently moving to another port (which CORS would block)
     strictPort: true,
   },
+  preview: {
+    // Same port as dev so `npm run preview` also passes the backend's CORS check
+    port: 3000,
+    strictPort: true,
+  },
 });

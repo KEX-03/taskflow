@@ -66,13 +66,13 @@ npm run dev                   # starts on http://localhost:3000
 
 `VITE_API_URL` is required — it's the backend's base URL including `/api/v1`. Change it if your backend runs elsewhere, then restart `npm run dev` (Vite only reads `.env` on startup).
 
-The dev server always uses port `3000` to match the backend's default `FRONTEND_ORIGIN`; if that port is taken it exits with an error instead of switching ports.
+Both `npm run dev` and `npm run preview` always use port `3000` to match the backend's default `FRONTEND_ORIGIN`; if that port is taken they exit with an error instead of switching ports (so stop one before starting the other).
 
 | Script            | Description                                   |
 |-------------------|-----------------------------------------------|
 | `npm run dev`     | Start the dev server on http://localhost:3000 |
 | `npm run build`   | Build for production into `dist/`             |
-| `npm run preview` | Serve the `dist/` build locally               |
+| `npm run preview` | Serve the `dist/` build on http://localhost:3000 |
 
 ---
 
