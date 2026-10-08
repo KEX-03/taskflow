@@ -15,9 +15,17 @@ const PORT = process.env.PORT || 5000;
 app.use(morgan("dev"));
 
 // ── CORS ─────────────────────────────────────
+// FRONTEND_ORIGIN can list several origins separated by commas,
+// e.g. "http://localhost:3000,https://my-app.vercel.app".
+// Browsers send the origin without a trailing slash, so strip any.
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
