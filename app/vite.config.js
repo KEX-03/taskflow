@@ -7,5 +7,7 @@ export default defineConfig({
   server: {
     // Matches the backend's default FRONTEND_ORIGIN (http://localhost:3000)
     port: 3000,
+    // Fail instead of silently moving to another port (which CORS would block)
+    strictPort: true,
   },
 });
