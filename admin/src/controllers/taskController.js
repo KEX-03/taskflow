@@ -1,4 +1,8 @@
 const Task = require("../models/Task");
+const { PRIORITIES, STATUSES } = Task;
+const { getQueryString, escapeRegex, parsePositiveInt } = require("../utils/query");
+
+const MAX_SEARCH_LENGTH = 100;
 
 // ── POST /api/v1/tasks ───────────────────────
 const createTask = async (req, res) => {
@@ -22,22 +26,26 @@ const createTask = async (req, res) => {
 // ── GET /api/v1/tasks ────────────────────────
 // Supports: ?search=, ?priority=, ?status=, ?page=, ?limit=
 const getTasks = async (req, res) => {
-  const { search, priority, status, page = 1, limit = 20 } = req.query;
+  const search = getQueryString(req.query.search);
+  const priority = getQueryString(req.query.priority);
+  const status = getQueryString(req.query.status);
 
   const filter = { owner: req.user._id };
 
   if (search) {
-    filter.title = { $regex: search.trim(), $options: "i" };
+    // Literal, case-insensitive match; extra characters beyond the cap are ignored
+    const term = escapeRegex(search.slice(0, MAX_SEARCH_LENGTH));
+    filter.title = { $regex: term, $options: "i" };
   }
-  if (priority && ["low", "medium", "high"].includes(priority)) {
+  if (priority && PRIORITIES.includes(priority)) {
     filter.priority = priority;
   }
-  if (status && ["todo", "in-progress", "done"].includes(status)) {
+  if (status && STATUSES.includes(status)) {
     filter.status = status;
   }
 
-  const p = Math.max(1, parseInt(page));
-  const l = Math.min(50, Math.max(1, parseInt(limit)));
+  const p = parsePositiveInt(req.query.page, { fallback: 1 });
+  const l = parsePositiveInt(req.query.limit, { fallback: 20, max: 50 });
 
   const total = await Task.countDocuments(filter);
   const tasks = await Task.find(filter)
@@ -78,12 +86,12 @@ const updateTask = async (req, res) => {
   }
   if (description !== undefined) task.description = description.trim();
   if (priority !== undefined) {
-    if (!["low", "medium", "high"].includes(priority))
+    if (!PRIORITIES.includes(priority))
       return res.status(400).json({ success: false, message: "Invalid priority." });
     task.priority = priority;
   }
   if (status !== undefined) {
-    if (!["todo", "in-progress", "done"].includes(status))
+    if (!STATUSES.includes(status))
       return res.status(400).json({ success: false, message: "Invalid status." });
     task.status = status;
   }
