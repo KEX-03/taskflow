@@ -7,9 +7,7 @@
 [![Good first issues](https://img.shields.io/github/issues/KEX-03/taskflow/good%20first%20issue?label=good%20first%20issues&color=7057ff)](https://github.com/KEX-03/taskflow/labels/good%20first%20issue)
 [![Live demo](https://img.shields.io/badge/demo-live-success.svg)](https://taskflow-plum-one.vercel.app)
 
-![TaskFlow dashboard showing task statistics and recent tasks](docs/images/dashboard.png)
-
-<p align="center"><a href="docs/images/demo.gif">▶ Watch a short demo (GIF)</a></p>
+![Short demo of TaskFlow: logging in and managing tasks](docs/images/demo.gif)
 
 ## Live demo
 
@@ -29,6 +27,10 @@
 
 <details>
 <summary><b>More screenshots</b></summary>
+
+**Dashboard**
+
+![Dashboard showing task statistics and recent tasks](docs/images/dashboard.png)
 
 | Tasks | New task |
 |-------|----------|
