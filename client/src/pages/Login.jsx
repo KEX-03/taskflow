@@ -43,7 +43,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       {/* ── Subtle grid background ─────────── */}
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(slate #1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
       <div className="relative w-full max-w-md animate-fade-in">
         {/* ── Card ────────────────────────── */}
