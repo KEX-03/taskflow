@@ -54,6 +54,9 @@ This full string is your `MONGO_URI`.
    | **Build Command** | `npm install` |
    | **Start Command** | `npm start` |
    | **Instance Type** | Free |
+   | **Auto-Deploy** | On Commit |
+
+   **Auto-Deploy** makes Render redeploy the API every time a change to `server/` lands on `main`. You can check or change it later under **Settings → Build & Deploy**. If it's off, your live API keeps running old code until you click **Manual Deploy → Deploy latest commit**.
 
 4. Add the **environment variables**:
 
