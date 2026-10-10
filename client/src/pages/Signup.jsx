@@ -72,24 +72,30 @@ const Signup = () => {
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
-              <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="John Doe"
+              <label htmlFor="signup-name" className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+              <input
+                id="signup-name"
+                type="text" name="name" value={form.name} onChange={handleChange} placeholder="John Doe"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
-              <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
+              <label htmlFor="signup-email" className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+              <input
+                id="signup-email"
+                type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-              <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••"
+              <label htmlFor="signup-password" className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <input
+                id="signup-password"
+                 type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.password ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>}
 
@@ -114,8 +120,10 @@ const Signup = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
-              <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="••••••••"
+              <label htmlFor="signup-confirmPassword" className="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+              <input
+                id="signup-confirmPassword"
+                type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="••••••••"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.confirmPassword ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.confirmPassword && <p className="text-red-400 text-xs mt-1.5">{errors.confirmPassword}</p>}
             </div>
