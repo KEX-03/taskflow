@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateLogin } from "../utils/validation.js";
+import PasswordInput from "../components/Shared/PasswordInput.jsx";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -86,13 +87,12 @@ const Login = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="••••••••"
-                className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.password ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                placeholder="Enter password"
+                hasError={!!errors.password}
               />
               {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>}
             </div>
