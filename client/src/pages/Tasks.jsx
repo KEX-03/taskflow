@@ -12,7 +12,7 @@ const Modal = ({ open, onClose, title, children }) => {
       <div className="relative bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
         <div className="flex items-center justify-between p-5 border-b border-slate-800">
           <h3 className="text-base font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors text-xl leading-none">×</button>
+          <button type="button" aria-label="Close dialog" onClick={onClose} className="text-slate-500 hover:text-white transition-colors text-xl leading-none">×</button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -54,29 +54,29 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
       {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
 
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Title</label>
-        <input name="title" value={form.title} onChange={handleChange} placeholder="Task title…"
+        <label htmlFor="task-title" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Title</label>
+        <input id="task-title" name="title" value={form.title} onChange={handleChange} placeholder="Task title…"
           className="w-full px-3 py-2 text-sm rounded-lg" />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Description</label>
-        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Optional…" rows={3}
+        <label htmlFor="task-description" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Description</label>
+        <textarea id="task-description" name="description" value={form.description} onChange={handleChange} placeholder="Optional…" rows={3}
           className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
       </div>
 
       <div className="flex gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Priority</label>
-          <select name="priority" value={form.priority} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
+          <label htmlFor="task-priority" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Priority</label>
+          <select id="task-priority" name="priority" value={form.priority} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
         </div>
         <div className="flex-1">
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Status</label>
-          <select name="status" value={form.status} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
+          <label htmlFor="task-status" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Status</label>
+          <select id="task-status" name="status" value={form.status} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
             <option value="todo">To Do</option>
             <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
@@ -211,11 +211,11 @@ const Tasks = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors" title="Edit">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors" title="Edit">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 </button>
-                <button onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                 </button>
               </div>
             </div>
@@ -237,8 +237,8 @@ const Tasks = () => {
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Task">
         <p className="text-slate-400 text-sm mb-5">Are you sure you want to delete this task? This action cannot be undone.</p>
         <div className="flex gap-3">
-          <button onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
-          <button onClick={handleDelete} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">Delete</button>
+          <button type="button" onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
+          <button type="button" aria-label="Delete task" onClick={handleDelete} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">Delete</button>
         </div>
       </Modal>
     </div>

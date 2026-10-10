@@ -86,17 +86,38 @@ const Profile = () => {
           <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wide">Edit Profile</h2>
           <form onSubmit={handleProfileSave} noValidate className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Full Name</label>
-              <input name="name" value={form.name} onChange={handleChange} className={`w-full px-3 py-2 text-sm rounded-lg ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`} />
+              <label htmlFor="profile-name" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Full Name</label>
+              <input
+                id="profile-name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`}
+              />
               {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Bio</label>
-              <textarea name="bio" value={form.bio} onChange={handleChange} rows={3} placeholder="Tell us about yourself…" className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
+              <label htmlFor="profile-bio" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Bio</label>
+              <textarea
+                id="profile-bio"
+                name="bio"
+                value={form.bio}
+                onChange={handleChange}
+                rows={3}
+                placeholder="Tell us about yourself…"
+                className="w-full px-3 py-2 text-sm rounded-lg resize-none"
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Avatar URL</label>
-              <input name="avatar" value={form.avatar} onChange={handleChange} placeholder="https://…" className="w-full px-3 py-2 text-sm rounded-lg" />
+              <label htmlFor="profile-avatar" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Avatar URL</label>
+              <input
+                id="profile-avatar"
+                name="avatar"
+                value={form.avatar}
+                onChange={handleChange}
+                placeholder="https://…"
+                className="w-full px-3 py-2 text-sm rounded-lg"
+              />
               <p className="text-xs text-slate-600 mt-1">Leave blank to use auto-generated avatar.</p>
             </div>
             <button type="submit" disabled={loading} className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
@@ -110,21 +131,42 @@ const Profile = () => {
           <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wide">Change Password</h2>
           <form onSubmit={handlePasswordSave} noValidate className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Current Password</label>
-              <input type="password" name="currentPassword" value={pwForm.currentPassword} onChange={handlePwChange} placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.currentPassword ? "border-red-500 ring-1 ring-red-500" : ""}`} />
+              <label htmlFor="profile-current-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Current Password</label>
+              <input
+                id="profile-current-password"
+                type="password"
+                name="currentPassword"
+                value={pwForm.currentPassword}
+                onChange={handlePwChange}
+                placeholder="••••••••"
+                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.currentPassword ? "border-red-500 ring-1 ring-red-500" : ""}`}
+              />
               {errors.currentPassword && <p className="text-red-400 text-xs mt-1">{errors.currentPassword}</p>}
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">New Password</label>
-              <input type="password" name="newPassword" value={pwForm.newPassword} onChange={handlePwChange} placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.newPassword ? "border-red-500 ring-1 ring-red-500" : ""}`} />
+              <label htmlFor="profile-new-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">New Password</label>
+              <input
+                id="profile-new-password"
+                type="password"
+                name="newPassword"
+                value={pwForm.newPassword}
+                onChange={handlePwChange}
+                placeholder="••••••••"
+                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.newPassword ? "border-red-500 ring-1 ring-red-500" : ""}`}
+              />
               {errors.newPassword && <p className="text-red-400 text-xs mt-1">{errors.newPassword}</p>}
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Confirm New Password</label>
-              <input type="password" name="confirmNew" value={pwForm.confirmNew} onChange={handlePwChange} placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.confirmNew ? "border-red-500 ring-1 ring-red-500" : ""}`} />
+              <label htmlFor="profile-confirm-new-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Confirm New Password</label>
+              <input
+                id="profile-confirm-new-password"
+                type="password"
+                name="confirmNew"
+                value={pwForm.confirmNew}
+                onChange={handlePwChange}
+                placeholder="••••••••"
+                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.confirmNew ? "border-red-500 ring-1 ring-red-500" : ""}`}
+              />
               {errors.confirmNew && <p className="text-red-400 text-xs mt-1">{errors.confirmNew}</p>}
             </div>
             <button type="submit" disabled={pwLoading} className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-semibold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
