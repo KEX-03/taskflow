@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateSignup, passwordRules } from "../utils/validation.js";
+import PasswordInput from "../components/Shared/PasswordInput.jsx";
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -92,11 +93,20 @@ const Signup = () => {
 
             {/* Password */}
             <div>
-              <label htmlFor="signup-password" className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-              <input
+              <label
+              htmlFor="signup-password"
+              className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+
+              <PasswordInput
                 id="signup-password"
-                 type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••"
-                className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.password ? "border-red-500 ring-1 ring-red-500" : ""}`} />
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                hasError={!!errors.password}
+              />
+
               {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>}
 
               {/* Strength bar */}
@@ -120,12 +130,18 @@ const Signup = () => {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="signup-confirmPassword" className="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
-              <input
-                id="signup-confirmPassword"
-                type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="••••••••"
-                className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.confirmPassword ? "border-red-500 ring-1 ring-red-500" : ""}`} />
-              {errors.confirmPassword && <p className="text-red-400 text-xs mt-1.5">{errors.confirmPassword}</p>}
+              <label
+              htmlFor="signup-confirm-password" className="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+              <PasswordInput
+              id="signup-confirm-password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              hasError={!!errors.confirmPassword}
+            />
+            {errors.confirmPassword && <p className="text-red-400 text-xs mt-1.5">{errors.confirmPassword}</p>}
             </div>
 
             {/* Submit */}

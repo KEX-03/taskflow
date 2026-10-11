@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateLogin } from "../utils/validation.js";
+import PasswordInput from "../components/Shared/PasswordInput.jsx";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -71,9 +72,9 @@ const Login = () => {
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Email */}
             <div>
-              <label 
-              htmlFor="login-email"
-              className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+              <label
+                htmlFor="login-email"
+                className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
               <input
                 id="login-email"
                 type="email"
@@ -88,19 +89,20 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label 
-                htmlFor="login-password"
-                className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-              <input
+              <label htmlFor="login-password" className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <PasswordInput
                 id="login-password"
-                type="password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.password ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                hasError={!!errors.password}
               />
-              {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-400 text-xs mt-1.5">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             {/* Submit */}
