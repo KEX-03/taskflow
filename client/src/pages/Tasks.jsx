@@ -190,10 +190,42 @@ const Tasks = () => {
       {loading ? (
         <div className="flex justify-center py-16"><Spinner size="md" /></div>
       ) : tasks.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-          <button onClick={() => { setSearch(""); setFilterPriority(""); setFilterStatus(""); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
-        </div>
+       <div className="text-center py-16">
+    {!search && !filterPriority && !filterStatus ? (
+      <>
+        <div className="text-5xl mb-4" aria-hidden="true">📝</div>
+        <h2 className="text-lg font-semibold text-white mb-2">
+          You don't have any tasks yet
+        </h2>
+        <p className="text-slate-500 text-sm mb-5">
+          Create your first task to get started.
+        </p>
+        <button
+          onClick={() => setModalOpen(true)}
+          className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+        >
+          <span className="text-lg leading-none">+</span>
+          Create your first task
+        </button>
+      </>
+    ) : (
+      <>
+        <p className="text-slate-500 text-sm">
+          No tasks match your filters.
+        </p>
+        <button
+          onClick={() => {
+            setSearch("");
+            setFilterPriority("");
+            setFilterStatus("");
+          }}
+          className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors"
+        >
+          Clear filters
+        </button>
+      </>
+    )}
+  </div>
       ) : (
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
