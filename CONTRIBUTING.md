@@ -145,7 +145,9 @@ git merge upstream/main
 
 ## 4. Test your change
 
-There's no automated test suite yet (adding one is a [great contribution](https://github.com/KEX-03/taskflow/issues)!), so please **test by hand** before opening a pull request:
+The backend has an automated test suite using Node.js's built-in test runner. From the repository root, run `npm test` to run the backend tests. You can also run `npm test` from the `server/` directory.
+
+Please also **test by hand** before opening a pull request:
 
 1. **It builds.** `npm run build` finishes with `✓ built in …`.
 2. **It starts cleanly.** `npm run dev` shows no errors in either the `[server]` or the `[client]` output.
