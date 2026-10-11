@@ -79,9 +79,9 @@ const getTask = async (req, res) => {
     return sendTaskNotFound(res);
   }
   
-  const task = await Task.findOne({ _id: req.params.id, owner: req.user._id });
+  const task = await Task.findOne({ _id: id, owner: req.user._id });
   if (!task) {
-    return res.status(404).json({ success: false, message: "Task not found." });
+    return sendTaskNotFound(res);
   }
   res.json({ success: true, task });
 };
@@ -94,9 +94,9 @@ const updateTask = async (req, res) => {
     return sendTaskNotFound(res);
   }
 
-  const task = await Task.findOne({ _id: req.params.id, owner: req.user._id });
+  const task = await Task.findOne({ _id: id, owner: req.user._id });
   if (!task) {
-    return res.status(404).json({ success: false, message: "Task not found." });
+    return sendTaskNotFound(res);
   }
 
   const { title, description, priority, status } = req.body;
@@ -131,9 +131,9 @@ const deleteTask = async (req, res) => {
     return sendTaskNotFound(res);
   }
 
-  const task = await Task.findOne({ _id: req.params.id, owner: req.user._id });
+  const task = await Task.findOne({ _id: id, owner: req.user._id });
   if (!task) {
-    return res.status(404).json({ success: false, message: "Task not found." });
+    return sendTaskNotFound(res);
   }
   await task.deleteOne();
   res.json({ success: true, message: "Task deleted." });
