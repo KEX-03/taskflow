@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -12,6 +11,7 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
+
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,31 +21,10 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedForm = { ...form, [name]: value };
 
-    setForm(updatedForm);
+    setForm((prev) => ({ ...prev, [name]: value }));
 
-    setErrors((prev) => {
-      const nextErrors = { ...prev, [name]: "" };
-
-      if (
-        name === "password" ||
-        name === "confirmPassword"
-      ) {
-        if (!updatedForm.confirmPassword) {
-          nextErrors.confirmPassword = "";
-        } else if (
-          updatedForm.password !== updatedForm.confirmPassword
-        ) {
-          nextErrors.confirmPassword = "Passwords do not match.";
-        } else {
-          nextErrors.confirmPassword = "";
-        }
-      }
-
-      return nextErrors;
-    });
-
+    setErrors((prev) => ({ ...prev, [name]: "" }));
     setServerError("");
   };
 
@@ -70,9 +49,9 @@ const Signup = () => {
 
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      const msg =
-        err.response?.data?.message || "Signup failed.";
-      setServerError(msg);
+        const msg =
+          err.response?.data?.message || "Signup failed.";
+          setServerError(msg);
     } finally {
       setLoading(false);
     }
@@ -141,15 +120,11 @@ const Signup = () => {
           >
             {/* Name */}
             <div>
-              <label
-                htmlFor="signup-name"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">
                 Full Name
               </label>
 
               <input
-                id="signup-name"
                 type="text"
                 name="name"
                 value={form.name}
@@ -160,12 +135,10 @@ const Signup = () => {
                     ? "border-red-500 ring-1 ring-red-500"
                     : ""
                 }`}
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? "signup-name-error" : undefined}
               />
 
               {errors.name && (
-                <p id="signup-name-error" className="text-red-400 text-xs mt-1.5">
+                <p className="text-red-400 text-xs mt-1.5">
                   {errors.name}
                 </p>
               )}
@@ -173,15 +146,11 @@ const Signup = () => {
 
             {/* Email */}
             <div>
-              <label
-                htmlFor="signup-email"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">
                 Email
               </label>
 
               <input
-                id="signup-email"
                 type="email"
                 name="email"
                 value={form.email}
@@ -192,12 +161,10 @@ const Signup = () => {
                     ? "border-red-500 ring-1 ring-red-500"
                     : ""
                 }`}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "signup-email-error" : undefined}
               />
 
               {errors.email && (
-                <p id="signup-email-error" className="text-red-400 text-xs mt-1.5">
+                <p className="text-red-400 text-xs mt-1.5">
                   {errors.email}
                 </p>
               )}
@@ -213,9 +180,12 @@ const Signup = () => {
               </label>
 
               <PasswordInput
+                id="signup-password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="new-password"
                 hasError={!!errors.password}
               />
 
@@ -276,9 +246,12 @@ const Signup = () => {
               </label>
 
               <PasswordInput
+                id="signup-confirm-password"
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="new-password"
                 hasError={!!errors.confirmPassword}
               />
 
@@ -286,10 +259,10 @@ const Signup = () => {
                 <p
                   className="text-red-400 text-xs mt-1.5"
                   role="alert"
-                >
-                  {errors.confirmPassword}
-                </p>
-              )}
+            >
+              {errors.confirmPassword}
+            </p>
+            )}
             </div>
 
             {/* Submit */}
