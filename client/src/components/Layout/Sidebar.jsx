@@ -157,7 +157,7 @@ const Sidebar = () => {
       {/* ── Collapse toggle ──────────────── */}
       <button
         type="button"
-        arial-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-500 transition-colors"
         style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
