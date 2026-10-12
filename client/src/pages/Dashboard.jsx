@@ -14,9 +14,21 @@ const StatCard = ({ title, value, icon, color, sub }) => (
     {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
   </div>
 );
+// Return a greeting based on the user's local hour.
+const getGreeting = (hour) => {
+  if (hour >= 5 && hour < 12) {
+    return "Good morning";
+  }
 
+  if (hour >= 12 && hour < 17) {
+    return "Good afternoon";
+  }
+
+  return "Good evening";
+};
 const Dashboard = () => {
   const { user } = useAuth();
+  const greeting = getGreeting(new Date().getHours());
   const [stats, setStats] = useState({ total: 0, todo: 0, inProgress: 0, done: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +64,7 @@ const Dashboard = () => {
       {/* ── Greeting ─────────────────────── */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">
-          Good morning, <span className="text-primary-400">{user?.name?.split(" ")[0]}</span> 👋
+          {greeting}, <span className="text-primary-400">{user?.name?.split(" ")[0]}</span>👋
         </h1>
         <p className="text-slate-500 text-sm mt-1">Here's what's going on with your tasks.</p>
       </div>
