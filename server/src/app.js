@@ -19,6 +19,12 @@ if (missingEnv.length) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Hosts like Render put a proxy in front of the server, so every request
+// would seem to come from the proxy's IP. Trusting the first proxy lets
+// Express read the visitor's real IP from the X-Forwarded-For header,
+// which the login/signup rate limit relies on.
+app.set("trust proxy", 1);
+
 // ── Logging ──────────────────────────────────
 app.use(morgan("dev"));
 
