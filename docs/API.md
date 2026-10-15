@@ -147,6 +147,13 @@ curl -X POST http://localhost:5000/api/v1/auth/signup \
     "message": "An account with this email already exists."
   }
   ```
+- **429 Too Many Requests** - More than 10 signup requests from the same IP address in 15 minutes:
+  ```json
+  {
+    "success": false,
+    "message": "Too many attempts. Please try again in 15 minutes."
+  }
+  ```
 
 ---
 
@@ -201,6 +208,13 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
   {
     "success": false,
     "message": "Invalid email or password."
+  }
+  ```
+- **429 Too Many Requests** - More than 10 failed login attempts (successful logins don't count) from the same IP address in 15 minutes:
+  ```json
+  {
+    "success": false,
+    "message": "Too many attempts. Please try again in 15 minutes."
   }
   ```
 
