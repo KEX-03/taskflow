@@ -9,7 +9,8 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "test": "npm test --prefix server"
+    "test": "npm test --prefix server",
+    "seed": "npm run seed --prefix server"
   },
   "engines": {
     "node": ">=22.12.0"

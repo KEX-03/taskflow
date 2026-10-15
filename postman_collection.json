@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "TaskFlow API",
-    "description": "Complete API collection for the TaskFlow Auth + Dashboard app.\n\n**Setup:** Set the `baseUrl` collection variable to your backend origin (default: `http://localhost:5000`). After a successful Login or Signup call, the `token` variable is set automatically via a test script — all protected routes use it.",
+    "description": "Complete API collection for TaskFlow.\n\n**Setup:** Set the `baseUrl` collection variable to your backend origin (default: `http://localhost:5000`). After a successful Login or Signup call, the `token` variable is set automatically via a test script — all protected routes use it.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

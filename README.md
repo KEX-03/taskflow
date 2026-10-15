@@ -107,6 +107,7 @@ This starts both parts together:
 | `npm run dev:client` | Start only the app |
 | `npm run build` | Build the app for production (into `client/dist/`) |
 | `npm test` | Run the backend's automated tests |
+| `npm run seed` | Populate the database with a demo user and sample tasks (use `npm run seed -- --allow-remote` for remote databases) |
 
 **Something not working?** The server prints a `❌` message explaining what's wrong, for example a missing setting or MongoDB not running.
 
@@ -142,7 +143,7 @@ taskflow/
 
 ## API overview
 
-All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in the header: `Authorization: Bearer <token>`. You get a token from signup or login.
+All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in the header: `Authorization: Bearer <token>`. You get a token from signup or login. For full request and response examples, query parameters, and error schemas, see the [API Reference](docs/API.md).
 
 | Method | Endpoint | | Description |
 |--------|----------|---|-------------|
