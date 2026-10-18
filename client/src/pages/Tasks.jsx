@@ -105,6 +105,13 @@ const Tasks = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState({
+    total: 0,
+    page: 1,
+    limit: 20,
+    pages: 0,
+  });
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -113,14 +120,16 @@ const Tasks = () => {
       if (search) params.set("search", search);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
+      params.set("page", page);
       const { data } = await api.get(`/tasks?${params}`);
       setTasks(data.tasks);
+      setMeta(data.meta);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [search, filterPriority, filterStatus]);
+  }, [search, filterPriority, filterStatus, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -143,7 +152,11 @@ const Tasks = () => {
     await api.delete(`/tasks/${deleteId}`);
     addToast("Task deleted.", "info");
     setDeleteId(null);
-    fetchTasks();
+    if(tasks.length === 1 && page>1) {
+      setPage(page-1);
+    } else {
+      fetchTasks();
+    }
   };
 
   // ── Badges ─────────────────────────────
@@ -156,7 +169,7 @@ const Tasks = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-white">Tasks</h1>
-          <p className="text-slate-500 text-sm">{tasks.length} task{tasks.length !== 1 ? "s" : ""} found</p>
+          <p className="text-slate-500 text-sm">{meta.total} task{meta.total !== 1 ? "s" : ""} found</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
           <span className="text-lg leading-none">+</span> New Task
@@ -169,16 +182,28 @@ const Tasks = () => {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tasks…"
+          <input type="text" value={search} onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search tasks…"
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg" />
         </div>
-        <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)} className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
+        <select value={filterPriority} onChange={(e) => {
+              setFilterPriority(e.target.value);
+              setPage(1);
+            }}
+          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
           <option value="">All Priorities</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
+        <select value={filterStatus} onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setPage(1);
+            }}
+          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
           <option value="">All Statuses</option>
           <option value="todo">To Do</option>
           <option value="in-progress">In Progress</option>
@@ -237,6 +262,29 @@ const Tasks = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Pagination Controls ─────────── */}
+      {meta.pages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+
+          <button
+          onClick={()=> setPage(page-1)}
+          disabled={page === 1}
+          className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700">
+            Previous
+          </button>
+
+          <span>Page {page} of {meta.pages}</span>
+
+          <button
+          onClick={()=> setPage(page+1)}
+          disabled={page >= meta.pages}
+          className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700">
+            Next
+          </button>
+
         </div>
       )}
 
