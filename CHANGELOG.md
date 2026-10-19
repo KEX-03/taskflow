@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading skeletons on the Tasks page: placeholder cards shaped like real tasks appear while tasks load, instead of a spinner ([#30](https://github.com/KEX-03/taskflow/pull/30)). Thanks to [@CreatorguyS](https://github.com/CreatorguyS)!
 - `npm run seed` creates a demo user (`demo@example.com`) with 8 sample tasks for local development. It refuses to run against a non-local database unless `--allow-remote` is given ([#31](https://github.com/KEX-03/taskflow/pull/31)). Thanks to [@CreatorguyS](https://github.com/CreatorguyS)!
 - An API reference ([`docs/API.md`](docs/API.md)) with example requests and real responses for every endpoint ([#32](https://github.com/KEX-03/taskflow/pull/32)). Thanks to [@CreatorguyS](https://github.com/CreatorguyS)!
+- Continuous integration: every pull request and every push to `main` runs the server tests and the client build with GitHub Actions, and the result shows on the pull request.
 
 ### Changed
 

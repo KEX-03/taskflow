@@ -129,6 +129,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org): `type(scope)
 | `refactor` | Restructuring code without changing behavior | `refactor(server): move auth validation into a helper` |
 | `test` | Adding or changing tests | `test(server): add tests for task controller` |
 | `build` | Dependencies, scripts, build setup | `build(client): upgrade vite` |
+| `ci` | GitHub Actions workflows | `ci: run tests on pull requests` |
 | `chore` | Other maintenance | `chore: update .gitignore` |
 
 Small, focused commits are easier to review than one giant commit.
@@ -158,6 +159,8 @@ The backend has an automated test suite using Node.js's built-in test runner. It
    - update your profile
 6. **The browser console is clean.** Open the developer tools (**F12**) and check the **Console** tab for red errors.
 7. **For API changes:** call the endpoint with [Postman](https://www.postman.com) (import [`postman_collection.json`](postman_collection.json)) or `curl`, including the error cases (missing fields, invalid values, no login token).
+
+When you open a pull request, GitHub Actions runs the tests and the build automatically, and shows the result at the bottom of the PR. If a check fails, click **Details** to see why, fix it, and push again: the checks re-run on every push. (On your first pull request, a maintainer may need to approve the checks before they run.)
 
 ---
 

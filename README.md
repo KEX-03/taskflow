@@ -2,6 +2,7 @@
 
 **A clean, beginner-friendly full-stack task manager built with MongoDB, Express, React and Node, made for learning and first open-source contributions.**
 
+[![CI](https://github.com/KEX-03/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/KEX-03/taskflow/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Good first issues](https://img.shields.io/github/issues/KEX-03/taskflow/good%20first%20issue?label=good%20first%20issues&color=7057ff)](https://github.com/KEX-03/taskflow/labels/good%20first%20issue)
