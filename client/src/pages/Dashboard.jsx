@@ -18,7 +18,7 @@ const StatCard = ({ title, value, icon, color, sub }) => (
 // Return a greeting based on the user's local hour.
 const getGreeting = (hour) => {
   if (hour >= 5 && hour < 12) {
-    return "Good morning";
+    return "Good morning"; {
   }
 
   if (hour >= 12 && hour < 17) {
