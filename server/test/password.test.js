@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const { validatePassword } = require("../src/utils/password");
 
 test("accepts a password that meets all six rules", () => {
-  assert.deepEqual(validatePassword("weak"), []);
+  assert.deepEqual(validatePassword("StrongPass123!"), []);
 });
 
 test("rejects passwords shorter than 12 characters", () => {
