@@ -21,8 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An API reference ([`docs/API.md`](docs/API.md)) with example requests and real responses for every endpoint ([#32](https://github.com/KEX-03/taskflow/pull/32)). Thanks to [@CreatorguyS](https://github.com/CreatorguyS)!
 - Continuous integration: every pull request and every push to `main` runs the server tests and the client build with GitHub Actions, and the result shows on the pull request ([#44](https://github.com/KEX-03/taskflow/pull/44)).
 - Pressing <kbd>Esc</kbd> closes the New Task, Edit Task and Delete Task dialogs, and screen readers now announce them as dialogs with their title ([#45](https://github.com/KEX-03/taskflow/pull/45)). Thanks to [@Mikcys](https://github.com/Mikcys)!
-- When a contributor's pull request is merged, a GitHub Actions workflow posts a thank-you comment, and points first-time contributors to more issues to work on.
-- Releases are automated with GitHub Actions: a "Prepare release" workflow opens a pull request that bumps the version and moves the Unreleased changelog entries into a new version, and merging it publishes the GitHub Release with those entries as the notes.
+- When a contributor's pull request is merged, a GitHub Actions workflow posts a thank-you comment, and points first-time contributors to more issues to work on ([#46](https://github.com/KEX-03/taskflow/pull/46)).
+- Releases are automated with GitHub Actions: a "Prepare release" workflow opens a pull request that bumps the version and moves the Unreleased changelog entries into a new version, and merging it publishes the GitHub Release with those entries as the notes ([#47](https://github.com/KEX-03/taskflow/pull/47)).
 
 ### Changed
 
@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Accessibility: every form label is now linked to its field (clicking a label focuses it, and screen readers announce it), and the icon-only buttons (Edit, Delete, dialog Close, sidebar Collapse/Expand) have descriptive names ([#23](https://github.com/KEX-03/taskflow/pull/23)). Thanks to [@manish-panwarr](https://github.com/manish-panwarr)!
 - Requesting, updating or deleting a task with an invalid id (like `/tasks/abc`) now returns 404 "Task not found." instead of a 500 error that exposed an internal database message ([#27](https://github.com/KEX-03/taskflow/pull/27)). Thanks to [@s-sivaselvan](https://github.com/s-sivaselvan)!
+- The Tasks page now shows every task instead of only the 20 newest: Previous/Next buttons and a "Page X of Y" label appear when there's more than one page, and the header shows the total number of matching tasks ([#36](https://github.com/KEX-03/taskflow/pull/36)). Thanks to [@varunverma1361-create](https://github.com/varunverma1361-create)!
 
 ### Security
 
