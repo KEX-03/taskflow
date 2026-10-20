@@ -7,9 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Approved pull requests are merged automatically: when the maintainer approves a PR, a GitHub Actions workflow squash-merges it as soon as the tests and the build pass, with a commit message built from the PR title, its description and the issues it closes.
+
+### Changed
+
+- The README, contributing guide and pull request template explain that approved pull requests are merged automatically, and that the pull request's title and "What does this PR do?" section become the commit on `main`.
+
 ### Fixed
 
 - Password fields in Microsoft Edge no longer show two eye icons: Edge's built-in reveal button is hidden, and the Profile page's password fields now have the same show/hide toggle as Login and Signup ([#50](https://github.com/KEX-03/taskflow/pull/50)).
+- The default avatar on the Profile page works for names with special characters: "Tom & Jerry" now shows "TJ" instead of "TO", and names with `#` keep their background colour ([#52](https://github.com/KEX-03/taskflow/pull/52)). Thanks to [@suryaprakashsingh1705-sys](https://github.com/suryaprakashsingh1705-sys)!
 
 ## [1.1.0] - 2026-10-20
 

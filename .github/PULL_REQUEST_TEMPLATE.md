@@ -1,6 +1,10 @@
+<!-- Title: use Conventional Commits, e.g. "fix(client): show every task on the Tasks page".
+     Approved PRs are squash-merged automatically: the title becomes the commit title,
+     and the "What does this PR do?" section below becomes the commit description. -->
+
 ## What does this PR do?
 
-<!-- A short description of the change and why it's needed. -->
+<!-- A short description of the change and why it's needed. This becomes the commit description on main. -->
 
 Closes #<!-- issue number, e.g. Closes #42 -->
 
@@ -19,4 +23,4 @@ Closes #<!-- issue number, e.g. Closes #42 -->
 - [ ] I tested my change locally (see [Test your change](https://github.com/KEX-03/taskflow/blob/main/CONTRIBUTING.md#4-test-your-change))
 - [ ] I added screenshots for UI changes
 - [ ] I updated the docs (README, `.env.example`, Postman collection) if needed
-- [ ] My commit messages follow [Conventional Commits](https://www.conventionalcommits.org) (e.g. `fix(client): ...`)
+- [ ] The PR title and my commit messages follow [Conventional Commits](https://www.conventionalcommits.org) (e.g. `fix(client): ...`)

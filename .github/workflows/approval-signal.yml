@@ -1,0 +1,26 @@
+name: Approval signal
+
+# Step 1 of merge-on-approval.yml. Reviews on PRs from forks only get a read-only token,
+# so this just records which PR was approved; merge-on-approval.yml checks the approval
+# and does the merge with the repo's own permissions.
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions: {}
+
+jobs:
+  signal:
+    name: Record approved PR
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save the PR number
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: echo "$PR_NUMBER" > pr-number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-number
+          path: pr-number.txt
+          retention-days: 1

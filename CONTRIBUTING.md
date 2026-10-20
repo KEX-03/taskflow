@@ -134,6 +134,8 @@ We use [Conventional Commits](https://www.conventionalcommits.org): `type(scope)
 
 Small, focused commits are easier to review than one giant commit.
 
+Pull requests are **squash-merged**: all your commits become one commit on `main`, and **your pull request's title becomes that commit's title**. So give the pull request a title in this same format too (see [Open a pull request](#5-open-a-pull-request)).
+
 ### Keep your branch up to date
 
 If `main` has changed since you started, bring your branch up to date:
@@ -171,9 +173,11 @@ When you open a pull request, GitHub Actions runs the tests and the build automa
    git push -u origin fix/42-dashboard-task-count
    ```
 2. GitHub will show a **Compare & pull request** button on your fork. Click it, and check that the base is `KEX-03/taskflow` → `main`.
-3. Fill in the pull request template:
+3. **Give it a title in the [Conventional Commits](#commit-messages) format**, for example `fix(client): show every task on the Tasks page`. It becomes the commit title on `main`.
+4. Fill in the pull request template:
    - **Link the issue** with `Closes #42`, so it closes automatically when merged.
-   - **Explain what you changed and why**, and **how you tested it**.
+   - **Explain what you changed and why** under "What does this PR do?". Write it for someone reading the project history later: this section becomes the commit's description on `main`.
+   - **Explain how you tested it**.
    - **Add screenshots** (before and after) for anything visible in the UI.
    - **Update the docs** if you changed setup steps, environment variables or API endpoints.
 
@@ -182,7 +186,7 @@ What to expect:
 - **Keep pull requests small**: one issue per pull request.
 - A maintainer will review it and may ask for changes. That's normal and part of learning! Push new commits to the same branch and the pull request updates automatically.
 - Please be patient: maintainers review in their free time.
-- Once it's approved, a maintainer merges it. 🎉
+- Once it's approved, it's **merged automatically** as soon as the tests and the build pass. 🎉 The commit on `main` is made from your pull request: the title, the "What does this PR do?" section and a `Closes #...` line for the linked issue. A maintainer may tidy the title or description before approving.
 
 ---
 
