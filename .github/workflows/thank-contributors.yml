@@ -1,0 +1,78 @@
+name: Thank contributors
+
+on:
+  # pull_request_target (not pull_request) so the token can comment on PRs from forks.
+  # Safe here: this workflow never checks out or runs the PR's code.
+  pull_request_target:
+    types: [closed]
+  # Manual run for testing on an already-merged PR
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Number of a merged pull request
+        required: true
+        type: number
+      dry_run:
+        description: Only log the comment, don't post it
+        type: boolean
+        default: true
+
+# Only needs to comment on pull requests
+permissions:
+  pull-requests: write
+
+jobs:
+  thank:
+    name: Post thank-you comment
+    # Merged PRs from contributors only: not the repo owner, not bots
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       github.event.pull_request.user.login != github.repository_owner &&
+       github.event.pull_request.user.type != 'Bot')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const manual = context.eventName === "workflow_dispatch";
+            const dryRun = manual && process.env.DRY_RUN !== "false";
+
+            const pr = manual
+              ? (await github.rest.pulls.get({ owner, repo, pull_number: Number(process.env.PR_NUMBER) })).data
+              : context.payload.pull_request;
+            const author = pr.user.login;
+
+            // Same checks as the job's `if`, for manual runs
+            if (!pr.merged_at || author === owner || pr.user.type === "Bot") {
+              core.info(`Skipped #${pr.number}: not merged, or opened by the owner or a bot.`);
+              return;
+            }
+
+            // First merged PR? Look for an earlier merged PR by the same author.
+            // (Listing PRs instead of searching, since search can lag behind a merge.)
+            const closed = await github.paginate(github.rest.pulls.list, { owner, repo, state: "closed", per_page: 100 });
+            const firstMerge = !closed.some((p) =>
+              p.user?.login === author && p.merged_at && p.number !== pr.number && p.merged_at < pr.merged_at
+            );
+
+            const labels = `https://github.com/${owner}/${repo}/labels`;
+            let body = `Merged, thanks @${author}! 🎉 Your change will be in the changelog for the next release.`;
+            // Only first-time contributors get pointed to more issues
+            if (firstMerge) {
+              body +=
+                `\n\nWant to keep going? Have a look at the [good first issues](${labels}/good%20first%20issue) or ` +
+                `[help wanted](${labels}/help%20wanted) issues and comment on one to get assigned.`;
+            }
+            body += `\n\nP.S. If you haven't already, a ⭐ on the repo helps other first-timers find TaskFlow.`;
+
+            if (dryRun) {
+              core.info(`Dry run for #${pr.number} (first merged PR: ${firstMerge}). Comment would be:\n\n${body}`);
+              return;
+            }
+            await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            core.info(`Posted thank-you comment on #${pr.number}.`);
