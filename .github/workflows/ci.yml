@@ -5,6 +5,8 @@ on:
     branches: [main]
   push:
     branches: [main]
+  # Lets prepare-release.yml start CI on release PRs (PRs opened by a workflow don't trigger it)
+  workflow_dispatch:
 
 # The workflow only needs to read the code
 permissions:

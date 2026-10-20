@@ -1,0 +1,39 @@
+name: Publish release
+
+# When a release PR from prepare-release.yml is merged, tag the merge commit
+# and publish a GitHub Release with that version's changelog section as the notes.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write # create the tag and the release
+
+jobs:
+  publish:
+    name: Tag and publish
+    # Merged release/v* PRs from this repo only; a fork's branch with the same name does nothing
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'release/v')
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{ github.event.pull_request.head.ref }}
+      SHA: ${{ github.event.pull_request.merge_commit_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Create the tag and the GitHub Release
+        run: |
+          version="${BRANCH#release/v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Can't read a version from the branch name: $BRANCH"
+            exit 1
+          fi
+          node .github/scripts/changelog.js notes "$version" > notes.md
+          gh release create "v$version" --target "$SHA" --title "v$version" --notes-file notes.md

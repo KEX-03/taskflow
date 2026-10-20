@@ -1,0 +1,71 @@
+name: Prepare release
+
+# Run by hand from the Actions tab. Opens a PR that bumps the version and moves the
+# Unreleased changelog entries into a new version section. Merging that PR publishes
+# the release (see publish-release.yml).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: New version, for example 1.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: write # push the release branch
+  pull-requests: write # open the release PR
+  actions: write # start CI on the release branch
+
+jobs:
+  prepare:
+    name: Open release PR
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check the version
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Version must look like 1.2.3, got: $VERSION"
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "❌ Tag v$VERSION already exists"
+            exit 1
+          fi
+
+      - name: Bump the version in package.json and package-lock.json
+        run: |
+          for dir in . server client; do
+            (cd "$dir" && npm version "$VERSION" --no-git-tag-version)
+          done
+
+      - name: Move the Unreleased changelog entries into the new version
+        run: node .github/scripts/changelog.js release "$VERSION" "$(date -u +%F)"
+
+      - name: Push the release branch and open the PR
+        run: |
+          branch="release/v$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "chore: release v$VERSION"
+          git push origin "$branch"
+
+          {
+            echo "Merging this PR publishes the **v$VERSION** release, with these notes:"
+            echo
+            echo "---"
+            echo
+            node .github/scripts/changelog.js notes "$VERSION"
+          } > pr-body.md
+          gh pr create --base main --head "$branch" --title "chore: release v$VERSION" --body-file pr-body.md
+
+          # PRs opened by this workflow don't trigger CI by themselves, so start it here
+          gh workflow run ci.yml --ref "$branch"

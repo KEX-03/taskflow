@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Continuous integration: every pull request and every push to `main` runs the server tests and the client build with GitHub Actions, and the result shows on the pull request ([#44](https://github.com/KEX-03/taskflow/pull/44)).
 - Pressing <kbd>Esc</kbd> closes the New Task, Edit Task and Delete Task dialogs, and screen readers now announce them as dialogs with their title ([#45](https://github.com/KEX-03/taskflow/pull/45)). Thanks to [@Mikcys](https://github.com/Mikcys)!
 - When a contributor's pull request is merged, a GitHub Actions workflow posts a thank-you comment, and points first-time contributors to more issues to work on.
+- Releases are automated with GitHub Actions: a "Prepare release" workflow opens a pull request that bumps the version and moves the Unreleased changelog entries into a new version, and merging it publishes the GitHub Release with those entries as the notes.
 
 ### Changed
 
