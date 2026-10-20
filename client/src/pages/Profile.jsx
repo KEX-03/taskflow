@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../components/Shared/Toast.jsx";
 import api from "../utils/api.js";
 import { validatePassword } from "../utils/validation.js";
+import PasswordInput from "../components/Shared/PasswordInput.jsx";
 
 const Profile = () => {
   const { user, updateLocalUser } = useAuth();
@@ -143,40 +144,40 @@ const Profile = () => {
           <form onSubmit={handlePasswordSave} noValidate className="space-y-4">
             <div>
               <label htmlFor="profile-current-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Current Password</label>
-              <input
+              <PasswordInput
                 id="profile-current-password"
-                type="password"
                 name="currentPassword"
                 value={pwForm.currentPassword}
                 onChange={handlePwChange}
                 placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.currentPassword ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                hasError={!!errors.currentPassword}
+                className="px-3 py-2"
               />
               {errors.currentPassword && <p className="text-red-400 text-xs mt-1">{errors.currentPassword}</p>}
             </div>
             <div>
               <label htmlFor="profile-new-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">New Password</label>
-              <input
+              <PasswordInput
                 id="profile-new-password"
-                type="password"
                 name="newPassword"
                 value={pwForm.newPassword}
                 onChange={handlePwChange}
                 placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.newPassword ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                hasError={!!errors.newPassword}
+                className="px-3 py-2"
               />
               {errors.newPassword && <p className="text-red-400 text-xs mt-1">{errors.newPassword}</p>}
             </div>
             <div>
               <label htmlFor="profile-confirm-new-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Confirm New Password</label>
-              <input
+              <PasswordInput
                 id="profile-confirm-new-password"
-                type="password"
                 name="confirmNew"
                 value={pwForm.confirmNew}
                 onChange={handlePwChange}
                 placeholder="••••••••"
-                className={`w-full px-3 py-2 text-sm rounded-lg ${errors.confirmNew ? "border-red-500 ring-1 ring-red-500" : ""}`}
+                hasError={!!errors.confirmNew}
+                className="px-3 py-2"
               />
               {errors.confirmNew && <p className="text-red-400 text-xs mt-1">{errors.confirmNew}</p>}
             </div>

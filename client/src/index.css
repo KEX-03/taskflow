@@ -68,6 +68,10 @@
   input:focus, textarea:focus, select:focus {
     @apply outline-hidden border-primary-500 ring-1 ring-primary-500;
   }
+  /* Hide Edge's built-in password reveal button; PasswordInput has its own show/hide toggle */
+  input::-ms-reveal {
+    display: none;
+  }
   /* Tailwind 4 no longer gives buttons a pointer cursor; keep the v3 behavior */
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
