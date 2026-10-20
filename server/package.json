@@ -1,6 +1,6 @@
 {
   "name": "taskflow-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TaskFlow REST API (Express + MongoDB)",
   "main": "src/app.js",
   "scripts": {

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-20
+
 ### Added
 
 - Show/hide password toggle on the Login and Signup pages, with labels linked to the password fields ([#22](https://github.com/KEX-03/taskflow/pull/22)). Thanks to [@Mathi23ok](https://github.com/Mathi23ok)!
@@ -80,5 +82,6 @@ First public release. 🎉
 
 - Unused `uuid` dependency from the server.
 
-[Unreleased]: https://github.com/KEX-03/taskflow/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/KEX-03/taskflow/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/KEX-03/taskflow/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/KEX-03/taskflow/releases/tag/v1.0.0
