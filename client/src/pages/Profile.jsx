@@ -114,11 +114,17 @@ const Profile = () => {
                 id="profile-bio"
                 name="bio"
                 value={form.bio}
+                maxLength={300}
                 onChange={handleChange}
                 rows={3}
                 placeholder="Tell us about yourself…"
                 className="w-full px-3 py-2 text-sm rounded-lg resize-none"
               />
+              <p className={`text-xs mt-1 ${
+                form.bio.length >= 280 ? "text-amber-400" : "text-slate-600"
+              }`}>
+                {form.bio.length} / 300
+              </p>
             </div>
             <div>
               <label htmlFor="profile-avatar" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Avatar URL</label>
