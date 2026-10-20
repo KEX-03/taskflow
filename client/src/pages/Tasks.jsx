@@ -124,6 +124,9 @@ const Tasks = () => {
       const { data } = await api.get(`/tasks?${params}`);
       setTasks(data.tasks);
       setMeta(data.meta);
+      if (data.meta.pages > 0 && page > data.meta.pages) {
+        setPage(data.meta.pages);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -152,11 +155,7 @@ const Tasks = () => {
     await api.delete(`/tasks/${deleteId}`);
     addToast("Task deleted.", "info");
     setDeleteId(null);
-    if(tasks.length === 1 && page>1) {
-      setPage(page-1);
-    } else {
-      fetchTasks();
-    }
+    fetchTasks();
   };
 
   // ── Badges ─────────────────────────────
@@ -270,18 +269,20 @@ const Tasks = () => {
         <div className="flex items-center justify-between mt-6">
 
           <button
-          onClick={()=> setPage(page-1)}
-          disabled={page === 1}
-          className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700">
+            onClick={()=> setPage(page-1)}
+            disabled={page === 1}
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Previous
           </button>
 
-          <span>Page {page} of {meta.pages}</span>
+          <span className="text-slate-500 text-sm">Page {page} of {meta.pages}</span>
 
           <button
-          onClick={()=> setPage(page+1)}
-          disabled={page >= meta.pages}
-          className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700">
+            onClick={()=> setPage(page+1)}
+            disabled={page >= meta.pages}
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
             Next
           </button>
 
