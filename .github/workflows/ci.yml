@@ -30,6 +30,8 @@ jobs:
           cache-dependency-path: server/package-lock.json
       - run: npm ci --prefix server
       - run: npm run lint --prefix server
+      # The release and merge scripts in .github/scripts are linted with the server's config
+      - run: npm run lint:scripts
       - run: npm test
       # When the API tests (#28) need MongoDB, add a `services: mongo` block to this job
 
