@@ -29,6 +29,7 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
       - run: npm ci --prefix server
+      - run: npm run lint --prefix server
       - run: npm test
       # When the API tests (#28) need MongoDB, add a `services: mongo` block to this job
 
@@ -43,6 +44,7 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
       - run: npm ci --prefix client
+      - run: npm run lint --prefix client
       - run: npm run build
         env:
           # Placeholder; the build only needs the variable to be set

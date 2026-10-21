@@ -87,6 +87,7 @@ Other commands you can run from the root:
 | `npm run dev:client` | Start only the frontend (http://localhost:3000) |
 | `npm run build` | Build the frontend for production |
 | `npm test` | Run the backend's automated tests |
+| `npm run lint` | Check the client and server code for likely bugs with ESLint |
 
 **Something went wrong?** The server prints a `❌` line explaining what's missing, for example an environment variable or a MongoDB connection. Port already in use? Stop the other program, or the other `npm run dev`, first.
 
@@ -151,7 +152,7 @@ git merge upstream/main
 
 The backend has an automated test suite using Node.js's built-in test runner. It only covers part of the code so far, so please run the tests **and** check your change by hand before opening a pull request:
 
-1. **The tests pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`. If you changed a helper in `server/src/utils/`, add or update its tests in `server/test/`.
+1. **The tests and the linter pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`, and `npm run lint` reports no problems. If you changed a helper in `server/src/utils/`, add or update its tests in `server/test/`.
 2. **It builds.** `npm run build` finishes with `✓ built in …`.
 3. **It starts cleanly.** `npm run dev` shows no errors in either the `[server]` or the `[client]` output.
 4. **Your change works.** Try the exact thing your issue describes, including edge cases (empty input, very long text, and so on).
