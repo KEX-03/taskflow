@@ -69,3 +69,15 @@ test("updateTask replaces tags and rejects invalid ones", async (t) => {
   assert.equal(bad.statusCode, 400);
   assert.deepEqual(task.tags, ["review"]);
 });
+
+test("updateTask without tags keeps the existing tags", async (t) => {
+  const task = { tags: ["work", "urgent"], save: async () => {} };
+  t.mock.method(Task, "findOne", async () => task);
+
+  const res = response();
+  await updateTask({ user, params: { id: "670c5c189a421ef8841a0105" }, body: { status: "done" } }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(task.status, "done");
+  assert.deepEqual(task.tags, ["work", "urgent"]);
+});

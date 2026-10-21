@@ -62,6 +62,18 @@ Validation errors also include an `errors` array with each failing rule (for exa
 
 ---
 
+### Tags
+
+A task has a `tags` list, which is `[]` unless tags were given.
+
+- **Rules:** up to 5 tags, each 1–20 characters. Every tag is trimmed and stored in lowercase, and duplicates are dropped, keeping the first: `["Work", "urgent", "work "]` is saved as `["work", "urgent"]`.
+- **Create** (`POST /tasks`): `tags` is optional and defaults to `[]`.
+- **Update** (`PUT /tasks/:id`): `tags` replaces the whole list and `[]` clears it. If the request leaves `tags` out, the task keeps its tags.
+- **Errors:** a `tags` value that isn't an array of strings, a tag that is empty or longer than 20 characters after trimming, or more than 5 distinct tags returns `400` with a message saying which rule failed. Nothing is saved.
+- **Filter** (`GET /tasks?tag=`): returns only tasks that have that tag. The value is trimmed and lowercased the same way, so `tag=Work` finds `work`. It combines with `search`, `status`, `priority` and pagination.
+
+---
+
 ## Endpoints
 
 ### 1. Health Check
@@ -539,7 +551,7 @@ Updates one or more fields of an existing task.
   - `description` (string): Up to 1000 characters.
   - `priority` (string): `"low"`, `"medium"`, or `"high"`.
   - `status` (string): `"todo"`, `"in-progress"`, or `"done"`.
-  - `tags` (array of strings): Replaces the task's tags, with the same rules as on create. `[]` removes them all.
+  - `tags` (array of strings): Replaces the task's tags, with the same rules as on create. `[]` removes them all. Leave it out to keep the current tags. See [Tags](#tags).
 
 #### Example Request
 ```bash
