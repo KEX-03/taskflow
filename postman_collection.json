@@ -106,7 +106,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Build landing page\",\n  \"description\": \"Design and implement the marketing landing page.\",\n  \"priority\": \"high\",\n  \"status\": \"todo\"\n}"
+              "raw": "{\n  \"title\": \"Build landing page\",\n  \"description\": \"Design and implement the marketing landing page.\",\n  \"priority\": \"high\",\n  \"status\": \"todo\",\n  \"tags\": [\"work\", \"urgent\"]\n}"
             }
           },
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('taskId', pm.response.json().task._id); }"] } }]
@@ -116,13 +116,14 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/tasks?search=&priority=&status=&page=1&limit=20",
+              "raw": "{{baseUrl}}/api/v1/tasks?search=&priority=&status=&tag=&page=1&limit=20",
               "host": ["{{baseUrl}}"],
               "path": ["api","v1","tasks"],
               "query": [
                 { "key": "search", "value": "" },
                 { "key": "priority", "value": "" },
                 { "key": "status", "value": "" },
+                { "key": "tag", "value": "" },
                 { "key": "page", "value": "1" },
                 { "key": "limit", "value": "20" }
               ]

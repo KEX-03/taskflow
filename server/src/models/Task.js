@@ -26,6 +26,11 @@ const taskSchema = new mongoose.Schema(
       enum: { values: STATUSES, message: "Invalid status" },
       default: "todo",
     },
+    // Lowercase, unique, at most 5 of 1-20 characters (checked by utils/tags.js)
+    tags: {
+      type: [String],
+      default: [],
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

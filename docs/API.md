@@ -382,12 +382,13 @@ Lists tasks belonging to the authenticated user with optional search, filters, a
   - `search` (string): Filters tasks whose title contains this term (case-insensitive, max 100 characters).
   - `status` (string): Filters by status: `"todo"`, `"in-progress"`, or `"done"`.
   - `priority` (string): Filters by priority: `"low"`, `"medium"`, or `"high"`.
+  - `tag` (string): Only tasks with this tag (case-insensitive, e.g. `tag=work`). Combines with the other filters.
   - `page` (number): Page number (defaults to `1`).
   - `limit` (number): Number of tasks per page (defaults to `20`, maximum `50`).
 
 #### Example Request
 ```bash
-curl -X GET "http://localhost:5000/api/v1/tasks?status=in-progress&priority=high&page=1&limit=10" \
+curl -X GET "http://localhost:5000/api/v1/tasks?status=in-progress&priority=high&tag=review&page=1&limit=10" \
   -H "Authorization: Bearer <your_jwt_token>"
 ```
 
@@ -402,6 +403,7 @@ curl -X GET "http://localhost:5000/api/v1/tasks?status=in-progress&priority=high
       "description": "Review and test open community PRs locally.",
       "priority": "high",
       "status": "in-progress",
+      "tags": ["review"],
       "owner": "670c5b369a421ef8841a0101",
       "createdAt": "2026-10-14T10:15:00.000Z",
       "updatedAt": "2026-10-14T10:15:00.000Z",
@@ -430,6 +432,7 @@ Creates a new task associated with the authenticated user.
   - `description` (string, optional): Up to 1000 characters. Defaults to `""`.
   - `priority` (string, optional): `"low"`, `"medium"`, or `"high"`. Defaults to `"medium"`.
   - `status` (string, optional): `"todo"`, `"in-progress"`, or `"done"`. Defaults to `"todo"`.
+  - `tags` (array of strings, optional): Up to 5 tags of 1–20 characters each. Tags are trimmed, stored in lowercase, and duplicates are removed (`["Work", "work "]` is saved as `["work"]`). Defaults to `[]`.
 
 #### Example Request
 ```bash
@@ -440,7 +443,8 @@ curl -X POST http://localhost:5000/api/v1/tasks \
     "title": "Write comprehensive unit tests",
     "description": "Add tests covering all controller edge cases.",
     "priority": "high",
-    "status": "todo"
+    "status": "todo",
+    "tags": ["Testing", "backend"]
   }'
 ```
 
@@ -454,6 +458,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
     "description": "Add tests covering all controller edge cases.",
     "priority": "high",
     "status": "todo",
+    "tags": ["testing", "backend"],
     "owner": "670c5b369a421ef8841a0101",
     "createdAt": "2026-10-14T10:15:00.000Z",
     "updatedAt": "2026-10-14T10:15:00.000Z",
@@ -462,12 +467,19 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 }
 ```
 
-#### Error Response
+#### Error Responses
 - **400 Bad Request** - Missing title:
   ```json
   {
     "success": false,
     "message": "Title is required."
+  }
+  ```
+- **400 Bad Request** - Invalid tags (not an array of strings, more than 5 tags, or a tag outside 1–20 characters):
+  ```json
+  {
+    "success": false,
+    "message": "A task can have at most 5 tags."
   }
   ```
 
@@ -496,6 +508,7 @@ curl -X GET http://localhost:5000/api/v1/tasks/670c5c189a421ef8841a0105 \
     "description": "Add tests covering all controller edge cases.",
     "priority": "high",
     "status": "todo",
+    "tags": ["testing", "backend"],
     "owner": "670c5b369a421ef8841a0101",
     "createdAt": "2026-10-14T10:15:00.000Z",
     "updatedAt": "2026-10-14T10:15:00.000Z",
@@ -526,6 +539,7 @@ Updates one or more fields of an existing task.
   - `description` (string): Up to 1000 characters.
   - `priority` (string): `"low"`, `"medium"`, or `"high"`.
   - `status` (string): `"todo"`, `"in-progress"`, or `"done"`.
+  - `tags` (array of strings): Replaces the task's tags, with the same rules as on create. `[]` removes them all.
 
 #### Example Request
 ```bash
@@ -547,6 +561,7 @@ curl -X PUT http://localhost:5000/api/v1/tasks/670c5c189a421ef8841a0105 \
     "description": "Add tests covering all controller edge cases.",
     "priority": "high",
     "status": "done",
+    "tags": ["testing", "backend"],
     "owner": "670c5b369a421ef8841a0101",
     "createdAt": "2026-10-14T10:15:00.000Z",
     "updatedAt": "2026-10-14T10:20:00.000Z",

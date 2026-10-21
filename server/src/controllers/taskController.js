@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Task = require("../models/Task");
 const { PRIORITIES, STATUSES } = Task;
 const { getQueryString, escapeRegex, parsePositiveInt } = require("../utils/query");
+const { normalizeTags } = require("../utils/tags");
 
 const MAX_SEARCH_LENGTH = 100;
 
@@ -17,10 +18,14 @@ const sendTaskNotFound = (res) =>
 
 // ── POST /api/v1/tasks ───────────────────────
 const createTask = async (req, res) => {
-  const { title, description, priority, status } = req.body;
+  const { title, description, priority, status, tags } = req.body;
 
   if (!title || !title.trim()) {
     return res.status(400).json({ success: false, message: "Title is required." });
+  }
+  const tagResult = tags === undefined ? { tags: [] } : normalizeTags(tags);
+  if (tagResult.error) {
+    return res.status(400).json({ success: false, message: tagResult.error });
   }
 
   const task = await Task.create({
@@ -28,6 +33,7 @@ const createTask = async (req, res) => {
     description: description?.trim() || "",
     priority: priority || "medium",
     status: status || "todo",
+    tags: tagResult.tags,
     owner: req.user._id,
   });
 
@@ -35,11 +41,12 @@ const createTask = async (req, res) => {
 };
 
 // ── GET /api/v1/tasks ────────────────────────
-// Supports: ?search=, ?priority=, ?status=, ?page=, ?limit=
+// Supports: ?search=, ?priority=, ?status=, ?tag=, ?page=, ?limit=
 const getTasks = async (req, res) => {
   const search = getQueryString(req.query.search);
   const priority = getQueryString(req.query.priority);
   const status = getQueryString(req.query.status);
+  const tag = getQueryString(req.query.tag);
 
   const filter = { owner: req.user._id };
 
@@ -53,6 +60,10 @@ const getTasks = async (req, res) => {
   }
   if (status && STATUSES.includes(status)) {
     filter.status = status;
+  }
+  if (tag) {
+    // Tags are stored lowercase, so ?tag=Work finds "work"
+    filter.tags = tag.toLowerCase();
   }
 
   const p = parsePositiveInt(req.query.page, { fallback: 1 });
@@ -99,7 +110,7 @@ const updateTask = async (req, res) => {
     return sendTaskNotFound(res);
   }
 
-  const { title, description, priority, status } = req.body;
+  const { title, description, priority, status, tags } = req.body;
 
   if (title !== undefined) {
     if (!title.trim()) {
@@ -117,6 +128,11 @@ const updateTask = async (req, res) => {
     if (!STATUSES.includes(status))
       return res.status(400).json({ success: false, message: "Invalid status." });
     task.status = status;
+  }
+  if (tags !== undefined) {
+    const tagResult = normalizeTags(tags);
+    if (tagResult.error) return res.status(400).json({ success: false, message: tagResult.error });
+    task.tags = tagResult.tags;
   }
 
   await task.save();
