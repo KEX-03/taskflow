@@ -3,6 +3,9 @@ const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
 // ── Global error handler middleware ──────────
+// Express only treats a middleware as an error handler when it takes all four arguments,
+// so `next` has to stay even though it isn't used
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   console.error("[Error]", err.stack || err.message);
 

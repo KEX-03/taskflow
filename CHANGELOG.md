@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ESLint checks the client and server code for likely bugs (unused variables, mistakes with React hooks). Run it with `npm run lint`, and CI runs it on every pull request ([#81](https://github.com/KEX-03/taskflow/pull/81)).
+- Automated tests for the scripts behind the release and merge automation, which `npm test` now runs alongside the backend tests ([#79](https://github.com/KEX-03/taskflow/issues/79)).
 - A character counter under the Bio field on the Profile page ("120 / 300"), which turns amber from 280 characters. The field now stops at the 300-character limit instead of the save failing ([#54](https://github.com/KEX-03/taskflow/pull/54)). Thanks to [@SwatiManjari](https://github.com/SwatiManjari)!
 - Approved pull requests are merged automatically: when the maintainer approves a PR, a GitHub Actions workflow squash-merges it as soon as the tests and the build pass, with a commit message built from the PR title, its description and the issues it closes ([#53](https://github.com/KEX-03/taskflow/pull/53), [#55](https://github.com/KEX-03/taskflow/pull/55)).
 
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The README's demo GIF shows the current app.
 - The automatic thank-you comment on merged pull requests now invites every contributor to suggest their own ideas through the feature request form.
 - The README, contributing guide and pull request template explain that approved pull requests are merged automatically, and that the pull request's title and "What does this PR do?" section become the commit on `main`.
+- Good first issues are now reserved for people making their first few open-source contributions, and the contributing guide says that pull requests for issues that aren't assigned to the author are closed.
 
 ### Fixed
 
