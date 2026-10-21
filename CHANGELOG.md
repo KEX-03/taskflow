@@ -10,19 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - ESLint checks the client and server code for likely bugs (unused variables, mistakes with React hooks). Run it with `npm run lint`, and CI runs it on every pull request ([#81](https://github.com/KEX-03/taskflow/pull/81)).
-- Automated tests for the scripts behind the release and merge automation, which `npm test` now runs alongside the backend tests ([#79](https://github.com/KEX-03/taskflow/issues/79)).
+- Automated tests for the scripts behind the release and merge automation, which `npm test` now runs alongside the backend tests ([#83](https://github.com/KEX-03/taskflow/pull/83)).
 - A character counter under the Bio field on the Profile page ("120 / 300"), which turns amber from 280 characters. The field now stops at the 300-character limit instead of the save failing ([#54](https://github.com/KEX-03/taskflow/pull/54)). Thanks to [@SwatiManjari](https://github.com/SwatiManjari)!
 - Approved pull requests are merged automatically: when the maintainer approves a PR, a GitHub Actions workflow squash-merges it as soon as the tests and the build pass, with a commit message built from the PR title, its description and the issues it closes ([#53](https://github.com/KEX-03/taskflow/pull/53), [#55](https://github.com/KEX-03/taskflow/pull/55)).
 
 ### Changed
 
+- In production, the API's request logs use a compact format and leave out the hosting platform's health checks. Development logs are unchanged ([#80](https://github.com/KEX-03/taskflow/pull/80)). Thanks to [@ShivamKumarKeshari-123](https://github.com/ShivamKumarKeshari-123)!
 - The README's demo GIF shows the current app.
-- The automatic thank-you comment on merged pull requests now invites every contributor to suggest their own ideas through the feature request form.
+- The automatic thank-you comment on merged pull requests now invites every contributor to suggest their own ideas through the feature request form ([#58](https://github.com/KEX-03/taskflow/pull/58)).
 - The README, contributing guide and pull request template explain that approved pull requests are merged automatically, and that the pull request's title and "What does this PR do?" section become the commit on `main`.
 - Good first issues are now reserved for people making their first few open-source contributions, and the contributing guide says that pull requests for issues that aren't assigned to the author are closed.
 
 ### Fixed
 
+- The task search waits until you stop typing before asking the server, instead of sending a request on every keystroke, and a slow response for an older search can no longer replace the results for the current one ([#56](https://github.com/KEX-03/taskflow/pull/56)). Thanks to [@Saurabh-Singh33](https://github.com/Saurabh-Singh33)!
+- The auto-merge commit message now also picks up a "What does this PR do?" section written with a `###` heading, and keeps sub-headings inside that section. Before, a `###` heading left only the "Closes #N" line in the commit.
 - Password fields in Microsoft Edge no longer show two eye icons: Edge's built-in reveal button is hidden, and the Profile page's password fields now have the same show/hide toggle as Login and Signup ([#50](https://github.com/KEX-03/taskflow/pull/50)).
 - The default avatar on the Profile page works for names with special characters: "Tom & Jerry" now shows "TJ" instead of "TO", and names with `#` keep their background colour ([#52](https://github.com/KEX-03/taskflow/pull/52)). Thanks to [@suryaprakashsingh1705-sys](https://github.com/suryaprakashsingh1705-sys)!
 

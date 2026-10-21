@@ -57,6 +57,18 @@ test("a description without the template section gives only the Closes lines", (
   assert.equal(body, "Closes #3");
 });
 
+test("also reads a '### What does this PR do?' heading", () => {
+  const description = "### What does this PR do?\n\n- Keeps dev logs.\n\n### Testing\n- Checked it.\n\nCloses #65";
+  const { body } = buildMergeMessage({ number: 80, title: "feat: x", body: description, closingIssues: [65] });
+  assert.equal(body, "- Keeps dev logs.\n\nCloses #65");
+});
+
+test("keeps sub-headings that are inside the section", () => {
+  const description = "## What does this PR do?\n\nSummary.\n\n### Changes\n- One.\n\n## How did you test it?\nx";
+  const { body } = buildMergeMessage({ number: 1, title: "feat: x", body: description });
+  assert.equal(body, "Summary.\n\n### Changes\n- One.");
+});
+
 test("lists several linked issues once each, in order", () => {
   const { body } = buildMergeMessage({ number: 1, title: "fix: x", body: "", closingIssues: [12, 3, 12] });
   assert.equal(body, "Closes #3\nCloses #12");
