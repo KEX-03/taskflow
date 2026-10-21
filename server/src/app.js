@@ -25,8 +25,17 @@ const PORT = process.env.PORT || 5000;
 // which the login/signup rate limit relies on.
 app.set("trust proxy", 1);
 
-// ── Logging ──────────────────────────────────
-app.use(morgan("dev"));
+
+// Logging ──────────────────────────────────
+// Keep dev logs unchanged; use compact production logs and skip health checks.
+const isProduction = process.env.NODE_ENV === "production";
+
+app.use(
+  morgan(isProduction ? "tiny" : "dev", {
+    skip: (req) =>
+      isProduction && req.path === "/api/v1/health",
+  })
+);
 
 // ── CORS ─────────────────────────────────────
 // FRONTEND_ORIGIN can list several origins separated by commas,
