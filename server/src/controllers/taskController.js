@@ -71,6 +71,16 @@ const getTasks = async (req, res) => {
   });
 };
 
+// ── GET /api/v1/tasks/stats ──────────────────
+const getTaskStats = async (req, res) => {
+  const owner = req.user._id;
+  const [todo, inProgress, done] = await Promise.all(
+    STATUSES.map((status) => Task.countDocuments({ owner, status }))
+  );
+  const total = todo + inProgress + done;
+  res.json({ success: true, stats: { total, todo, inProgress, done } });
+};
+
 // ── GET /api/v1/tasks/:id ────────────────────
 const getTask = async (req, res) => {
   const { id } = req.params;
@@ -139,4 +149,4 @@ const deleteTask = async (req, res) => {
   res.json({ success: true, message: "Task deleted." });
 };
 
-module.exports = { createTask, getTasks, getTask, updateTask, deleteTask };
+module.exports = { createTask, getTasks, getTaskStats, getTask, updateTask, deleteTask };

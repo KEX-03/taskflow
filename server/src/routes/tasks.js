@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createTask,
   getTasks,
+  getTaskStats,
   getTask,
   updateTask,
   deleteTask,
@@ -12,6 +13,7 @@ const { asyncHandler } = require("../utils/errorHandler");
 
 router.post("/", protect, asyncHandler(createTask));
 router.get("/", protect, asyncHandler(getTasks));
+router.get("/stats", protect, asyncHandler(getTaskStats));
 router.get("/:id", protect, asyncHandler(getTask));
 router.put("/:id", protect, asyncHandler(updateTask));
 router.delete("/:id", protect, asyncHandler(deleteTask));

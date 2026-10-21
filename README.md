@@ -155,6 +155,7 @@ All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in 
 | `PUT` | `/me` | 🔒 | Update your profile or password |
 | `GET` | `/tasks` | 🔒 | List your tasks. Optional: `?search=`, `?status=`, `?priority=`, `?page=`, `?limit=` |
 | `POST` | `/tasks` | 🔒 | Create a task |
+| `GET` | `/tasks/stats` | 🔒 | Get task counts by status |
 | `GET` | `/tasks/:id` | 🔒 | Get one task |
 | `PUT` | `/tasks/:id` | 🔒 | Update a task |
 | `DELETE` | `/tasks/:id` | 🔒 | Delete a task |

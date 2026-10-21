@@ -131,6 +131,14 @@
           }
         },
         {
+          "name": "Get Task Stats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks/stats", "host": ["{{baseUrl}}"], "path": ["api","v1","tasks","stats"] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
           "name": "Get Single Task",
           "request": {
             "method": "GET",
