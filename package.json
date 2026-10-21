@@ -9,9 +9,10 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "test": "npm test --prefix server",
+    "test": "npm test --prefix server && node --test .github/scripts/*.test.js",
     "seed": "npm run seed --prefix server",
-    "lint": "npm run lint --prefix client && npm run lint --prefix server"
+    "lint": "npm run lint --prefix client && npm run lint --prefix server && npm run lint:scripts",
+    "lint:scripts": "npm exec --prefix server -- eslint -c server/eslint.config.js .github/scripts"
   },
   "engines": {
     "node": ">=22.12.0"

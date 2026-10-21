@@ -107,7 +107,7 @@ This starts both parts together:
 | `npm run dev:server` | Start only the API |
 | `npm run dev:client` | Start only the app |
 | `npm run build` | Build the app for production (into `client/dist/`) |
-| `npm test` | Run the backend's automated tests |
+| `npm test` | Run the automated tests (the backend and the release and merge scripts) |
 | `npm run lint` | Check the code for likely bugs with ESLint |
 | `npm run seed` | Populate the database with a demo user and sample tasks (use `npm run seed -- --allow-remote` for remote databases) |
 
