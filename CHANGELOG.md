@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The README's demo GIF shows the current app.
+- The automatic thank-you comment on merged pull requests now invites every contributor to suggest their own ideas through the feature request form.
 - The README, contributing guide and pull request template explain that approved pull requests are merged automatically, and that the pull request's title and "What does this PR do?" section become the commit on `main`.
 
 ### Fixed

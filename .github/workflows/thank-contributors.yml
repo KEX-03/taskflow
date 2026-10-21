@@ -68,6 +68,10 @@ jobs:
                 `\n\nWant to keep going? Have a look at the [good first issues](${labels}/good%20first%20issue) or ` +
                 `[help wanted](${labels}/help%20wanted) issues and comment on one to get assigned.`;
             }
+            // Everyone is invited to suggest their own ideas
+            body +=
+              `\n\nHave an idea that would make TaskFlow better? ` +
+              `[Suggest it](https://github.com/${owner}/${repo}/issues/new?template=feature_request.yml), and you might end up building it.`;
             body += `\n\nP.S. If you haven't already, a ⭐ on the repo helps other first-timers find TaskFlow.`;
 
             if (dryRun) {
