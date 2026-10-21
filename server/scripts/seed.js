@@ -127,7 +127,9 @@ const seed = async () => {
     console.error("❌  Failed to seed database:", err.message);
     try {
       await mongoose.disconnect();
-    } catch (_) {}
+    } catch {
+      // Already failing; a disconnect error wouldn't add anything useful
+    }
     process.exit(1);
   }
 };
