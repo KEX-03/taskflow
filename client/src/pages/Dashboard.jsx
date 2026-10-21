@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { Link } from "react-router";
 import api from "../utils/api.js";
 import Spinner from "../components/Shared/Spinner.jsx";
+import { useToast } from "../components/Shared/Toast.jsx";
 
 const StatCard = ({ title, value, icon, color, sub }) => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 animate-slide-up">
@@ -30,6 +31,7 @@ const getGreeting = (hour) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const greeting = getGreeting(new Date().getHours());
   const [stats, setStats] = useState({ total: 0, todo: 0, inProgress: 0, done: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
@@ -49,12 +51,13 @@ const Dashboard = () => {
         setRecentTasks(tasks.slice(0, 5));
       } catch (err) {
         console.error(err);
+        addToast(err.response?.data?.message || "Couldn't load your dashboard.", "error");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [addToast]);
 
   if (loading) return <div className="flex-1 flex items-center justify-center"><Spinner size="lg" /></div>;
 
