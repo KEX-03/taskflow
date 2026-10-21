@@ -135,15 +135,6 @@ const Tasks = () => {
   });
   const abortControllerRef = useRef(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
   useEffect(() => () => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
   }, []);
@@ -184,6 +175,27 @@ const Tasks = () => {
   }, [debouncedSearch, filterPriority, filterStatus, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
+
+  // Debounce the search. This runs after the fetch effect above, so when the debounced
+  // value changes, that effect has already started the new request.
+  useEffect(() => {
+    if (search === debouncedSearch) {
+      // Nothing to do on page load or once the debounced value has caught up, unless typing
+      // cancelled a request and the text was then changed back (no new fetch would follow)
+      if (abortControllerRef.current?.signal.aborted) fetchTasks();
+      return;
+    }
+
+    // The search text changed, so a request still on its way is for an older search
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search, debouncedSearch, fetchTasks]);
 
   // ── CRUD handlers ──────────────────────
   const handleCreate = async (form) => {
