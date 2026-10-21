@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useId } from "react";
+import React, { useState, useEffect, useCallback, useId, useRef } from "react";
+import axios from "axios";
 import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
@@ -118,6 +119,7 @@ const Tasks = () => {
   const { addToast } = useToast();
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [loading, setLoading] = useState(true);
@@ -131,27 +133,55 @@ const Tasks = () => {
     limit: 20,
     pages: 0,
   });
+  const abortControllerRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => () => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+  }, []);
 
   const fetchTasks = useCallback(async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (search) params.set("search", search);
+      if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
       params.set("page", page);
-      const { data } = await api.get(`/tasks?${params}`);
+      const { data } = await api.get(`/tasks?${params}`, {
+        signal: controller.signal,
+      });
+
+      if (controller.signal.aborted) return;
+
       setTasks(data.tasks);
       setMeta(data.meta);
       if (data.meta.pages > 0 && page > data.meta.pages) {
         setPage(data.meta.pages);
       }
     } catch (err) {
+      if (axios.isCancel(err) || err?.name === "CanceledError") return;
       console.error(err);
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) {
+        setLoading(false);
+      }
     }
-  }, [search, filterPriority, filterStatus, page]);
+  }, [debouncedSearch, filterPriority, filterStatus, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -200,10 +230,7 @@ const Tasks = () => {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" value={search} onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tasks…"
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg" />
         </div>
@@ -238,7 +265,7 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !filterPriority && !filterStatus ? (
+          {!search && !debouncedSearch && !filterPriority && !filterStatus ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
               <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
@@ -250,7 +277,7 @@ const Tasks = () => {
           ) : (
             <>
               <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setFilterPriority(""); setFilterStatus(""); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
             </>
           )}
         </div>
