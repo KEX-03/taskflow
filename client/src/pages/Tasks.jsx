@@ -74,17 +74,41 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
       {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
 
       <div>
-        <label htmlFor="task-title" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Title</label>
-        <input id="task-title" name="title" value={form.title} onChange={handleChange} placeholder="Task title…"
-          className="w-full px-3 py-2 text-sm rounded-lg" />
-      </div>
+  <label htmlFor="task-title" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
+    Title
+  </label>
+
+  <input
+    id="task-title"
+    name="title"
+    value={form.title}
+    onChange={handleChange}
+    placeholder="Task title…"
+    maxLength={200}
+    className="w-full px-3 py-2 text-sm rounded-lg"
+  />
+</div>
 
       <div>
-        <label htmlFor="task-description" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Description</label>
-        <textarea id="task-description" name="description" value={form.description} onChange={handleChange} placeholder="Optional…" rows={3}
-          className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
-      </div>
+  <label htmlFor="task-description" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
+    Description
+  </label>
 
+  <textarea
+    id="task-description"
+    name="description"
+    value={form.description}
+    onChange={handleChange}
+    placeholder="Optional…"
+    rows={3}
+    maxLength={1000}
+    className="w-full px-3 py-2 text-sm rounded-lg resize-none"
+  />
+
+  <div className="text-xs text-slate-600 text-right">
+    {form.description.length} / 1000
+  </div>
+</div>
       <div className="flex gap-3">
         <div className="flex-1">
           <label htmlFor="task-priority" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Priority</label>
