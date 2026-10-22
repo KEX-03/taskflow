@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { Link } from "react-router";
 import api from "../utils/api.js";
 import Spinner from "../components/Shared/Spinner.jsx";
+import usePageTitle from "../utils/usePageTitle.js";
 
 const StatCard = ({ title, value, icon, color, sub }) => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 animate-slide-up">
@@ -34,6 +35,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ total: 0, todo: 0, inProgress: 0, done: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  usePageTitle("Dashboard");
 
   useEffect(() => {
     const fetchData = async () => {

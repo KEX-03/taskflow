@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateSignup, passwordRules } from "../utils/validation.js";
 import PasswordInput from "../components/Shared/PasswordInput.jsx";
+import usePageTitle from "../utils/usePageTitle.js";
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -11,6 +12,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  usePageTitle("Sign up");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
