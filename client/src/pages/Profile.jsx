@@ -4,7 +4,7 @@ import { useToast } from "../components/Shared/Toast.jsx";
 import api from "../utils/api.js";
 import { validatePassword } from "../utils/validation.js";
 import PasswordInput from "../components/Shared/PasswordInput.jsx";
-import usePageTitle from "../utils/usePageTitle.js"
+import usePageTitle from "../utils/usePageTitle.js";
 
 const Profile = () => {
   const { user, updateLocalUser } = useAuth();

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateSignup, passwordRules } from "../utils/validation.js";
 import PasswordInput from "../components/Shared/PasswordInput.jsx";
-import usePageTitle from "../utils/usePageTitle.js"
+import usePageTitle from "../utils/usePageTitle.js";
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });

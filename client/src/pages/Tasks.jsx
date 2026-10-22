@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useId } from "react";
 import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
-import usePageTitle from "../utils/usePageTitle.js"
+import usePageTitle from "../utils/usePageTitle.js";
 
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {

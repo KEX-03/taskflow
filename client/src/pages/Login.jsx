@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { validateLogin } from "../utils/validation.js";
 import PasswordInput from "../components/Shared/PasswordInput.jsx";
-import usePageTitle from "../utils/usePageTitle.js"
+import usePageTitle from "../utils/usePageTitle.js";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
