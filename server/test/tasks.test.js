@@ -94,6 +94,120 @@ test("creating a task returns 201 with default priority and status", async () =>
   assert.equal(data.task.priority, "medium");
   assert.equal(data.task.status, "todo");
   assert.equal(data.task.description, "");
+  assert.equal(data.task.dueDate, null);
+});
+
+test("creating a task with a due date returns the saved date", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/tasks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${user1Token}`,
+    },
+    body: JSON.stringify({
+      title: "Task with due date",
+      dueDate: "2026-10-31",
+    }),
+  });
+
+  assert.equal(res.status, 201);
+
+  const data = await res.json();
+  assert.equal(data.success, true);
+  assert.equal(data.task.dueDate, "2026-10-31T00:00:00.000Z");
+});
+
+test("creating a task with an invalid due date returns 400", async () => {
+  const invalidDates = ["tomorrow", "2026-02-30"];
+
+  for (const dueDate of invalidDates) {
+    const res = await fetch(`${baseUrl}/api/v1/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user1Token}`,
+      },
+      body: JSON.stringify({
+        title: "Invalid due date task",
+        dueDate,
+      }),
+    });
+
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /dueDate/i);
+  }
+});
+
+test("updating a task due date supports setting, clearing, and omission", async () => {
+  const task = await Task.create({
+    title: "Due date update test",
+    owner: user1._id,
+    dueDate: new Date("2026-10-31T00:00:00.000Z"),
+  });
+
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${user1Token}`,
+  };
+
+  // 1. Update the due date
+  const updateRes = await fetch(`${baseUrl}/api/v1/tasks/${task._id}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ dueDate: "2026-11-15" }),
+  });
+
+  assert.equal(updateRes.status, 200);
+  const updatedData = await updateRes.json();
+  assert.equal(updatedData.task.dueDate, "2026-11-15T00:00:00.000Z");
+
+  // 2. Omit dueDate: existing date should remain unchanged
+  const omitRes = await fetch(`${baseUrl}/api/v1/tasks/${task._id}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ title: "Still the same due date" }),
+  });
+
+  assert.equal(omitRes.status, 200);
+  const omitData = await omitRes.json();
+  assert.equal(omitData.task.dueDate, "2026-11-15T00:00:00.000Z");
+
+  // 3. Send null: clear the due date
+  const clearRes = await fetch(`${baseUrl}/api/v1/tasks/${task._id}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ dueDate: null }),
+  });
+
+  assert.equal(clearRes.status, 200);
+  const clearData = await clearRes.json();
+  assert.equal(clearData.task.dueDate, null);
+});
+
+test("updating a task with an invalid due date returns 400", async () => {
+  const task = await Task.create({
+    title: "Invalid due date update test",
+    owner: user1._id,
+    dueDate: new Date("2026-10-31T00:00:00.000Z"),
+  });
+
+  for (const dueDate of ["tomorrow", "2026-02-30"]) {
+    const res = await fetch(`${baseUrl}/api/v1/tasks/${task._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user1Token}`,
+      },
+      body: JSON.stringify({ dueDate }),
+    });
+
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.match(data.message, /dueDate/i);
+  }
 });
 
 test("creating a task with an empty title returns 400", async () => {

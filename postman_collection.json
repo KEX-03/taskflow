@@ -106,8 +106,8 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Build landing page\",\n  \"description\": \"Design and implement the marketing landing page.\",\n  \"priority\": \"high\",\n  \"status\": \"todo\",\n  \"tags\": [\"work\", \"urgent\"]\n}"
-            }
+              "raw": "{\n  \"title\": \"Build landing page\",\n  \"description\": \"Design and implement the marketing landing page.\",\n  \"priority\": \"high\",\n  \"status\": \"todo\",\n  \"tags\": [\"work\", \"urgent\"]\n,  \"dueDate\": \"2026-10-31\"}"
+             }
           },
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('taskId', pm.response.json().task._id); }"] } }]
         },
@@ -150,7 +150,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"in-progress\",\n  \"priority\": \"medium\"\n}"
+              "raw": "{\n  \"status\": \"in-progress\",\n  \"priority\": \"medium\", \n \"dueDate\": \"2026-10-31\"\n}"
             }
           }
         },

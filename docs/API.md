@@ -445,7 +445,7 @@ Creates a new task associated with the authenticated user.
   - `priority` (string, optional): `"low"`, `"medium"`, or `"high"`. Defaults to `"medium"`.
   - `status` (string, optional): `"todo"`, `"in-progress"`, or `"done"`. Defaults to `"todo"`.
   - `tags` (array of strings, optional): Up to 5 tags of 1–20 characters each. Tags are trimmed, stored in lowercase, and duplicates are removed (`["Work", "work "]` is saved as `["work"]`). Defaults to `[]`.
-
+ - `dueDate` (string or null, optional): Due date in YYYY-MM-DD format (for example, "2026-10-31"). Defaults to null when omitted. Invalid dates or formats return 400 Bad Request.
 #### Example Request
 ```bash
 curl -X POST http://localhost:5000/api/v1/tasks \
@@ -456,7 +456,8 @@ curl -X POST http://localhost:5000/api/v1/tasks \
     "description": "Add tests covering all controller edge cases.",
     "priority": "high",
     "status": "todo",
-    "tags": ["Testing", "backend"]
+    "tags": ["Testing", "backend"],
+     "dueDate": "2026-10-31"
   }'
 ```
 
@@ -552,6 +553,7 @@ Updates one or more fields of an existing task.
   - `priority` (string): `"low"`, `"medium"`, or `"high"`.
   - `status` (string): `"todo"`, `"in-progress"`, or `"done"`.
   - `tags` (array of strings): Replaces the task's tags, with the same rules as on create. `[]` removes them all. Leave it out to keep the current tags. See [Tags](#tags).
+ - `dueDate ` (string or null): Due date in YYYY-MM-DD format (for example, "2026-10-31"). Set it to null to clear the due date. Leave it out to keep the current due date. Invalid dates or formats return 400 Bad Request.
 
 #### Example Request
 ```bash
@@ -559,10 +561,15 @@ curl -X PUT http://localhost:5000/api/v1/tasks/670c5c189a421ef8841a0105 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <your_jwt_token>" \
   -d '{
-    "status": "done"
+    "status": "done",
+    "dueDate": "2026-10-31"
   }'
 ```
+#### Example: Clear the Due Date
 
+{
+  "dueDate": null
+}
 #### Success Response (200 OK)
 ```json
 {
