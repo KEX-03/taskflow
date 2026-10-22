@@ -20,15 +20,15 @@ Every request to the server passes through the same steps, in the order they're 
 
 ```mermaid
 flowchart LR
-    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>logging · CORS · JSON body"]
-    M --> R["Route<br/>routes/tasks.js"]
-    R --> P{"protect<br/>valid token?"}
+    B["Browser (React app)"] -->|"HTTP request PUT /api/v1/tasks/42"| M["Middleware logging · CORS · JSON body"]
+    M --> R["Route routes/tasks.js"]
+    R --> P{"protect valid token?"}
     P -->|no| E401["401 Unauthorized"]
-    P -->|"yes: sets req.user"| C["Controller<br/>controllers/taskController.js"]
-    C --> Mo["Model<br/>models/Task.js"]
+    P -->|"yes: sets req.user"| C["Controller controllers/taskController.js"]
+    C --> Mo["Model models/Task.js"]
     Mo <--> DB[("MongoDB")]
     C -->|"JSON response"| B
-    C -.->|"if something throws"| EH["Error handler<br/>utils/errorHandler.js"]
+    C -.->|"if something throws"| EH["Error handler utils/errorHandler.js"]
     EH -.->|"400 / 500 JSON"| B
 ```
 
@@ -74,32 +74,32 @@ The password is removed every time a user is turned into JSON (`toJSON` in `User
 
 ## Server structure
 
-```
+```text
 server/src/
-├── server.js          Entry point: database connection and startup
-├── app.js             Express app: middleware and routes
-├── config/            MongoDB connection (`db.js`)
-├── models/            Mongoose schemas (User, Task)
-├── controllers/       Request handlers: endpoint business logic
-├── routes/            Maps URL routes to controllers
-├── middleware/        Authentication middleware (`auth.js`)
-└── utils/             Helpers for tokens, errors, passwords, and query parsing
+├── server.js       Entry point: database connection and startup
+├── app.js          Express app: middleware and routes
+├── config/         MongoDB connection (db.js)
+├── models/         Mongoose schemas (User, Task)
+├── controllers/    Request handlers: endpoint business logic
+├── routes/         Maps URL routes to controllers
+├── middleware/     Authentication middleware (auth.js)
+└── utils/          Helpers for tokens, errors, passwords, and query parsing
 ```
 
 ## Client structure
 
-```
+```text
 client/src/
-├── index.jsx          Starts React and renders <App />
-├── App.jsx            Providers + all routes
-├── pages/             Login, Signup, Dashboard, Tasks, Profile
-├── context/           AuthContext: user, token, login/signup/logout
+├── index.jsx       Starts React and renders <App />
+├── App.jsx         Providers + all routes
+├── pages/          Login, Signup, Dashboard, Tasks, Profile
+├── context/        AuthContext: user, token, login/signup/logout
 ├── components/
-│   ├── Layout/        Sidebar, ProtectedRoute
-│   └── Shared/        Toast (pop-up messages), Spinner
+│   ├── Layout/     Sidebar, ProtectedRoute
+│   └── Shared/     Toast (pop-up messages), Spinner
 └── utils/
-    ├── api.js         Axios instance + token and 401 interceptors
-    └── validation.js  Form checks for signup and login
+    ├── api.js      Axios instance + token and 401 interceptors
+    └── validation.js Form checks for signup and login
 ```
 
 - **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `AuthProvider` (who is logged in) and `ToastProvider` (messages). Then it lists the routes:
@@ -115,13 +115,7 @@ In production, the client is a static site on Vercel, and [`client/vercel.json`]
 
 ## Automated testing
 
-TaskFlow includes an automated test suite for the server using Node.js's built-in test runner (`node --test`), located in `server/test/`:
-
-- **Unit tests:**
-  - [`password.test.js`](../server/test/password.test.js): validates password complexity rules in `utils/password.js`.
-  - [`query.test.js`](../server/test/query.test.js): tests query string parsing, integer parsing, and regex escaping in `utils/query.js`.
-- **Integration tests:**
-  - [`tasks.test.js`](../server/test/tasks.test.js): tests the Tasks API against MongoDB (authentication, task creation, default fields, validation errors, ownership scoping, status and search filtering, updates, deletes, and task API behavior).
+TaskFlow includes unit tests for helper functions and integration tests for the task API. Tests are located in `server/test/` and use Node.js's built-in test runner (`node --test`).
 
 ### Running tests
 
