@@ -14,6 +14,8 @@ The client and server only talk using **JSON over HTTP**, at URLs starting with 
 
 ## Request flow
 
+The server's entry point is [`server/src/server.js`](../server/src/server.js), which validates required environment variables, connects to MongoDB, and starts the HTTP listener. The Express application itself is configured and exported separately in [`server/src/app.js`](../server/src/app.js), allowing automated integration tests to import the application directly without starting a background network listener.
+
 Every request to the server passes through the same steps, in the order they're set up in [`server/src/app.js`](../server/src/app.js):
 
 ```mermaid
@@ -70,6 +72,20 @@ Two collections, defined in [`server/src/models/`](../server/src/models):
 
 The password is removed every time a user is turned into JSON (`toJSON` in `User.js`), so it can't leak into a response by accident.
 
+## Server structure
+
+```
+server/src/
+├── server.js          Entry point: database connection and startup
+├── app.js             Express app: middleware and routes
+├── config/            MongoDB connection (`db.js`)
+├── models/            Mongoose schemas (User, Task)
+├── controllers/       Request handlers: endpoint business logic
+├── routes/            Maps URL routes to controllers
+├── middleware/        Authentication middleware (`auth.js`)
+└── utils/             Helpers for tokens, errors, passwords, and query parsing
+```
+
 ## Client structure
 
 ```
@@ -96,3 +112,29 @@ client/src/
 - **Styling** uses Tailwind CSS utility classes directly in the JSX. Theme colors and animations are defined in [`src/index.css`](../client/src/index.css).
 
 In production, the client is a static site on Vercel, and [`client/vercel.json`](../client/vercel.json) sends every URL to `index.html` so React Router can show the right page. See the [deployment guide](DEPLOYMENT.md) for how the three parts are hosted.
+
+## Automated testing
+
+TaskFlow includes an automated test suite for the server using Node.js's built-in test runner (`node --test`), located in `server/test/`:
+
+- **Unit tests:**
+  - [`password.test.js`](../server/test/password.test.js): validates password complexity rules in `utils/password.js`.
+  - [`query.test.js`](../server/test/query.test.js): tests query string parsing, integer parsing, and regex escaping in `utils/query.js`.
+- **Integration tests:**
+  - [`tasks.test.js`](../server/test/tasks.test.js): tests the Tasks API against MongoDB (authentication, task creation, default fields, validation errors, ownership scoping, status and search filtering, updates, deletes, and task API behavior).
+
+### Running tests
+
+Make sure MongoDB is running locally, then execute from the repository root:
+
+```bash
+npm test
+```
+
+Or from the `server/` directory:
+
+```bash
+npm test
+```
+
+Integration tests require MongoDB and automatically run against a dedicated test database (`taskflow_test`), leaving development data untouched. Database names for tests must end in `_test`.

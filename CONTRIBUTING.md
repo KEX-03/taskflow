@@ -1,3 +1,4 @@
+
 # Contributing to TaskFlow
 
 Thanks for wanting to help! TaskFlow is built for learning, so **first-time contributors are very welcome**. Never opened a pull request before? This guide walks you through every step.
@@ -33,11 +34,11 @@ By taking part, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md). I
 
 ### What you need
 
-- **[Node.js](https://nodejs.org)** 22.12 or newer. Version 24 is recommended (it's in [`.nvmrc`](.nvmrc)). Check yours with `node --version`.
-- **[Git](https://git-scm.com)**.
+- [Node.js](https://nodejs.org) **22.12 or newer**. Version 24 is recommended (it's in [`.nvmrc`](.nvmrc)). Check yours with `node --version`.
+- [Git](https://git-scm.com).
 - **MongoDB**, either:
-  - installed locally ([MongoDB Community Server](https://www.mongodb.com/try/download/community)), or
-  - a free cloud database on [MongoDB Atlas](https://www.mongodb.com/atlas) (step 1 of the [deployment guide](docs/DEPLOYMENT.md#1-database-mongodb-atlas) shows how to get a connection string).
+  - Installed locally ([MongoDB Community Server](https://www.mongodb.com/try/download/community)), or
+  - A free cloud database on [MongoDB Atlas](https://www.mongodb.com/atlas). Step 1 of the [deployment guide](docs/DEPLOYMENT.md#1-database-mongodb-atlas) explains how to get a connection string.
 
 ### Fork and clone
 
@@ -45,11 +46,14 @@ A **fork** is your own copy of the repository on GitHub. You push your changes t
 
 1. Click **Fork** at the top right of the [TaskFlow repository](https://github.com/KEX-03/taskflow).
 2. Clone **your fork** (replace `<your-username>`):
+
    ```bash
    git clone https://github.com/<your-username>/taskflow.git
    cd taskflow
    ```
+
 3. Connect it to the original repository, called `upstream`, so you can get the latest changes later:
+
    ```bash
    git remote add upstream https://github.com/KEX-03/taskflow.git
    ```
@@ -59,39 +63,48 @@ A **fork** is your own copy of the repository on GitHub. You push your changes t
 All commands run from the **repository root** (the `taskflow` folder).
 
 1. Install everything (root, server and client):
+
    ```bash
    npm run install:all
    ```
+
 2. Create your local settings files from the examples:
+
    ```bash
    # macOS / Linux / Git Bash
    cp server/.env.example server/.env
    cp client/.env.example client/.env
    ```
+
    ```powershell
    # Windows PowerShell
    Copy-Item server/.env.example server/.env
    Copy-Item client/.env.example client/.env
    ```
+
    The defaults work with a local MongoDB. Using Atlas? Put your connection string in `MONGO_URI` in `server/.env`. Each setting is explained in the file.
+
 3. Start the server and the client together:
+
    ```bash
    npm run dev
    ```
-   You should see `[server] ✅  Server running on http://localhost:5000` and a `[client]` line from Vite.
-4. Open **http://localhost:3000** and sign up for an account.
+
+   You should see a server message showing that it is running at `http://localhost:5000` and a client message from Vite.
+
+4. Open [http://localhost:3000](http://localhost:3000) and sign up for an account.
 
 Other commands you can run from the root:
 
 | Command | What it does |
 |---------|--------------|
-| `npm run dev:server` | Start only the API (http://localhost:5000) |
-| `npm run dev:client` | Start only the frontend (http://localhost:3000) |
+| `npm run dev:server` | Start only the API ([http://localhost:5000](http://localhost:5000)) |
+| `npm run dev:client` | Start only the frontend ([http://localhost:3000](http://localhost:3000)) |
 | `npm run build` | Build the frontend for production |
-| `npm test` | Run the automated tests (the backend and the release and merge scripts) |
+| `npm test` | Run the automated tests (backend unit and integration tests, plus release and merge script tests) |
 | `npm run lint` | Check the client and server code for likely bugs with ESLint |
 
-**Something went wrong?** The server prints a `❌` line explaining what's missing, for example an environment variable or a MongoDB connection. Port already in use? Stop the other program, or the other `npm run dev`, first.
+**Something went wrong?** The server prints a message explaining what's missing, for example an environment variable or a MongoDB connection. Port already in use? Stop the other program, or the other `npm run dev`, first.
 
 ---
 
@@ -119,9 +132,9 @@ Name branches `<type>/<issue-number>-<short-description>`, using the same types 
 
 We use [Conventional Commits](https://www.conventionalcommits.org): `type(scope): short description`.
 
-- **type** says what kind of change it is.
-- **scope** (optional) says which part: `server` or `client`.
-- **description** is written in lowercase, in the imperative ("add", not "added"), without a full stop at the end.
+- **Type** says what kind of change it is.
+- **Scope** (optional) says which part: `server` or `client`.
+- **Description** is written in lowercase, in the imperative ("add", not "added"), without a full stop at the end.
 
 | Type | Use it for | Example |
 |------|------------|---------|
@@ -152,44 +165,46 @@ git merge upstream/main
 
 ## 4. Test your change
 
-The backend has an automated test suite using Node.js's built-in test runner. It only covers part of the code so far, so please run the tests **and** check your change by hand before opening a pull request:
+The backend has an automated test suite using Node.js's built-in test runner. It needs MongoDB running locally (the same as `npm run dev`), so make sure MongoDB is running before starting the tests.
 
-1. **The tests and the linter pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`, and `npm run lint` reports no problems. If you changed a helper in `server/src/utils/`, add or update its tests in `server/test/`. Changes to the scripts in `.github/scripts/` need their tests there updated too.
-2. **It builds.** `npm run build` finishes with `✓ built in …`.
-3. **It starts cleanly.** `npm run dev` shows no errors in either the `[server]` or the `[client]` output.
-4. **Your change works.** Try the exact thing your issue describes, including edge cases (empty input, very long text, and so on).
+1. **The tests and the linter pass.** Run `npm test` from the repository root (or from `server/`) and verify that it finishes with `ℹ fail 0`. Run `npm run lint` and make sure it reports no problems. If you change a helper in `server/src/utils/` or an API endpoint, add or update the relevant tests in `server/test/`. Changes to scripts in `.github/scripts/` should include corresponding test updates.
+2. **It builds.** `npm run build` finishes successfully.
+3. **It starts cleanly.** `npm run dev` shows no errors in either the server or client output.
+4. **Your change works.** Try the exact thing your issue describes, including edge cases such as empty input and invalid values.
 5. **Nothing else broke.** Run through the main flow:
-   - sign up, log out, log back in
-   - create, edit, filter, search and delete a task
-   - update your profile
+   - Sign up, log out, and log back in.
+   - Create, edit, filter, search, and delete a task.
+   - Update your profile.
 6. **The browser console is clean.** Open the developer tools (**F12**) and check the **Console** tab for red errors.
-7. **For API changes:** call the endpoint with [Postman](https://www.postman.com) (import [`postman_collection.json`](postman_collection.json)) or `curl`, including the error cases (missing fields, invalid values, no login token).
+7. **For API changes:** call the endpoint with [Postman](https://www.postman.com) (import [`postman_collection.json`](postman_collection.json)) or `curl`, including error cases such as missing fields, invalid values, and no login token.
 
-When you open a pull request, GitHub Actions runs the tests and the build automatically, and shows the result at the bottom of the PR. If a check fails, click **Details** to see why, fix it, and push again: the checks re-run on every push. (On your first pull request, a maintainer may need to approve the checks before they run.)
+When you open a pull request, GitHub Actions runs the tests and the build automatically, and shows the result at the bottom of the PR. If a check fails, click **Details** to see why, fix it, and push again: the checks re-run on every push. On your first pull request, a maintainer may need to approve the checks before they run.
 
 ---
 
 ## 5. Open a pull request
 
 1. Push your branch to your fork:
+
    ```bash
    git push -u origin fix/42-dashboard-task-count
    ```
+
 2. GitHub will show a **Compare & pull request** button on your fork. Click it, and check that the base is `KEX-03/taskflow` → `main`.
-3. **Give it a title in the [Conventional Commits](#commit-messages) format**, for example `fix(client): show every task on the Tasks page`. It becomes the commit title on `main`.
+3. **Give it a title in the Conventional Commits format**, for example `fix(client): show every task on the Tasks page`. It becomes the commit title on `main`.
 4. Fill in the pull request template:
    - **Link the issue** with `Closes #42`, so it closes automatically when merged.
    - **Explain what you changed and why** under "What does this PR do?". Write it for someone reading the project history later: this section becomes the commit's description on `main`.
    - **Explain how you tested it**.
    - **Add screenshots** (before and after) for anything visible in the UI.
-   - **Update the docs** if you changed setup steps, environment variables or API endpoints.
+   - **Update the docs** if you changed setup steps, environment variables, or API endpoints.
 
 What to expect:
 
-- **Keep pull requests small**: one issue per pull request.
+- **Keep pull requests small:** one issue per pull request.
 - A maintainer will review it and may ask for changes. That's normal and part of learning! Push new commits to the same branch and the pull request updates automatically.
 - Please be patient: maintainers review in their free time.
-- Once it's approved, it's **merged automatically** as soon as the tests and the build pass. 🎉 The commit on `main` is made from your pull request: the title, the "What does this PR do?" section and a `Closes #...` line for the linked issue. A maintainer may tidy the title or description before approving.
+- Once it's approved, it's **merged automatically** as soon as the tests and the build pass. The commit on `main` is made from your pull request: the title, the "What does this PR do?" section, and a `Closes #...` line for the linked issue. A maintainer may tidy the title or description before approving.
 
 ---
 
@@ -197,29 +212,31 @@ What to expect:
 
 For the bigger picture (how a request flows, how login works, and how the data is stored), read [How TaskFlow works](docs/ARCHITECTURE.md) first.
 
-```
+```text
 taskflow/
 ├── server/src/            Express API
-│   ├── app.js             Entry point: middleware, routes, startup
+│   ├── app.js             Express app: middleware and routes
+│   ├── server.js          Entry point: database connection and startup
 │   ├── config/db.js       MongoDB connection
 │   ├── models/            Mongoose schemas: User, Task
 │   ├── controllers/       Request handlers (the actual logic)
-│   ├── routes/            URL → controller mapping
-│   ├── middleware/auth.js `protect`: checks the login token
+│   ├── routes/            URL-to-controller mapping
+│   ├── middleware/auth.js protect: checks the login token
 │   └── utils/             Helpers: tokens, errors, query parsing
+├── server/test/           Automated unit and integration tests
 └── client/src/            React app
     ├── App.jsx            All page routes
     ├── pages/             One file per page
     ├── components/        Shared UI (Sidebar, Toast, Spinner, ...)
-    ├── context/           AuthContext: the logged-in user
-    └── utils/api.js       Axios instance that talks to the API
+    ├── context/            AuthContext: the logged-in user
+    └── utils/api.js        Axios instance that talks to the API
 ```
 
 ### Adding an API endpoint (model → controller → route)
 
-A request travels **route → middleware → controller → model**. To add an endpoint, work backwards through those files. Example: `GET /api/v1/tasks/stats`, which returns how many tasks the user has in each status.
+A request travels **route → middleware → controller → model**. To add an endpoint, work through the following steps.
 
-**1. Model** (`server/src/models/`): only needed if you store **new data**. To add a field, add it to the schema in `Task.js` or `User.js`:
+**1. Model** (`server/src/models/`): only needed if you store **new data**. For example, to add a field, include it in the appropriate schema in `Task.js` or `User.js`:
 
 ```js
 dueDate: {
@@ -228,44 +245,29 @@ dueDate: {
 },
 ```
 
-The stats example only reads existing data, so it doesn't need this step.
+**2. Controller** (`server/src/controllers/`): write the function that handles the request. `req.user` is the logged-in user (set by `protect`). Always ensure users can access only their own data when the endpoint operates on user-owned resources.
 
-**2. Controller** (`server/src/controllers/taskController.js`): write the function that handles the request. `req.user` is the logged-in user (set by `protect`). **Always filter by `owner`**, so users only ever see their own tasks:
-
-```js
-// ── GET /api/v1/tasks/stats ──────────────────
-const getTaskStats = async (req, res) => {
-  const owner = req.user._id;
-  const [todo, inProgress, done] = await Promise.all(
-    STATUSES.map((status) => Task.countDocuments({ owner, status }))
-  );
-  res.json({ success: true, stats: { todo, inProgress, done } });
-};
-```
-
-Then add `getTaskStats` to the `module.exports` at the bottom of the file.
-
-**3. Route** (`server/src/routes/tasks.js`): connect a URL to the controller. Wrap it in `protect` (login required) and `asyncHandler` (passes errors to the error handler):
+**3. Route** (`server/src/routes/`): connect the URL to the controller. Wrap protected endpoints in `protect` and use `asyncHandler` to pass errors to the error handler:
 
 ```js
-router.get("/stats", protect, asyncHandler(getTaskStats));
+router.get("/example", protect, asyncHandler(getExample));
 ```
 
-> ⚠️ Put it **above** `router.get("/:id", ...)`. Express checks routes from top to bottom, and `/:id` would otherwise catch `/stats` and treat `"stats"` as a task id.
-
-**4. App** (`server/src/app.js`): only needed for a **new routes file**. Mount it next to the others:
+**4. App** (`server/src/app.js`): only needed for a new routes file. Mount it next to the existing routes:
 
 ```js
-app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/example", exampleRoutes);
 ```
 
-**5. Try it:** log in through Postman (or `curl`), then call `GET http://localhost:5000/api/v1/tasks/stats` with the token. Also add the endpoint to `postman_collection.json` and to the API table in the README.
+**5. Try it:** test the endpoint with Postman or `curl`, including a valid request and relevant error cases. Add it to `postman_collection.json` and the API table in the README when appropriate.
+
+**6. Add automated tests** (`server/test/`): add integration tests for API behavior or unit tests for new helpers. Run `npm test` from the root to ensure all tests pass.
 
 ### Adding a page to the client
 
 Example: an **Archive** page at `/archive`.
 
-**1. Create the page** in `client/src/pages/Archive.jsx`. Use the shared `api` instance for requests (it adds the login token for you) and `useToast` for messages:
+**1. Create the page** in `client/src/pages/Archive.jsx`. Use the shared `api` instance for requests and `useToast` for messages:
 
 ```jsx
 import React, { useEffect, useState } from "react";
@@ -286,7 +288,9 @@ const Archive = () => {
     <div className="flex-1 p-6 overflow-y-auto">
       <h1 className="text-xl font-bold text-white mb-6">Archive</h1>
       {tasks.map((task) => (
-        <p key={task._id} className="text-slate-300 text-sm">{task.title}</p>
+        <p key={task._id} className="text-slate-300 text-sm">
+          {task.title}
+        </p>
       ))}
     </div>
   );
@@ -295,25 +299,28 @@ const Archive = () => {
 export default Archive;
 ```
 
-**2. Add a route** in `client/src/App.jsx`. Import the page at the top, then add a `<Route>` next to the others. Wrapping it in `ProtectedRoute` sends logged-out users to the login page, and `DashLayout` adds the sidebar:
+**2. Add a route** in `client/src/App.jsx`. Import the page at the top, then add a `Route` next to the others. Wrapping it in `ProtectedRoute` sends logged-out users to the login page, and `DashLayout` adds the sidebar:
 
 ```jsx
 import Archive from "./pages/Archive.jsx";
 ```
+
 ```jsx
 <Route
   path="/archive"
   element={
     <ProtectedRoute>
-      <DashLayout><Archive /></DashLayout>
+      <DashLayout>
+        <Archive />
+      </DashLayout>
     </ProtectedRoute>
   }
 />
 ```
 
-**3. Add a sidebar link** in `client/src/components/Layout/Sidebar.jsx` by adding an entry to the `navItems` array, with `to: "/archive"`, a `label` and an `icon` (copy the SVG from another entry to start with).
+**3. Add a sidebar link** in `client/src/components/Layout/Sidebar.jsx` by adding an entry to the `navItems` array, with `to: "/archive"`, a `label`, and an `icon` (copy the SVG from another entry to start with).
 
-**4. Try it:** open http://localhost:3000/archive while logged in, then try it again while logged out (you should be sent to the login page).
+**4. Try it:** open [http://localhost:3000/archive](http://localhost:3000/archive) while logged in, then try it again while logged out (you should be sent to the login page).
 
 Styling uses [Tailwind CSS](https://tailwindcss.com) utility classes. Copy the classes from existing pages to keep the look consistent.
 
@@ -326,4 +333,4 @@ Styling uses [Tailwind CSS](https://tailwindcss.com) utility classes. Copy the c
 - **Found a bug?** [Open an issue](https://github.com/KEX-03/taskflow/issues/new/choose).
 - **Found a security problem?** Please don't open a public issue; see [SECURITY.md](SECURITY.md).
 
-Thanks for contributing! 💙
+Thanks for contributing!

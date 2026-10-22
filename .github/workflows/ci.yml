@@ -21,6 +21,11 @@ jobs:
   test:
     name: Server tests
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -33,7 +38,6 @@ jobs:
       # The release and merge scripts in .github/scripts are linted with the server's config
       - run: npm run lint:scripts
       - run: npm test
-      # When the API tests (#28) need MongoDB, add a `services: mongo` block to this job
 
   build:
     name: Client build
