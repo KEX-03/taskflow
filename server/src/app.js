@@ -1,9 +1,7 @@
-
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
-
 const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
 const taskRoutes = require("./routes/tasks");
@@ -11,10 +9,16 @@ const { errorHandler } = require("./utils/errorHandler");
 
 const app = express();
 
-// Trust the first proxy so Express can read the visitor's real IP.
+// Hosts like Render put a proxy in front of the server, so every request
+// would seem to come from the proxy's IP. Trusting the first proxy lets
+// Express read the visitor's real IP from the X-Forwarded-For header,
+// which the login/signup rate limit relies on.
 app.set("trust proxy", 1);
 
-// Logging: use compact logs in production and skip health checks.
+
+// Logging ──────────────────────────────────
+// Keep dev logs unchanged; use compact production logs and skip health checks.
+// Tests run with NODE_ENV=test and skip logging entirely.
 const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
@@ -25,10 +29,11 @@ app.use(
   })
 );
 
-// CORS
-const allowedOrigins = (
-  process.env.FRONTEND_ORIGIN || "http://localhost:3000"
-)
+// ── CORS ─────────────────────────────────────
+// FRONTEND_ORIGIN can list several origins separated by commas,
+// e.g. "http://localhost:3000,https://my-app.vercel.app".
+// Browsers send the origin without a trailing slash, so strip any.
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
@@ -40,31 +45,25 @@ app.use(
   })
 );
 
-// Body Parser
+// ── Body Parser ──────────────────────────────
 app.use(express.json());
 
-// Health Check
+// ── Health Check ─────────────────────────────
 app.get("/api/v1/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Routes
+// ── Routes ───────────────────────────────────
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/me", profileRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 
-// 404 Handler
+// ── 404 Handler ──────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
+  res.status(404).json({ success: false, message: "Route not found" });
 });
 
-// Global Error Handler
+// ── Global Error Handler ─────────────────────
 app.use(errorHandler);
 
 module.exports = app;

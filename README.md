@@ -1,4 +1,3 @@
-
 # TaskFlow
 
 **A clean, beginner-friendly full-stack task manager built with MongoDB, Express, React and Node, made for learning and first open-source contributions.**
@@ -13,17 +12,17 @@
 
 ## Live demo
 
-**[TaskFlow live demo](https://taskflow-plum-one.vercel.app):** sign up with any email (it doesn't need to be real) and try it out.
+**👉 [taskflow-plum-one.vercel.app](https://taskflow-plum-one.vercel.app)**: sign up with any email (it doesn't need to be real) and try it out.
 
-> The first load can take up to a minute. The API runs on a free hosting plan that goes to sleep when nobody is using it, and waking up takes a moment. After that it's fast.
+> ⏳ **The first load can take up to a minute.** The API runs on a free hosting plan that goes to sleep when nobody is using it, and waking up takes a moment. After that it's fast.
 
 ## Features
 
 - **Sign up and log in** with secure password hashing and JWT (token-based) authentication
 - **Dashboard** with task counts by status and your most recent tasks
-- **Tasks:** create, edit and delete, with search and filters by priority and status
-- **Profile:** update your name, bio and avatar, and change your password
-- **Protected pages:** logged-out visitors are sent to the login page
+- **Tasks**: create, edit and delete, with search and filters by priority and status
+- **Profile**: update your name, bio and avatar, and change your password
+- **Protected pages**: logged-out visitors are sent to the login page
 - **Each user only sees their own tasks**, enforced by the API
 - **Clean, readable code** split into small files, with a [contributing guide](CONTRIBUTING.md) that explains where everything lives
 
@@ -98,8 +97,8 @@ npm run dev
 
 This starts both parts together:
 
-- **API** at [http://localhost:5000](http://localhost:5000) (health check: [http://localhost:5000/api/v1/health](http://localhost:5000/api/v1/health))
-- **App** at [http://localhost:3000](http://localhost:3000): open it and sign up for an account
+- **API** at http://localhost:5000 (health check: http://localhost:5000/api/v1/health)
+- **App** at **http://localhost:3000**: open it and sign up for an account
 
 | Command (from the repository root) | What it does |
 |------------------------------------|--------------|
@@ -108,29 +107,29 @@ This starts both parts together:
 | `npm run dev:server` | Start only the API |
 | `npm run dev:client` | Start only the app |
 | `npm run build` | Build the app for production (into `client/dist/`) |
-| `npm test` | Run the automated tests (backend unit and integration tests, plus release and merge scripts) |
+| `npm test` | Run the automated tests (the backend and the release and merge scripts) |
 | `npm run lint` | Check the code for likely bugs with ESLint |
 | `npm run seed` | Populate the database with a demo user and sample tasks (use `npm run seed -- --allow-remote` for remote databases) |
 
-**Running tests:** Make sure MongoDB is running locally, then run `npm test` from the root (or from `server/`). It runs unit and integration tests using Node.js's built-in test runner against a test database (`taskflow_test`), leaving development data untouched.
+**Running the tests:** the API tests need MongoDB running locally, the same as `npm run dev`. They use a separate `taskflow_test` database and delete it when they finish, so your own data is never touched.
 
-**Something not working?** The server prints a message explaining what's wrong, for example a missing setting or MongoDB not running.
+**Something not working?** The server prints a `❌` message explaining what's wrong, for example a missing setting or MongoDB not running.
 
 ## Project structure
 
-```text
+```
 taskflow/
 ├── server/                  Express REST API
 │   ├── src/
-│   │   ├── app.js           Express app: middleware and routes
-│   │   ├── server.js        Entry point: database connection and startup
+│   │   ├── server.js        Entry point: connects to MongoDB and starts the server
+│   │   ├── app.js           The Express app: middleware and routes
 │   │   ├── config/          MongoDB connection
 │   │   ├── models/          Mongoose schemas (User, Task)
 │   │   ├── controllers/     Request handlers: the logic for each endpoint
 │   │   ├── routes/          Maps URLs to controllers
-│   │   ├── middleware/      protect: checks the login token
+│   │   ├── middleware/      `protect`: checks the login token
 │   │   └── utils/           Helpers for tokens, errors and query parsing
-│   ├── test/                Automated tests for helpers and the task API
+│   ├── test/                Automated tests for the helpers and the task API
 │   └── .env.example         Server settings, explained
 ├── client/                  React app (Vite)
 │   ├── src/
@@ -152,8 +151,8 @@ taskflow/
 
 All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in the header: `Authorization: Bearer <token>`. You get a token from signup or login. For full request and response examples, query parameters, and error schemas, see the [API Reference](docs/API.md).
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
+| Method | Endpoint | | Description |
+|--------|----------|---|-------------|
 | `POST` | `/auth/signup` | | Create an account, returns a token |
 | `POST` | `/auth/login` | | Log in, returns a token |
 | `POST` | `/auth/logout` | 🔒 | Log out (the app deletes its token) |
@@ -168,7 +167,7 @@ All endpoints start with `/api/v1`. Endpoints marked 🔒 need a login token in 
 
 Login allows 10 failed attempts and signup 10 requests per 15 minutes per IP address. After that, they return `429 Too Many Requests`.
 
-**Try it in Postman:** import [`postman_collection.json`](postman_collection.json). After you run **Signup** or **Login**, the token is saved and used by every other request automatically.
+**Try it in Postman:** import [`postman_collection.json`](postman_collection.json). After you run *Signup* or *Login*, the token is saved and used by every other request automatically.
 
 ## Deployment
 
@@ -176,7 +175,7 @@ TaskFlow runs on free plans of MongoDB Atlas, Render and Vercel. The [deployment
 
 ## Contributing
 
-Contributions of all sizes are welcome, especially from **first-time contributors**!
+Contributions of all sizes are welcome, especially from **first-time contributors**! 🎉
 
 1. Pick an issue labelled [**good first issue**](https://github.com/KEX-03/taskflow/labels/good%20first%20issue) and comment that you'd like to work on it. These are reserved for people making their first few open-source contributions. If you've done several already, pick a [**help wanted**](https://github.com/KEX-03/taskflow/labels/help%20wanted) issue instead.
 2. Follow the [contributing guide](CONTRIBUTING.md): it covers setup, branches, commit messages, testing and opening a pull request, step by step.
@@ -185,7 +184,7 @@ Contributions of all sizes are welcome, especially from **first-time contributor
 
 Please follow our [Code of Conduct](CODE_OF_CONDUCT.md). Found a security problem? See [SECURITY.md](SECURITY.md). Changes are listed in the [changelog](CHANGELOG.md).
 
-If TaskFlow helped you learn something or you enjoyed contributing, a star on the repo helps other first-time contributors find it.
+If TaskFlow helped you learn something or you enjoyed contributing, a ⭐ on the repo helps other first-time contributors find it.
 
 ## License
 

@@ -14,21 +14,21 @@ The client and server only talk using **JSON over HTTP**, at URLs starting with 
 
 ## Request flow
 
-The server's entry point is [`server/src/server.js`](../server/src/server.js), which validates required environment variables, connects to MongoDB, and starts the HTTP listener. The Express application itself is configured and exported separately in [`server/src/app.js`](../server/src/app.js), allowing automated integration tests to import the application directly without starting a background network listener.
+The server starts in [`server/src/server.js`](../server/src/server.js): it checks the required settings, connects to MongoDB and starts listening. The Express app itself lives in [`server/src/app.js`](../server/src/app.js), separately, so the automated tests can load it without starting a real server.
 
 Every request to the server passes through the same steps, in the order they're set up in [`server/src/app.js`](../server/src/app.js):
 
 ```mermaid
 flowchart LR
-    B["Browser (React app)"] -->|"HTTP request PUT /api/v1/tasks/42"| M["Middleware logging · CORS · JSON body"]
-    M --> R["Route routes/tasks.js"]
-    R --> P{"protect valid token?"}
+    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>logging · CORS · JSON body"]
+    M --> R["Route<br/>routes/tasks.js"]
+    R --> P{"protect<br/>valid token?"}
     P -->|no| E401["401 Unauthorized"]
-    P -->|"yes: sets req.user"| C["Controller controllers/taskController.js"]
-    C --> Mo["Model models/Task.js"]
+    P -->|"yes: sets req.user"| C["Controller<br/>controllers/taskController.js"]
+    C --> Mo["Model<br/>models/Task.js"]
     Mo <--> DB[("MongoDB")]
     C -->|"JSON response"| B
-    C -.->|"if something throws"| EH["Error handler utils/errorHandler.js"]
+    C -.->|"if something throws"| EH["Error handler<br/>utils/errorHandler.js"]
     EH -.->|"400 / 500 JSON"| B
 ```
 
@@ -72,34 +72,20 @@ Two collections, defined in [`server/src/models/`](../server/src/models):
 
 The password is removed every time a user is turned into JSON (`toJSON` in `User.js`), so it can't leak into a response by accident.
 
-## Server structure
-
-```text
-server/src/
-├── server.js       Entry point: database connection and startup
-├── app.js          Express app: middleware and routes
-├── config/         MongoDB connection (db.js)
-├── models/         Mongoose schemas (User, Task)
-├── controllers/    Request handlers: endpoint business logic
-├── routes/         Maps URL routes to controllers
-├── middleware/     Authentication middleware (auth.js)
-└── utils/          Helpers for tokens, errors, passwords, and query parsing
-```
-
 ## Client structure
 
-```text
+```
 client/src/
-├── index.jsx       Starts React and renders <App />
-├── App.jsx         Providers + all routes
-├── pages/          Login, Signup, Dashboard, Tasks, Profile
-├── context/        AuthContext: user, token, login/signup/logout
+├── index.jsx          Starts React and renders <App />
+├── App.jsx            Providers + all routes
+├── pages/             Login, Signup, Dashboard, Tasks, Profile
+├── context/           AuthContext: user, token, login/signup/logout
 ├── components/
-│   ├── Layout/     Sidebar, ProtectedRoute
-│   └── Shared/     Toast (pop-up messages), Spinner
+│   ├── Layout/        Sidebar, ProtectedRoute
+│   └── Shared/        Toast (pop-up messages), Spinner
 └── utils/
-    ├── api.js      Axios instance + token and 401 interceptors
-    └── validation.js Form checks for signup and login
+    ├── api.js         Axios instance + token and 401 interceptors
+    └── validation.js  Form checks for signup and login
 ```
 
 - **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `AuthProvider` (who is logged in) and `ToastProvider` (messages). Then it lists the routes:
@@ -113,22 +99,6 @@ client/src/
 
 In production, the client is a static site on Vercel, and [`client/vercel.json`](../client/vercel.json) sends every URL to `index.html` so React Router can show the right page. See the [deployment guide](DEPLOYMENT.md) for how the three parts are hosted.
 
-## Automated testing
+## Automated tests
 
-TaskFlow includes unit tests for helper functions and integration tests for the task API. Tests are located in `server/test/` and use Node.js's built-in test runner (`node --test`).
-
-### Running tests
-
-Make sure MongoDB is running locally, then execute from the repository root:
-
-```bash
-npm test
-```
-
-Or from the `server/` directory:
-
-```bash
-npm test
-```
-
-Integration tests require MongoDB and automatically run against a dedicated test database (`taskflow_test`), leaving development data untouched. Database names for tests must end in `_test`.
+The server's tests are in [`server/test/`](../server/test) and use Node's built-in test runner (`node --test`). There are unit tests for the helpers and integration tests for the task API, which send real HTTP requests to the app. The integration tests use a separate `taskflow_test` database on your local MongoDB and delete it when they finish.
