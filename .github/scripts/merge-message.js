@@ -7,10 +7,14 @@ const buildMergeMessage = ({ number, title, body, closingIssues = [] }) => {
   const headline = `${title.replace(/\s*\(#\d+\)\s*$/, "").trim()} (#${number})`;
 
   const lines = (body || "").replace(/<!--[\s\S]*?-->/g, "").split(/\r?\n/);
-  const start = lines.findIndex((line) => /^##\s*What does this PR do\?\s*$/i.test(line));
+  // The heading can be "##" (as in the template) or "###" and smaller
+  const heading = /^(#{2,6})\s*What does this PR do\?\s*$/i;
+  const start = lines.findIndex((line) => heading.test(line));
   let section = [];
   if (start !== -1) {
-    const end = lines.findIndex((line, i) => i > start && /^##\s/.test(line));
+    // The section ends at the next heading of the same level or higher, so its own sub-headings stay in
+    const level = lines[start].match(heading)[1].length;
+    const end = lines.findIndex((line, i) => i > start && new RegExp(`^#{1,${level}}\\s`).test(line));
     section = lines.slice(start + 1, end === -1 ? lines.length : end);
   }
   const summary = section

@@ -20,8 +20,10 @@ By taking part, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md). I
 
 1. Browse the [open issues](https://github.com/KEX-03/taskflow/issues). If you're new, look for the [`good first issue`](https://github.com/KEX-03/taskflow/labels/good%20first%20issue) label: these are small, well-described tasks.
 2. **Comment on the issue before you start**, for example: *"Hi, I'd like to work on this!"*
-3. **Wait until a maintainer assigns the issue to you.** This stops two people from accidentally doing the same work.
+3. **Wait until a maintainer assigns the issue to you.** This stops two people from accidentally doing the same work. Pull requests for issues that aren't assigned to you are closed.
 4. If you get stuck or can't finish, just say so in a comment. That's completely fine, and someone else can pick it up.
+
+> **Good first issues are reserved for people making their first few open-source contributions.** They're how newcomers get started here. If you've already had several pull requests merged in other projects, please pick a [`help wanted`](https://github.com/KEX-03/taskflow/labels/help%20wanted) issue instead.
 
 **Have an idea that isn't in an issue yet?** [Open an issue](https://github.com/KEX-03/taskflow/issues/new/choose) first and describe it, so we can agree on the approach before you write code. Small fixes like typos can go straight to a pull request.
 
@@ -86,7 +88,8 @@ Other commands you can run from the root:
 | `npm run dev:server` | Start only the API (http://localhost:5000) |
 | `npm run dev:client` | Start only the frontend (http://localhost:3000) |
 | `npm run build` | Build the frontend for production |
-| `npm test` | Run the backend's automated tests |
+| `npm test` | Run the automated tests (the backend and the release and merge scripts) |
+| `npm run lint` | Check the client and server code for likely bugs with ESLint |
 
 **Something went wrong?** The server prints a `❌` line explaining what's missing, for example an environment variable or a MongoDB connection. Port already in use? Stop the other program, or the other `npm run dev`, first.
 
@@ -151,7 +154,7 @@ git merge upstream/main
 
 The backend has an automated test suite using Node.js's built-in test runner. It only covers part of the code so far, so please run the tests **and** check your change by hand before opening a pull request:
 
-1. **The tests pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`. If you changed a helper in `server/src/utils/`, add or update its tests in `server/test/`.
+1. **The tests and the linter pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`, and `npm run lint` reports no problems. If you changed a helper in `server/src/utils/`, add or update its tests in `server/test/`. Changes to the scripts in `.github/scripts/` need their tests there updated too.
 2. **It builds.** `npm run build` finishes with `✓ built in …`.
 3. **It starts cleanly.** `npm run dev` shows no errors in either the `[server]` or the `[client]` output.
 4. **Your change works.** Try the exact thing your issue describes, including edge cases (empty input, very long text, and so on).

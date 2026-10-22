@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 const { validatePassword } = require("../utils/password");
 
 // ── GET /api/v1/me ───────────────────────────

@@ -30,7 +30,7 @@ flowchart LR
     EH -.->|"400 / 500 JSON"| B
 ```
 
-1. **Middleware** runs first for every request: `morgan` logs it, `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`), and `express.json()` turns the JSON body into `req.body`.
+1. **Middleware** runs first for every request: `morgan` logs it (in production with a compact format, and without the health checks), `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`), and `express.json()` turns the JSON body into `req.body`.
 2. **Route** ([`routes/`](../server/src/routes)): matches the method and URL (like `PUT /tasks/:id`) and decides which functions run.
 3. **`protect` middleware** ([`middleware/auth.js`](../server/src/middleware/auth.js)): on protected routes, checks the login token. If it's missing or invalid, the request stops here with **401**. If it's valid, it loads the user into `req.user`.
 4. **Controller** ([`controllers/`](../server/src/controllers)): the actual logic. It validates input, talks to the model, and sends a JSON response like `{ "success": true, "task": { ... } }`.
