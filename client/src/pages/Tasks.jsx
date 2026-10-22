@@ -40,6 +40,10 @@ const Modal = ({ open, onClose, title, children }) => {
   );
 };
 
+// ── Tag limits (same as the API, see server/src/utils/tags.js) ──
+const MAX_TAGS = 5;
+const MAX_TAG_LENGTH = 20;
+
 // ── Task Form inside modal ─────────────────
 const TaskForm = ({ initial = {}, onSave, onClose }) => {
   const [form, setForm] = useState({
@@ -48,6 +52,9 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     priority: initial.priority || "medium",
     status: initial.status || "todo",
   });
+  const [tags, setTags] = useState(Array.isArray(initial.tags) ? initial.tags : []);
+  const [tagInput, setTagInput] = useState("");
+  const [tagError, setTagError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -56,12 +63,82 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     setError("");
   };
 
+  // Normalize raw tags the way the API does (trim, lowercase, drop duplicates)
+  // and enforce its limits. Returns the new list and an error message, if any.
+  const addTags = (rawTags, currentTags) => {
+    const next = [...currentTags];
+    let message = "";
+    for (const rawTag of rawTags) {
+      const tag = rawTag.trim().toLowerCase();
+      if (!tag || next.includes(tag)) continue;
+      if (tag.length > MAX_TAG_LENGTH) {
+        message = `Each tag must be 1 to ${MAX_TAG_LENGTH} characters.`;
+        continue;
+      }
+      if (next.length >= MAX_TAGS) {
+        message = `A task can have at most ${MAX_TAGS} tags.`;
+        continue;
+      }
+      next.push(tag);
+    }
+    return { next, message };
+  };
+
+  const commitTagInput = () => {
+    const { next, message } = addTags([tagInput], tags);
+    setTags(next);
+    setTagError(message);
+    // Keep the text when it was rejected, so it can still be fixed
+    if (!message) setTagInput("");
+    return { next, message };
+  };
+
+  const handleTagInputChange = (e) => {
+    const value = e.target.value;
+    if (!value.includes(",")) {
+      setTagInput(value);
+      return;
+    }
+    // A comma adds the tag (this also handles pasting a comma-separated list)
+    const parts = value.split(",");
+    const remainder = parts.pop();
+    const { next, message } = addTags(parts, tags);
+    setTags(next);
+    setTagError(message);
+    setTagInput(remainder);
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      // Enter would otherwise submit the whole form
+      e.preventDefault();
+      commitTagInput();
+    } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
+      setTags(tags.slice(0, -1));
+      setTagError("");
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+    setTagError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) { setError("Title is required."); return; }
+    // A tag that was typed but not confirmed with Enter or a comma counts too
+    let finalTags = tags;
+    if (tagInput.trim()) {
+      const { next, message } = addTags([tagInput], tags);
+      if (message) { setTagError(message); return; }
+      finalTags = next;
+      setTags(next);
+      setTagInput("");
+    }
     setLoading(true);
     try {
-      await onSave(form);
+      await onSave({ ...form, tags: finalTags });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -104,6 +181,25 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         </div>
       </div>
 
+      <div>
+        <label htmlFor="task-tags" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Tags</label>
+        <div className="flex flex-wrap items-center gap-1.5 w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500">
+          {tags.map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1 text-xs font-medium pl-2 pr-1 py-0.5 rounded-full text-primary-400 bg-primary-400/10">
+              {tag}
+              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="text-primary-400 hover:text-white transition-colors leading-none px-0.5">×</button>
+            </span>
+          ))}
+          <input id="task-tags" name="tags" value={tagInput} onChange={handleTagInputChange} onKeyDown={handleTagKeyDown} placeholder={tags.length === 0 ? "Add a tag…" : ""}
+            className="flex-1 min-w-[100px] bg-transparent border-none outline-none focus:ring-0 focus:border-transparent px-0 py-0 text-sm shadow-none" />
+        </div>
+        {tagError ? (
+          <p className="text-red-400 text-xs mt-1.5">{tagError}</p>
+        ) : (
+          <p className="text-slate-500 text-xs mt-1.5">Press Enter or a comma to add a tag. Up to {MAX_TAGS} tags, {MAX_TAG_LENGTH} characters each.</p>
+        )}
+      </div>
+
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
         <button type="submit" disabled={loading} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
@@ -122,6 +218,7 @@ const Tasks = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
@@ -152,6 +249,7 @@ const Tasks = () => {
       if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
+      if (filterTag) params.set("tag", filterTag);
       params.set("page", page);
       const { data } = await api.get(`/tasks?${params}`, {
         signal: controller.signal,
@@ -172,7 +270,7 @@ const Tasks = () => {
         setLoading(false);
       }
     }
-  }, [debouncedSearch, filterPriority, filterStatus, page]);
+  }, [debouncedSearch, filterPriority, filterStatus, filterTag, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -266,6 +364,12 @@ const Tasks = () => {
           <option value="in-progress">In Progress</option>
           <option value="done">Done</option>
         </select>
+        {filterTag && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg bg-primary-400/10 text-primary-400">
+            Tag: {filterTag}
+            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="text-primary-400 hover:text-white transition-colors leading-none">×</button>
+          </span>
+        )}
       </div>
 
       {/* ── Task List ───────────────────── */}
@@ -277,7 +381,7 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !debouncedSearch && !filterPriority && !filterStatus ? (
+          {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
               <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
@@ -289,7 +393,7 @@ const Tasks = () => {
           ) : (
             <>
               <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setFilterTag(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
             </>
           )}
         </div>
@@ -300,13 +404,20 @@ const Tasks = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
                     {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                   </span>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                   </span>
+                  {Array.isArray(task.tags) && task.tags.map((tag) => (
+                    <button key={tag} type="button" aria-label={`Filter by tag ${tag}`} title={`Filter by tag ${tag}`}
+                      onClick={() => { setFilterTag(tag); setPage(1); }}
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full transition-colors ${filterTag === tag ? "text-white bg-primary-600" : "text-primary-400 bg-primary-400/10 hover:bg-primary-400/20"}`}>
+                      {tag}
+                    </button>
+                  ))}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
