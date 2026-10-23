@@ -30,6 +30,25 @@
   --color-emerald-500: #10b981;
   --color-emerald-600: #059669;
 
+  /* Semantic tokens map UI roles to the current dark palette.
+    Future themes can change these mappings without editing components. */
+  --color-surface: var(--color-slate-950);
+  --color-surface-raised: var(--color-slate-800);
+  --color-surface-card: var(--color-slate-900);
+
+  --color-border: var(--color-slate-700);
+  --color-border-subtle: var(--color-slate-800);
+  --color-border-muted: var(--color-slate-500);
+
+  --color-text: var(--color-slate-100);
+  --color-text-label: var(--color-slate-300);
+  --color-text-secondary: var(--color-slate-400);
+  --color-text-muted: var(--color-slate-500);
+  
+  --color-grid: var(--color-slate-850);
+  --color-scrollbar: var(--color-slate-700);
+  --color-scrollbar-hover: var(--color-slate-600);
+
   --font-sans: "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
@@ -56,14 +75,14 @@
     box-sizing: border-box;
   }
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen;
+    @apply bg-surface text-text min-h-screen;
     font-family: 'Segoe UI', system-ui, sans-serif;
   }
   input, textarea, select {
-    @apply bg-slate-800 border border-slate-700 text-slate-100 rounded-lg;
+    @apply bg-surface-raised border border-border text-text rounded-lg;
   }
   input::placeholder, textarea::placeholder {
-    @apply text-slate-500;
+    @apply text-text-muted;
   }
   input:focus, textarea:focus, select:focus {
     @apply outline-hidden border-primary-500 ring-1 ring-primary-500;
@@ -81,5 +100,5 @@
 /* ── Scrollbar ─────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { @apply bg-transparent; }
-::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
-::-webkit-scrollbar-thumb:hover { @apply bg-slate-600; }
+::-webkit-scrollbar-thumb { @apply bg-scrollbar rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-scrollbar-hover; }
