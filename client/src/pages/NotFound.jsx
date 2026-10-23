@@ -39,7 +39,7 @@ const NotFound = () => {
               onClick={() => navigate("/login")}
               className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              Login
+              Go to Login
             </button>
           )}
         </div>
