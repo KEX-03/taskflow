@@ -46,11 +46,11 @@ const Signup = () => {
   const strength = passedRules.length; // 0-3
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+    <div className="min-h-screen bg-surface flex items-center justify-center px-4">
+      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(var(--color-grid) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
       <div className="relative w-full max-w-md animate-fade-in">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-surface-card border border-border-subtle rounded-2xl p-8 shadow-2xl">
           {/* ── Header ──────────────────── */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-600/10 border border-primary-600/30 mb-4">
@@ -62,7 +62,7 @@ const Signup = () => {
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-white">Create account</h1>
-            <p className="text-slate-500 text-sm mt-1">Join TaskFlow — manage your tasks effortlessly</p>
+            <p className="text-text-muted text-sm mt-1">Join TaskFlow — manage your tasks effortlessly</p>
           </div>
 
           {/* ── Server error banner ────────── */}
@@ -76,7 +76,7 @@ const Signup = () => {
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="signup-name" className="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+              <label htmlFor="signup-name" className="block text-sm font-medium text-text-label mb-1.5">Full Name</label>
               <input id="signup-name" type="text" name="name" value={form.name} onChange={handleChange} placeholder="John Doe"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.name ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
@@ -84,7 +84,7 @@ const Signup = () => {
 
             {/* Email */}
             <div>
-              <label htmlFor="signup-email" className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+              <label htmlFor="signup-email" className="block text-sm font-medium text-text-label mb-1.5">Email</label>
               <input id="signup-email" type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
                 className={`w-full px-4 py-2.5 text-sm rounded-lg transition-colors ${errors.email ? "border-red-500 ring-1 ring-red-500" : ""}`} />
               {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
@@ -92,7 +92,7 @@ const Signup = () => {
 
             {/* Password */}
             <div>
-              <label htmlFor="signup-password" className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <label htmlFor="signup-password" className="block text-sm font-medium text-text-label mb-1.5">Password</label>
               <PasswordInput
                 id="signup-password"
                 name="password"
@@ -109,12 +109,12 @@ const Signup = () => {
                 <div className="mt-2.5">
                   <div className="flex gap-1.5">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${strength >= i ? (strength === 3 ? "bg-emerald-500" : strength === 2 ? "bg-yellow-500" : "bg-red-500") : "bg-slate-700"}`} />
+                      <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${strength >= i ? (strength === 3 ? "bg-emerald-500" : strength === 2 ? "bg-yellow-500" : "bg-red-500") : "bg-border"}`} />
                     ))}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
                     {passwordRules.map((r, i) => (
-                      <span key={i} className={`text-xs flex items-center gap-1 ${r.test(form.password) ? "text-emerald-400" : "text-slate-500"}`}>
+                      <span key={i} className={`text-xs flex items-center gap-1 ${r.test(form.password) ? "text-emerald-400" : "text-text-muted"}`}>
                         <span>{r.test(form.password) ? "✓" : "○"}</span> {r.label}
                       </span>
                     ))}
@@ -125,7 +125,7 @@ const Signup = () => {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+              <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-text-label mb-1.5">Confirm Password</label>
               <PasswordInput
                 id="signup-confirm-password"
                 name="confirmPassword"
@@ -150,7 +150,7 @@ const Signup = () => {
           </form>
 
           {/* ── Footer ──────────────────── */}
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-text-muted mt-6">
             Already have an account?{" "}
             <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">Sign in</Link>
           </p>

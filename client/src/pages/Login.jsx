@@ -45,13 +45,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       {/* ── Subtle grid background ─────────── */}
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(var(--color-grid) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
       <div className="relative w-full max-w-md animate-fade-in">
         {/* ── Card ────────────────────────── */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-surface-card border border-border-subtle rounded-2xl p-8 shadow-2xl">
           {/* ── Header ──────────────────── */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-600/10 border border-primary-600/30 mb-4">
@@ -61,7 +61,7 @@ const Login = () => {
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-            <p className="text-slate-500 text-sm mt-1">Sign in to your TaskFlow account</p>
+            <p className="text-text-muted text-sm mt-1">Sign in to your TaskFlow account</p>
           </div>
 
           {/* ── Server error banner ────────── */}
@@ -75,7 +75,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Email */}
             <div>
-              <label htmlFor="login-email" className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+              <label htmlFor="login-email" className="block text-sm font-medium text-text-label mb-1.5">Email</label>
               <input
                 id="login-email"
                 type="email"
@@ -90,7 +90,7 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label htmlFor="login-password" className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <label htmlFor="login-password" className="block text-sm font-medium text-text-label mb-1.5">Password</label>
               <PasswordInput
                 id="login-password"
                 name="password"
@@ -117,7 +117,7 @@ const Login = () => {
           </form>
 
           {/* ── Footer link ──────────────── */}
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-text-muted mt-6">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
               Sign up
