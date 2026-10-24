@@ -49,12 +49,12 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface border-r border-border transition-all duration-300 ${
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* ── Logo ─────────────────────────── */}
-      <div className="flex items-center gap-3 p-5 border-b border-border">
+      <div className="flex items-center gap-3 p-5 border-b border-border-subtle">
         <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
             <path d="M9 11l3 3L22 4" />
@@ -74,7 +74,7 @@ const Sidebar = () => {
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
-                  : "text-text hover:text-white hover:bg-surface-raised"
+                  : "text-text-secondary hover:text-white hover:bg-surface-raised"
               }`
             }
           >
@@ -85,7 +85,7 @@ const Sidebar = () => {
       </nav>
 
       {/* ── User + Logout ────────────────── */}
-      <div className="border-t border-border p-3">
+      <div className="border-t border-border-subtle p-3">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg mb-2">
           <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
             {user?.name?.[0]?.toUpperCase() || "U"}
@@ -99,7 +99,7 @@ const Sidebar = () => {
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text hover:text-red-400 hover:bg-red-400/10 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
