@@ -48,6 +48,9 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     description: initial.description || "",
     priority: initial.priority || "medium",
     status: initial.status || "todo",
+      dueDate: initial.dueDate
+       ? initial.dueDate.slice(0, 10)
+    : "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,7 +65,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     if (!form.title.trim()) { setError("Title is required."); return; }
     setLoading(true);
     try {
-      await onSave(form);
+      await onSave({
+       ...form,
+       dueDate: form.dueDate || null,
+});
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -104,6 +110,37 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
           </select>
         </div>
       </div>
+
+<div>
+  <label
+    htmlFor="task-due-date"
+    className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide"
+  >
+    Due Date (Optional)
+  </label>
+  <div className="flex items-center gap-2">
+    <input
+      id="task-due-date"
+      name="dueDate"
+      type="date"
+      value={form.dueDate}
+      onChange={handleChange}
+      className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg"
+    />
+    {form.dueDate && (
+      <button
+        type="button"
+        onClick={() => {
+          setForm((prev) => ({ ...prev, dueDate: "" }));
+          setError("");
+        }}
+        className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors"
+      >
+        Clear
+      </button>
+    )}
+  </div>
+</div>
 
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
@@ -303,6 +340,19 @@ const Tasks = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
+          {task.dueDate && (
+            <p className="text-xs text-slate-400 mt-1">
+              <span aria-hidden="true">📅 </span>
+              Due{" "}
+              {new Date(
+              `${task.dueDate.slice(0, 10)}T00:00:00`
+               ).toLocaleDateString("en-GB", {
+               day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+           </p>
+         )}
                 <div className="flex gap-2 mt-2">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
                     {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
