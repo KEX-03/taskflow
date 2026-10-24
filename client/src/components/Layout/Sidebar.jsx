@@ -115,7 +115,7 @@ const Sidebar = () => {
         type="button"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text hover:text-white hover:border-border-muted transition-colors"
+        className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
         style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
       >
         {collapsed ? "›" : "‹"}
