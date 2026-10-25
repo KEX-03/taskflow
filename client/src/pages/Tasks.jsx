@@ -77,14 +77,19 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 
       <div>
         <label htmlFor="task-title" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Title</label>
-        <input id="task-title" name="title" value={form.title} onChange={handleChange} placeholder="Task title…"
+        <input id="task-title" name="title" value={form.title} maxLength={200} onChange={handleChange} placeholder="Task title…"
           className="w-full px-3 py-2 text-sm rounded-lg" />
       </div>
 
       <div>
         <label htmlFor="task-description" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Description</label>
-        <textarea id="task-description" name="description" value={form.description} onChange={handleChange} placeholder="Optional…" rows={3}
+        <textarea id="task-description" name="description" value={form.description} maxLength={1000} onChange={handleChange} placeholder="Optional…" rows={3}
           className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
+        <p className={`text-xs mt-1 ${
+          form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
+        }`}>
+          {form.description.length} / 1000
+        </p>
       </div>
 
       <div className="flex gap-3">
