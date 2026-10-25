@@ -49,6 +49,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     priority: initial.priority || "medium",
     status: initial.status || "todo",
     dueDate: initial.dueDate ? initial.dueDate.slice(0, 10) : "",
+    tags: Array.isArray(initial.tags) ? initial.tags.join(", ") : "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,17 +60,47 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.title.trim()) { setError("Title is required."); return; }
-    setLoading(true);
-    try {
-      await onSave({ ...form, dueDate: form.dueDate || null });
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+
+  if (!form.title.trim()) {
+    setError("Title is required.");
+    return;
+  }
+
+  const tags = [
+    ...new Set(
+      form.tags
+        .split(",")
+        .map((tag) => tag.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  ];
+
+  if (tags.length > 5) {
+    setError("You can add a maximum of 5 tags.");
+    return;
+  }
+
+  if (tags.some((tag) => tag.length > 20)) {
+    setError("Each tag must be 1–20 characters long.");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    await onSave({
+      ...form,
+      tags,
+      dueDate: form.dueDate || null,
+    });
+  } catch (err) {
+    setError(err.response?.data?.message || "Something went wrong.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -117,6 +148,26 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
           )}
         </div>
       </div>
+      <div>
+        <label
+          htmlFor="task-tags"
+          className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide"
+        >
+          Tags
+        </label>
+        <input
+          id="task-tags"
+          name="tags"
+          value={form.tags}
+          onChange={handleChange}
+          placeholder="Comma-separated tags…"
+          className="w-full px-3 py-2 text-sm rounded-lg"
+        />
+        <p className="text-xs text-slate-500 mt-1">
+          Comma-separated, maximum 5 tags. Each tag can be 1–20 characters.
+        </p>
+      </div>
+
 
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
@@ -143,6 +194,7 @@ const Tasks = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
@@ -175,6 +227,7 @@ const Tasks = () => {
       if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
+      if (filterTag) params.set("tag", filterTag.trim().toLowerCase());
       params.set("page", page);
       const { data } = await api.get(`/tasks?${params}`, {
         signal: controller.signal,
@@ -195,7 +248,7 @@ const Tasks = () => {
         setLoading(false);
       }
     }
-  }, [debouncedSearch, filterPriority, filterStatus, page]);
+  }, [debouncedSearch, filterPriority, filterStatus, filterTag, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -279,6 +332,19 @@ const Tasks = () => {
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
+
+<input
+  type="text"
+  value={filterTag}
+  onChange={(e) => {
+    setFilterTag(e.target.value);
+    setPage(1);
+  }}
+  placeholder="Filter by tag..."
+  aria-label="Filter tasks by tag"
+  className="px-3 py-2 text-sm rounded-lg min-w-[140px]"
+/>
+
         <select value={filterStatus} onChange={(e) => {
               setFilterStatus(e.target.value);
               setPage(1);
@@ -300,7 +366,7 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !debouncedSearch && !filterPriority && !filterStatus ? (
+          {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
               <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
@@ -312,7 +378,7 @@ const Tasks = () => {
           ) : (
             <>
               <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1);setFilterTag(""); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
             </>
           )}
         </div>
@@ -323,9 +389,27 @@ const Tasks = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
-                {task.dueDate && (
-                  <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
-                )}
+
+
+{task.dueDate && (
+  <p className="text-xs text-slate-400 mt-1">
+    <span aria-hidden="true">📅 </span>
+    Due {formatDueDate(task.dueDate)}
+  </p>
+)}
+
+{Array.isArray(task.tags) && task.tags.length > 0 && (
+  <div className="flex flex-wrap gap-1.5 mt-2">
+    {task.tags.map((tag) => (
+      <span
+        key={tag}
+        className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-300 border border-primary-500/20"
+      >
+        #{tag}
+      </span>
+    ))}
+  </div>
+)}
                 <div className="flex gap-2 mt-2">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
                     {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
