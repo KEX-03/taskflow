@@ -25,6 +25,7 @@ const NotFound = () => {
           {/* ── Header ──────────────────── */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-white">Page not found</h1>
+            <p className="text-slate-500 text-sm mt-1">The page you're looking for doesn't exist</p>
           </div>
 
           {user ? (

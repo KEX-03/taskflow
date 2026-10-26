@@ -32,30 +32,14 @@ const App = () => (
     <AuthProvider>
       <ToastProvider>
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <AuthRoute>
-                <Login />
-              </AuthRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <AuthRoute>
-                <Signup />
-              </AuthRoute>
-            }
-          />
+          <Route path="/login" element={<AuthRoute> <Login /></AuthRoute>} />
+          <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 
-          <Route
-            path="/dashboard"
+          <Route 
+            path="/dashboard" 
             element={
               <ProtectedRoute>
-                <DashLayout>
-                  <Dashboard />
-                </DashLayout>
+                <DashLayout><Dashboard /></DashLayout>
               </ProtectedRoute>
             }
           />
@@ -63,9 +47,7 @@ const App = () => (
             path="/tasks"
             element={
               <ProtectedRoute>
-                <DashLayout>
-                  <Tasks />
-                </DashLayout>
+                <DashLayout><Tasks /></DashLayout>
               </ProtectedRoute>
             }
           />
@@ -73,9 +55,7 @@ const App = () => (
             path="/profile"
             element={
               <ProtectedRoute>
-                <DashLayout>
-                  <Profile />
-                </DashLayout>
+                <DashLayout><Profile /></DashLayout>
               </ProtectedRoute>
             }
           />
