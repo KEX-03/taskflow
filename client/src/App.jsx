@@ -21,7 +21,7 @@ const AuthRoute = ({ children }) => {
 };
 
 const DashLayout = ({ children }) => (
-  <div className="flex h-screen bg-slate-950 relative">
+  <div className="flex h-screen bg-surface relative">
     <Sidebar />
     <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
   </div>

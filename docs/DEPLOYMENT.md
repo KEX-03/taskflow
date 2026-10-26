@@ -127,7 +127,13 @@ Browsers only let the frontend talk to the API if the API lists the frontend's a
    Keeping `http://localhost:3000` lets you run the frontend locally against the deployed API. Remove it if you don't need that.
 3. Save. Render redeploys the service with the new value (if it doesn't, use **Manual Deploy** → **Deploy latest commit**).
 
-> **Preview deployments:** Vercel also creates a separate URL for every branch and pull request (like `https://<your-app>-git-<branch>-<you>.vercel.app`). Those aren't in `FRONTEND_ORIGIN`, so the API blocks them. Add a preview URL to the list if you need to test one.
+> **Preview deployments:** Vercel also creates a separate URL for every branch and pull request (like `https://<your-app>-git-<branch>-<you>.vercel.app`). Those aren't in `FRONTEND_ORIGIN`, so the API blocks them. To allow all of them, add `FRONTEND_ORIGIN_PATTERN` in Render with your project name and Vercel team slug (the part before `.vercel.app` in a preview URL):
+> ```
+> ^https://<your-app>-[a-z0-9-]+-<your-team>\.vercel\.app$
+> ```
+> The server refuses to start if the pattern could match other websites: it must start with `^https://`, end with `$`, and write every dot as `\.`.
+>
+> A preview runs the code from its branch, including pull requests from forks, and logging in there gives that code your login token for the real API. Read a pull request's changes before logging in to its preview, or use a separate test account.
 
 ---
 
@@ -165,6 +171,7 @@ If you share a demo link, warn people that the first load may take up to a minut
 | `JWT_SECRET` | **Yes** | 64 random hex characters | Secret used to sign login tokens. The server won't start without it. Changing it logs everyone out. |
 | `JWT_EXPIRES_IN` | No | `7d` | How long a login lasts (`1h`, `7d`, …). Default: `7d`. |
 | `FRONTEND_ORIGIN` | No | `https://my-app.vercel.app,http://localhost:3000` | Comma-separated list of frontend URLs allowed to call the API. Default: `http://localhost:3000`. |
+| `FRONTEND_ORIGIN_PATTERN` | No | `^https://my-app-[a-z0-9-]+-my-team\.vercel\.app$` | Pattern for Vercel preview URLs that may call the API. Must start with `^https://`, end with `$` and escape every dot (`\.`). See [Preview deployments](#4-connect-the-api-to-the-frontend-cors). |
 | `PORT` | No | `5000` | Port to listen on. **Set automatically by Render.** Default: `5000`. |
 | `NODE_VERSION` | No | `24` | Render-only: which Node.js version to use. |
 

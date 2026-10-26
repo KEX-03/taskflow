@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
 const taskRoutes = require("./routes/tasks");
 const { errorHandler } = require("./utils/errorHandler");
+const { parseAllowedOrigins } = require("./utils/cors");
 
 const app = express();
 
@@ -31,16 +32,18 @@ app.use(
 
 // ── CORS ─────────────────────────────────────
 // FRONTEND_ORIGIN can list several origins separated by commas,
-// e.g. "http://localhost:3000,https://my-app.vercel.app".
-// Browsers send the origin without a trailing slash, so strip any.
-const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:3000")
-  .split(",")
-  .map((origin) => origin.trim().replace(/\/+$/, ""))
-  .filter(Boolean);
+// e.g. "http://localhost:3000,https://my-app.vercel.app", and
+// FRONTEND_ORIGIN_PATTERN can add a pattern for Vercel preview URLs.
+// server.js stops with an error if the pattern is unsafe; if it gets here
+// anyway, no other origin is allowed rather than every one.
+const corsOrigins = parseAllowedOrigins(
+  process.env.FRONTEND_ORIGIN,
+  process.env.FRONTEND_ORIGIN_PATTERN
+);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: corsOrigins.origins || [],
     credentials: true,
   })
 );

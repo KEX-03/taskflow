@@ -48,6 +48,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     description: initial.description || "",
     priority: initial.priority || "medium",
     status: initial.status || "todo",
+    dueDate: initial.dueDate ? initial.dueDate.slice(0, 10) : "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,7 +63,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     if (!form.title.trim()) { setError("Title is required."); return; }
     setLoading(true);
     try {
-      await onSave(form);
+      await onSave({ ...form, dueDate: form.dueDate || null });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -76,14 +77,19 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 
       <div>
         <label htmlFor="task-title" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Title</label>
-        <input id="task-title" name="title" value={form.title} onChange={handleChange} placeholder="Task title…"
+        <input id="task-title" name="title" value={form.title} maxLength={200} onChange={handleChange} placeholder="Task title…"
           className="w-full px-3 py-2 text-sm rounded-lg" />
       </div>
 
       <div>
         <label htmlFor="task-description" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Description</label>
-        <textarea id="task-description" name="description" value={form.description} onChange={handleChange} placeholder="Optional…" rows={3}
+        <textarea id="task-description" name="description" value={form.description} maxLength={1000} onChange={handleChange} placeholder="Optional…" rows={3}
           className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
+        <p className={`text-xs mt-1 ${
+          form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
+        }`}>
+          {form.description.length} / 1000
+        </p>
       </div>
 
       <div className="flex gap-3">
@@ -105,6 +111,18 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         </div>
       </div>
 
+      <div>
+        <label htmlFor="task-due-date" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Due date</label>
+        <div className="flex items-center gap-2">
+          <input id="task-due-date" name="dueDate" type="date" value={form.dueDate} onChange={handleChange}
+            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg" />
+          {form.dueDate && (
+            <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
+              className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Clear</button>
+          )}
+        </div>
+      </div>
+
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
         <button type="submit" disabled={loading} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
@@ -114,6 +132,13 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     </form>
   );
 };
+
+// ── Due date, e.g. "31 Oct 2026" ────────────
+// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
+// local midnight keeps the same day in every timezone; new Date() on the
+// full value would show 30 Oct west of UTC.
+const formatDueDate = (dueDate) =>
+  new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
@@ -303,6 +328,9 @@ const Tasks = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
+                {task.dueDate && (
+                  <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                )}
                 <div className="flex gap-2 mt-2">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
                     {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}

@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Tasks can have an optional due date. The API accepts `"dueDate": "2026-10-31"` when creating or updating a task, `null` removes it, and anything else returns a 400 with a clear message. The app doesn't show due dates yet ([#90](https://github.com/KEX-03/taskflow/pull/90)). Thanks to [@maansi1004](https://github.com/maansi1004)!
+- Vercel preview deployments can log in: the optional `FRONTEND_ORIGIN_PATTERN` setting lets the API accept a pattern of frontend URLs as well as the exact ones in `FRONTEND_ORIGIN`. The server refuses to start if the pattern could match other websites. See [Preview deployments](docs/DEPLOYMENT.md#4-connect-the-api-to-the-frontend-cors).
+- Tasks can have an optional due date. Pick one in the New/Edit Task form (and clear it again), and task cards show it as "Due 31 Oct 2026", on the same day in every timezone ([#93](https://github.com/KEX-03/taskflow/pull/93)). The API accepts `"dueDate": "2026-10-31"` when creating or updating a task, `null` removes it, and anything else returns a 400 with a clear message ([#90](https://github.com/KEX-03/taskflow/pull/90)). Thanks to [@maansi1004](https://github.com/maansi1004)!
 - Each page sets its own browser tab title, like "Tasks — TaskFlow", so open tabs and browser history are easy to tell apart ([#89](https://github.com/KEX-03/taskflow/pull/89)). Thanks to [@varunverma1361-create](https://github.com/varunverma1361-create)!
 - API tests for the task endpoints: creating, listing, searching, updating and deleting tasks, and checking that users can't see or change each other's tasks. They run against a separate `taskflow_test` database, so `npm test` now needs MongoDB running locally ([#88](https://github.com/KEX-03/taskflow/pull/88)). Thanks to [@rahulkumar128667-blip](https://github.com/rahulkumar128667-blip)!
 - Tasks can have up to 5 tags. The API accepts `tags` when creating or updating a task, stores them in lowercase without duplicates, and `GET /tasks?tag=work` lists only the tasks with that tag. The app doesn't show tags yet ([#86](https://github.com/KEX-03/taskflow/pull/86)). Thanks to [@bercedev](https://github.com/bercedev)!
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The app's shared colours (page and card backgrounds, borders, text) now have names, like `bg-surface-card` and `text-text-muted`, defined in one place in `client/src/index.css`. The Login and Signup pages and the sidebar use them, and nothing looks different. This is the first step towards a light theme ([#92](https://github.com/KEX-03/taskflow/pull/92)). Thanks to [@nahid2012](https://github.com/nahid2012)!
 - In production, the API's request logs use a compact format and leave out the hosting platform's health checks. Development logs are unchanged ([#80](https://github.com/KEX-03/taskflow/pull/80)). Thanks to [@ShivamKumarKeshari-123](https://github.com/ShivamKumarKeshari-123)!
 - The README's demo GIF shows the current app.
 - The automatic thank-you comment on merged pull requests now invites every contributor to suggest their own ideas through the feature request form ([#58](https://github.com/KEX-03/taskflow/pull/58)).

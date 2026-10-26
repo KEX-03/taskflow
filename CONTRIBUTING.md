@@ -152,7 +152,7 @@ git merge upstream/main
 
 ## 4. Test your change
 
-The backend has an automated test suite using Node.js's built-in test runner. The API tests need MongoDB running locally, the same as `npm run dev`; they use a separate `taskflow_test` database, so your own data is safe. The tests only cover part of the code so far, so please run them **and** check your change by hand before opening a pull request:
+The backend has an automated test suite using Node.js's built-in test runner. The API tests need MongoDB running locally, the same as `npm run dev`; they use a separate `taskflow_test` database, so your own data is safe. Using Atlas? Put a connection string in `TEST_MONGO_URI` in `server/.env`, with a database name ending in `_test` (for example `.../taskflow_test`). The tests only cover part of the code so far, so please run them **and** check your change by hand before opening a pull request:
 
 1. **The tests and the linter pass.** `npm test` from the repository root (or from `server/`) ends with `ℹ fail 0`, and `npm run lint` reports no problems. If you changed a helper in `server/src/utils/` or an API endpoint, add or update its tests in `server/test/`. Changes to the scripts in `.github/scripts/` need their tests there updated too.
 2. **It builds.** `npm run build` finishes with `✓ built in …`.
@@ -290,7 +290,7 @@ const Archive = () => {
     <div className="flex-1 p-6 overflow-y-auto">
       <h1 className="text-xl font-bold text-white mb-6">Archive</h1>
       {tasks.map((task) => (
-        <p key={task._id} className="text-slate-300 text-sm">{task.title}</p>
+        <p key={task._id} className="text-text-label text-sm">{task.title}</p>
       ))}
     </div>
   );

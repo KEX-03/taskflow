@@ -20,7 +20,7 @@
 
 - **Sign up and log in** with secure password hashing and JWT (token-based) authentication
 - **Dashboard** with task counts by status and your most recent tasks
-- **Tasks**: create, edit and delete, with search and filters by priority and status
+- **Tasks**: create, edit and delete, with optional due dates, search and filters by priority and status
 - **Profile**: update your name, bio and avatar, and change your password
 - **Protected pages**: logged-out visitors are sent to the login page
 - **Each user only sees their own tasks**, enforced by the API
