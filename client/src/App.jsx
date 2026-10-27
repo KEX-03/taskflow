@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { ToastProvider } from "./components/Shared/Toast.jsx";
 import ProtectedRoute from "./components/Layout/ProtectedRoute.jsx";
 import Sidebar from "./components/Layout/Sidebar.jsx";
+import Topbar from "./components/Layout/Topbar.jsx";
 import Spinner from "./components/Shared/Spinner.jsx";
 
 import Login from "./pages/Login.jsx";
@@ -20,9 +21,20 @@ const AuthRoute = ({ children }) => {
 };
 
 const DashLayout = ({ children }) => (
-  <div className="flex h-screen bg-surface relative">
-    <Sidebar />
-    <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
+  <div className="relative flex h-dvh overflow-hidden bg-surface">
+    <div className="flex min-w-0 flex-1 flex-col md:flex-row">
+      <div className="shrink-0 md:hidden">
+        <Topbar />
+      </div>
+
+      <div className="hidden md:flex">
+        <Sidebar />
+      </div>
+
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        {children}
+      </main>
+    </div>
   </div>
 );
 
@@ -31,15 +43,30 @@ const App = () => (
     <AuthProvider>
       <ToastProvider>
         <Routes>
-          
-          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-          <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+          <Route
+            path="/login"
+            element={
+              <AuthRoute>
+                <Login />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthRoute>
+                <Signup />
+              </AuthRoute>
+            }
+          />
 
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashLayout><Dashboard /></DashLayout>
+                <DashLayout>
+                  <Dashboard />
+                </DashLayout>
               </ProtectedRoute>
             }
           />
@@ -47,7 +74,9 @@ const App = () => (
             path="/tasks"
             element={
               <ProtectedRoute>
-                <DashLayout><Tasks /></DashLayout>
+                <DashLayout>
+                  <Tasks />
+                </DashLayout>
               </ProtectedRoute>
             }
           />
@@ -55,7 +84,9 @@ const App = () => (
             path="/profile"
             element={
               <ProtectedRoute>
-                <DashLayout><Profile /></DashLayout>
+                <DashLayout>
+                  <Profile />
+                </DashLayout>
               </ProtectedRoute>
             }
           />
