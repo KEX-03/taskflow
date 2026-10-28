@@ -12,6 +12,7 @@ import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Tasks from "./pages/Tasks.jsx";
 import Profile from "./pages/Profile.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const AuthRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -92,7 +93,7 @@ const App = () => (
           />
 
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </ToastProvider>
     </AuthProvider>
