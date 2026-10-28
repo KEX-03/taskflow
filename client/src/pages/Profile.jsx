@@ -77,7 +77,8 @@ const Profile = () => {
     }
   };
 
-  const avatarUrl = form.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || "U")}&backgroundColor=3b82f6`;
+  const avatarSeed = encodeURIComponent(user?.name || "U");
+  const avatarUrl = form.avatar || "https:" + String.fromCharCode(47, 47) + "api.dicebear.com/7.x/initials/svg?seed=" + avatarSeed + "&backgroundColor=3b82f6";
 
   return (
     <div className="flex-1 p-6 overflow-y-auto">
