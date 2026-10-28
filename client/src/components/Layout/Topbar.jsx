@@ -20,7 +20,7 @@ const Topbar = () => {
 
     window.addEventListener("keydown", handleKeyDown);
 
-    return window.removeEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMenuOpen]);
 
   return (
@@ -35,9 +35,7 @@ const Topbar = () => {
           aria-controls="mobile-navigation"
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg
-            text-gray-600 transition-colors hover:bg-gray-100
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-gray-400"
+            text-text-secondary hover:text-white hover:bg-surface-raised"
         >
           {isMenuOpen ? (
             <svg
@@ -72,9 +70,12 @@ const Topbar = () => {
       {isMenuOpen && (
         <div
           id="mobile-navigation"
-          className="fixed inset-0 z-40 overflow-y-auto bg-white pt-12 md:hidden"
+          className="fixed inset-0 z-40 overflow-y-auto bg-black/60 backdrop-blur-xs md:hidden"
+          onClick={() => setIsMenuOpen(false)}
         >
-          <Sidebar mobileOpen={true} />
+          <div>
+            <Sidebar mobileOpen={true} />
+          </div>
         </div>
       )}
     </>

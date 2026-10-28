@@ -7,15 +7,7 @@ const navItems = [
   {
     to: "/dashboard",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -27,15 +19,7 @@ const navItems = [
   {
     to: "/tasks",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <path d="M9 11l3 3L22 4" />
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
@@ -45,15 +29,7 @@ const navItems = [
   {
     to: "/profile",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="8" r="4" />
       </svg>
@@ -74,8 +50,14 @@ const Sidebar = ({ mobileOpen = false }) => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen && "h-[calc(100dvh-3rem)] w-full"} ${
-        collapsed ? "w-16" : "w-64"
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${
+        mobileOpen
+          ? collapsed
+            ? "w-16 h-[calc(100dvh-4rem)]"
+            : "w-64 h-[calc(100dvh-4rem)]"
+          : collapsed
+            ? "w-16"
+            : "w-64"
       }`}
     >
       {/* ── Logo ─────────────────────────── */}
@@ -84,7 +66,7 @@ const Sidebar = ({ mobileOpen = false }) => {
       </div>
 
       {/* ── Nav Links ────────────────────── */}
-      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 mt-5 md:mt-0">
+      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 mt-14 md:mt-0">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -111,9 +93,7 @@ const Sidebar = ({ mobileOpen = false }) => {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {user?.name}
-              </p>
+              <p className="text-sm font-medium text-white truncate">{user?.name}</p>
               <p className="text-xs text-text-muted truncate">{user?.email}</p>
             </div>
           )}
@@ -122,15 +102,7 @@ const Sidebar = ({ mobileOpen = false }) => {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4"
-          >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
