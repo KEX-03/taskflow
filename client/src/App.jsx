@@ -44,7 +44,6 @@ const App = () => (
     <AuthProvider>
       <ToastProvider>
         <Routes>
-
           <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
           <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 

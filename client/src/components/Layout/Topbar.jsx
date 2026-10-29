@@ -25,7 +25,7 @@ const Topbar = () => {
 
   return (
     <>
-      <header className="relative z-50 flex h-12 w-full items-center justify-between border-b border-border-subtle bg-surface-card pr-3 py-8 md:hidden">
+      <header className="relative z-50 flex h-12 w-full items-center justify-between border-b border-border-subtle bg-surface-card pr-3 md:hidden">
         <Logo collapsed={false} />
 
         <button
@@ -70,12 +70,10 @@ const Topbar = () => {
       {isMenuOpen && (
         <div
           id="mobile-navigation"
-          className="fixed inset-0 z-40 overflow-y-auto bg-black/60 backdrop-blur-xs md:hidden"
-          onClick={() => setIsMenuOpen(false)}
+          className="fixed left-0 top-12 bottom-0 right-0 z-40 overflow-y-auto bg-black/60 backdrop-blur-xs md:hidden"
+          onClick={(e) => e.target === e.currentTarget && setIsMenuOpen(false)}
         >
-          <div>
-            <Sidebar mobileOpen={true} />
-          </div>
+          <Sidebar mobileOpen={true}/>
         </div>
       )}
     </>

@@ -38,7 +38,7 @@ const navItems = [
   },
 ];
 
-const Sidebar = ({ mobileOpen = false }) => {
+const Sidebar = ({mobileOpen = false}) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -50,14 +50,8 @@ const Sidebar = ({ mobileOpen = false }) => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${
-        mobileOpen
-          ? collapsed
-            ? "w-16 h-[calc(100dvh-4rem)]"
-            : "w-64 h-[calc(100dvh-4rem)]"
-          : collapsed
-            ? "w-16"
-            : "w-64"
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-[calc(100dvh-3rem)]" : ""} ${
+        collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* ── Logo ─────────────────────────── */}
@@ -66,7 +60,7 @@ const Sidebar = ({ mobileOpen = false }) => {
       </div>
 
       {/* ── Nav Links ────────────────────── */}
-      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 mt-14 md:mt-0">
+      <nav className="flex-1 py-4 flex flex-col gap-1 px-2">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
