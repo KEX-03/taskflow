@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
+import Logo from "../Shared/Logo.jsx";
 
 const navItems = [
   {
@@ -37,7 +38,7 @@ const navItems = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({mobileOpen = false}) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -49,19 +50,13 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-[calc(100dvh-3rem)]" : ""} ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* ── Logo ─────────────────────────── */}
-      <div className="flex items-center gap-3 p-5 border-b border-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-            <path d="M9 11l3 3L22 4" />
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-          </svg>
-        </div>
-        {!collapsed && <span className="text-lg font-bold text-white">TaskFlow</span>}
+      <div className="hidden md:block">
+        <Logo collapsed={collapsed} />
       </div>
 
       {/* ── Nav Links ────────────────────── */}
@@ -115,7 +110,7 @@ const Sidebar = () => {
         type="button"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
         style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
       >
         {collapsed ? "›" : "‹"}
