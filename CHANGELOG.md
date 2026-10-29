@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- On small screens, the sidebar is replaced by a top bar with a menu button, which opens the sidebar as a drawer over the page. Tapping outside it, pressing Esc or going to another page closes it, and on larger screens the sidebar works as before ([#98](https://github.com/KEX-03/taskflow/pull/98)). Thanks to [@damirgros](https://github.com/damirgros)!
 - Unknown URLs, like `/taks`, show a "Page not found" page with a button to the Dashboard (when logged in) or to the Login page, instead of silently sending you to the Login page ([#91](https://github.com/KEX-03/taskflow/pull/91)). Thanks to [@Salypse](https://github.com/Salypse)!
 - Screen readers announce the character counters on the Bio field and the task description, for example "240 / 300 characters used", without changing how they look ([#97](https://github.com/KEX-03/taskflow/pull/97)). Thanks to [@Anushka157-cha](https://github.com/Anushka157-cha)!
 - The task form stops the title at 200 characters and the description at 1000, the same limits as the API, and a counter under the description ("240 / 1000") turns amber from 950 characters, like the Bio counter ([#96](https://github.com/KEX-03/taskflow/pull/96)). Thanks to [@anthony95macias](https://github.com/anthony95macias)!

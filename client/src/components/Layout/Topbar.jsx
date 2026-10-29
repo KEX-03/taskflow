@@ -73,7 +73,7 @@ const Topbar = () => {
           className="fixed left-0 top-12 bottom-0 right-0 z-40 overflow-y-auto bg-black/60 backdrop-blur-xs md:hidden"
           onClick={(e) => e.target === e.currentTarget && setIsMenuOpen(false)}
         >
-          <Sidebar mobileOpen={true}/>
+          <Sidebar mobileOpen />
         </div>
       )}
     </>

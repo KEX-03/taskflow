@@ -315,7 +315,7 @@ import Archive from "./pages/Archive.jsx";
 />
 ```
 
-**3. Add a sidebar link** in `client/src/components/Layout/Sidebar.jsx` by adding an entry to the `navItems` array, with `to: "/archive"`, a `label` and an `icon` (copy the SVG from another entry to start with).
+**3. Add a sidebar link** in `client/src/components/Layout/Sidebar.jsx` by adding an entry to the `navItems` array, with `to: "/archive"`, a `label` and an `icon` (copy the SVG from another entry to start with). The small-screen menu reuses the sidebar, so the link shows up there too.
 
 **4. Try it:** open http://localhost:3000/archive while logged in, then try it again while logged out (you should be sent to the login page).
 

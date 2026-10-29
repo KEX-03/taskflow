@@ -83,8 +83,8 @@ client/src/
 ├── pages/             Login, Signup, Dashboard, Tasks, Profile, NotFound
 ├── context/           AuthContext: user, token, login/signup/logout
 ├── components/
-│   ├── Layout/        Sidebar, ProtectedRoute
-│   └── Shared/        Toast (pop-up messages), Spinner
+│   ├── Layout/        Sidebar, Topbar (small-screen menu), ProtectedRoute
+│   └── Shared/        Toast (pop-up messages), Spinner, Logo
 └── utils/
     ├── api.js         Axios instance + token and 401 interceptors
     └── validation.js  Form checks for signup and login
@@ -92,7 +92,7 @@ client/src/
 
 - **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `AuthProvider` (who is logged in) and `ToastProvider` (messages). Then it lists the routes:
   - `/login` and `/signup` use `AuthRoute`, which sends already logged-in users to the dashboard.
-  - `/dashboard`, `/tasks` and `/profile` use `ProtectedRoute`, which sends logged-out users to `/login`, and `DashLayout`, which adds the sidebar.
+  - `/dashboard`, `/tasks` and `/profile` use `ProtectedRoute`, which sends logged-out users to `/login`, and `DashLayout`, which adds the sidebar. On small screens, `DashLayout` shows a top bar instead, whose menu button opens the same sidebar as a drawer.
   - `/` redirects to `/login`. Any other URL shows the `NotFound` page ("Page not found"), with a button to the Dashboard or to Login, depending on whether you're logged in.
 - **Pages** own their data: each one calls the API through `utils/api.js` when it loads and keeps the results in its own state (`useState`). There's no global data store besides the logged-in user.
 - **Context** shares the logged-in user with every component through the `useAuth()` hook, and `useToast()` shows success and error messages.

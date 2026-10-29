@@ -38,7 +38,7 @@ const navItems = [
   },
 ];
 
-const Sidebar = ({mobileOpen = false}) => {
+const Sidebar = ({ mobileOpen = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -50,7 +50,7 @@ const Sidebar = ({mobileOpen = false}) => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-[calc(100dvh-3rem)]" : ""} ${
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-full" : ""} ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
@@ -110,7 +110,7 @@ const Sidebar = ({mobileOpen = false}) => {
         type="button"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
-        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
         style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
       >
         {collapsed ? "›" : "‹"}

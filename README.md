@@ -22,6 +22,7 @@
 - **Dashboard** with task counts by status and your most recent tasks
 - **Tasks**: create, edit and delete, with optional due dates, search and filters by priority and status
 - **Profile**: update your name, bio and avatar, and change your password
+- **Works on phones**: on small screens, the sidebar becomes a menu
 - **Protected pages**: logged-out visitors are sent to the login page
 - **Each user only sees their own tasks**, enforced by the API
 - **Clean, readable code** split into small files, with a [contributing guide](CONTRIBUTING.md) that explains where everything lives
