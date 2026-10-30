@@ -4,7 +4,11 @@ import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
-
+import {
+  formatDueDate,
+  isOverdue,
+  isDueToday,
+} from "../utils/dates.js";
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
   const titleId = useId();
@@ -133,13 +137,6 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     </form>
   );
 };
-
-// ── Due date, e.g. "31 Oct 2026" ────────────
-// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
-// local midnight keeps the same day in every timezone; new Date() on the
-// full value would show 30 Oct west of UTC.
-const formatDueDate = (dueDate) =>
-  new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
@@ -323,34 +320,86 @@ const Tasks = () => {
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          {tasks.map((task) => (
-            <div key={task._id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-start gap-4 hover:border-slate-700 transition-colors animate-fade-in">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">{task.title}</p>
-                {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
-                {task.dueDate && (
-                  <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
-                )}
-                <div className="flex gap-2 mt-2">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
-                    {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                  </span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
-                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors" title="Edit">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                </button>
-                <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="flex flex-col gap-2">{tasks.map((task) => (
+  <div
+    key={task._id}
+    className={`bg-slate-900 ${
+      isOverdue(task)
+        ? "border border-red-500/40 hover:border-red-500/40"
+        : "border border-slate-800 hover:border-slate-700"
+    } rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}
+  >
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-white">{task.title}</p>
+
+      {task.description && (
+        <p className="text-xs text-slate-500 mt-0.5 truncate">
+          {task.description}
+        </p>
+      )}
+
+      {task.dueDate && (
+        <div className="flex items-center gap-2 flex-wrap mt-1">
+          <p className="text-xs text-slate-400">
+            <span aria-hidden="true">📅 </span>
+            Due {formatDueDate(task.dueDate)}
+          </p>
+
+          {isOverdue(task) && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">
+              Overdue
+            </span>
+          )}
+
+          {isDueToday(task) && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full text-yellow-400 bg-yellow-400/10">
+              Due today
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="flex gap-2 mt-2">
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
+          {task.status === "in-progress"
+            ? "In Progress"
+            : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+        </span>
+
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
+          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+        </span>
+      </div>
+    </div>
+
+    <div className="flex items-center gap-2 shrink-0">
+      <button
+        aria-label="Edit task"
+        onClick={() => setEditTask(task)}
+        className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
+        title="Edit"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </button>
+
+      <button
+        aria-label="Delete task"
+        onClick={() => setDeleteId(task._id)}
+        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+        title="Delete"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+))}
+
         </div>
       )}
 
