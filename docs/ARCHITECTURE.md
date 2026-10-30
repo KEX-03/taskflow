@@ -80,7 +80,7 @@ The password is removed every time a user is turned into JSON (`toJSON` in `User
 client/src/
 ├── index.jsx          Starts React and renders <App />
 ├── App.jsx            Providers + all routes
-├── pages/             Login, Signup, Dashboard, Tasks, Profile
+├── pages/             Login, Signup, Dashboard, Tasks, Profile, NotFound
 ├── context/           AuthContext: user, token, login/signup/logout
 ├── components/
 │   ├── Layout/        Sidebar, ProtectedRoute
@@ -93,7 +93,7 @@ client/src/
 - **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `AuthProvider` (who is logged in) and `ToastProvider` (messages). Then it lists the routes:
   - `/login` and `/signup` use `AuthRoute`, which sends already logged-in users to the dashboard.
   - `/dashboard`, `/tasks` and `/profile` use `ProtectedRoute`, which sends logged-out users to `/login`, and `DashLayout`, which adds the sidebar.
-  - Any other URL redirects to `/login`.
+  - `/` redirects to `/login`. Any other URL shows the `NotFound` page ("Page not found"), with a button to the Dashboard or to Login, depending on whether you're logged in.
 - **Pages** own their data: each one calls the API through `utils/api.js` when it loads and keeps the results in its own state (`useState`). There's no global data store besides the logged-in user.
 - **Context** shares the logged-in user with every component through the `useAuth()` hook, and `useToast()` shows success and error messages.
 - **Validation** happens twice: `utils/validation.js` gives instant feedback in forms, but **the server is the source of truth** and checks everything again, because anyone can call the API directly.

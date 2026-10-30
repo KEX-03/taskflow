@@ -75,8 +75,8 @@
     box-sizing: border-box;
   }
   body {
-    @apply bg-surface text-text min-h-screen;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    @apply bg-surface text-text min-h-screen antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   }
   input, textarea, select {
     @apply bg-surface-raised border border-border text-text rounded-lg;

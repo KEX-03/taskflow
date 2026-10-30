@@ -167,6 +167,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
           id="task-title"
           name="title"
           value={form.title}
+          maxLength={200}
           onChange={handleChange}
           placeholder="Task title…"
           className="w-full px-3 py-2 text-sm rounded-lg"
@@ -180,15 +181,14 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         >
           Description
         </label>
-        <textarea
-          id="task-description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Optional…"
-          rows={3}
-          className="w-full px-3 py-2 text-sm rounded-lg resize-none"
-        />
+       <textarea id="task-description" name="description" value={form.description} maxLength={1000} onChange={handleChange} placeholder="Optional…" rows={3}
+  aria-describedby="task-description-counter"
+  className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
+<p id="task-description-counter" className={`text-xs mt-1 ${
+  form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
+}`}>
+  {form.description.length} / 1000<span className="sr-only"> characters used</span>
+</p>
       </div>
 
       <div className="flex gap-3">
