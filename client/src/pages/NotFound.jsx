@@ -16,7 +16,7 @@ const NotFound = () => {
         <div className="bg-surface-card border border-border-subtle rounded-2xl p-8 shadow-2xl">
           {/* ── Header ──────────────────── */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white">Page not found</h1>
+            <h1 className="text-2xl font-bold text-text">Page not found</h1>
             <p className="text-text-muted text-sm mt-1">The page you're looking for doesn't exist.</p>
           </div>
 

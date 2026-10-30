@@ -4,7 +4,7 @@ const TaskSkeleton = () => {
   return (
     <div
       aria-hidden="true"
-      className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-start gap-4 motion-safe:animate-pulse"
+      className="bg-surface-card border border-border-subtle rounded-xl p-4 flex items-start gap-4 motion-safe:animate-pulse"
     >
       <div className="flex-1 min-w-0">
         <div className="h-4 bg-slate-800 rounded w-1/3 mb-2" />

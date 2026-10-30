@@ -32,7 +32,7 @@ const PasswordInput = ({
         type="button"
         onClick={() => setIsVisible((visible) => !visible)}
         aria-label={isVisible ? "Hide password" : "Show password"}
-        className="absolute inset-y-0 right-0 flex items-center px-4 text-text-secondary hover:text-white transition-colors"
+        className="absolute inset-y-0 right-0 flex items-center px-4 text-text-secondary hover:text-text focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
       >
         {isVisible ? (
           <svg

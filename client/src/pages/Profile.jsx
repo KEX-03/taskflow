@@ -84,21 +84,21 @@ const Profile = () => {
 
   return (
     <div className="flex-1 p-6 overflow-y-auto">
-      <h1 className="text-xl font-bold text-white mb-6">Profile</h1>
+      <h1 className="text-xl font-bold text-text mb-6">Profile</h1>
 
       <div className="max-w-xl space-y-6">
         {/* ── Avatar + Name Header ────── */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex items-center gap-5">
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-6 flex items-center gap-5">
           <img src={avatarUrl} alt="avatar" className="w-16 h-16 rounded-full object-cover border-2 border-slate-700" />
           <div>
-            <p className="text-lg font-semibold text-white">{form.name || "—"}</p>
+            <p className="text-lg font-semibold text-text">{form.name || "—"}</p>
             <p className="text-sm text-slate-500">{user?.email}</p>
           </div>
         </div>
 
         {/* ── Edit Profile ──────────── */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wide">Edit Profile</h2>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-6">
+          <h2 className="text-sm font-semibold text-text mb-4 uppercase tracking-wide">Edit Profile</h2>
           <form onSubmit={handleProfileSave} noValidate className="space-y-4">
             <div>
               <label htmlFor="profile-name" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Full Name</label>
@@ -152,8 +152,8 @@ const Profile = () => {
         </div>
 
         {/* ── Change Password ────────── */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wide">Change Password</h2>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-6">
+          <h2 className="text-sm font-semibold text-text mb-4 uppercase tracking-wide">Change Password</h2>
           <form onSubmit={handlePasswordSave} noValidate className="space-y-4">
             <div>
               <label htmlFor="profile-current-password" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Current Password</label>
@@ -194,7 +194,7 @@ const Profile = () => {
               />
               {errors.confirmNew && <p className="text-red-400 text-xs mt-1">{errors.confirmNew}</p>}
             </div>
-            <button type="submit" disabled={pwLoading} className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-semibold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+            <button type="submit" disabled={pwLoading} className="w-full bg-surface-raised hover:bg-border-subtle disabled:opacity-50 text-text font-semibold py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
               {pwLoading ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving…</> : "Update Password"}
             </button>
           </form>

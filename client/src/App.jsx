@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { ToastProvider } from "./components/Shared/Toast.jsx";
 import ProtectedRoute from "./components/Layout/ProtectedRoute.jsx";
 import Sidebar from "./components/Layout/Sidebar.jsx";
@@ -41,42 +42,44 @@ const DashLayout = ({ children }) => (
 
 const App = () => (
   <BrowserRouter>
-    <AuthProvider>
-      <ToastProvider>
-        <Routes>
-          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-          <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
+    <ThemeProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <Routes>
+            <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+            <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashLayout><Dashboard /></DashLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <ProtectedRoute>
-                <DashLayout><Tasks /></DashLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <DashLayout><Profile /></DashLayout>
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashLayout><Dashboard /></DashLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <ProtectedRoute>
+                  <DashLayout><Tasks /></DashLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <DashLayout><Profile /></DashLayout>
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ToastProvider>
-    </AuthProvider>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ToastProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </BrowserRouter>
 );
 
