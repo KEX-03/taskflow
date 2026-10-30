@@ -49,8 +49,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     priority: initial.priority || "medium",
     status: initial.status || "todo",
     dueDate: initial.dueDate ? initial.dueDate.slice(0, 10) : "",
+    tags: Array.isArray(initial.tags) ? initial.tags : [],
   });
   const [error, setError] = useState("");
+  const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -58,12 +60,35 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     setError("");
   };
 
+  // Same rules as the API: trimmed, lowercased, no duplicates, up to 5 tags of 1–20 characters
+  const addTag = () => {
+    const tag = tagInput.trim().toLowerCase();
+    if (!tag) return;
+    if (tag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
+    if (form.tags.includes(tag)) { setTagInput(""); setError(""); return; }
+    if (form.tags.length >= 5) { setError("You can add a maximum of 5 tags."); return; }
+    setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
+    setTagInput("");
+    setError("");
+  };
+
+  const removeTag = (tag) => {
+    setForm((prev) => ({ ...prev, tags: prev.tags.filter((item) => item !== tag) }));
+    setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) { setError("Title is required."); return; }
+    // Text still in the tag box is saved as a tag too, so nothing typed is lost
+    const pendingTag = tagInput.trim().toLowerCase();
+    if (pendingTag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
+    const tags = [...new Set([...form.tags, ...(pendingTag ? [pendingTag] : [])])];
+    if (tags.length > 5) { setError("You can add a maximum of 5 tags."); return; }
     setLoading(true);
+    setError("");
     try {
-      await onSave({ ...form, dueDate: form.dueDate || null });
+      await onSave({ ...form, tags, dueDate: form.dueDate || null });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -124,6 +149,25 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         </div>
       </div>
 
+      <div>
+        <label htmlFor="task-tags" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Tags</label>
+        <input id="task-tags" value={tagInput} onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); }
+          }}
+          placeholder="Type a tag and press Enter…"
+          className="w-full px-3 py-2 text-sm rounded-lg" />
+        <div className="flex flex-wrap gap-2 mt-2">
+          {form.tags.map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2.5 py-1 text-xs text-primary-400">
+              #{tag}
+              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="ml-1 hover:text-white">×</button>
+            </span>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500 mt-1">Press Enter or comma to add a tag. Maximum 5 tags, 20 characters each.</p>
+      </div>
+
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Cancel</button>
         <button type="submit" disabled={loading} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
@@ -149,6 +193,7 @@ const Tasks = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
@@ -181,6 +226,7 @@ const Tasks = () => {
       if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
+      if (filterTag) params.set("tag", filterTag);
       params.set("page", page);
       const { data } = await api.get(`/tasks?${params}`, {
         signal: controller.signal,
@@ -201,7 +247,7 @@ const Tasks = () => {
         setLoading(false);
       }
     }
-  }, [debouncedSearch, filterPriority, filterStatus, page]);
+  }, [debouncedSearch, filterPriority, filterStatus, filterTag, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -295,6 +341,12 @@ const Tasks = () => {
           <option value="in-progress">In Progress</option>
           <option value="done">Done</option>
         </select>
+        {filterTag && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-2 text-sm text-primary-400">
+            #{filterTag}
+            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="hover:text-white">×</button>
+          </span>
+        )}
       </div>
 
       {/* ── Task List ───────────────────── */}
@@ -306,7 +358,7 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !debouncedSearch && !filterPriority && !filterStatus ? (
+          {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
               <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
@@ -318,7 +370,7 @@ const Tasks = () => {
           ) : (
             <>
               <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setFilterTag(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
             </>
           )}
         </div>
@@ -331,6 +383,16 @@ const Tasks = () => {
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
                 {task.dueDate && (
                   <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                )}
+                {task.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {task.tags.map((tag) => (
+                      <button key={tag} type="button" onClick={() => { setFilterTag(tag); setPage(1); }}
+                        className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 hover:bg-primary-500/20 transition-colors">
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
                 )}
                 <div className="flex gap-2 mt-2">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
