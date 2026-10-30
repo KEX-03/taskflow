@@ -95,7 +95,12 @@
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  html{
+    color-scheme: dark;
+  }
 }
+
+
 
 /* ── Scrollbar ─────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }

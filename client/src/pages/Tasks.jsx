@@ -149,7 +149,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
               // Open the calendar when clicking anywhere on the field, not just the icon
               try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
             }}
-            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
+            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
           />
           {form.dueDate && (
             <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
@@ -331,9 +331,9 @@ const Tasks = () => {
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg" />
         </div>
         <select value={filterPriority} onChange={(e) => {
-          setFilterPriority(e.target.value);
-          setPage(1);
-        }}
+              setFilterPriority(e.target.value);
+              setPage(1);
+            }}
           className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
           <option value="">All Priorities</option>
           <option value="low">Low</option>
@@ -341,9 +341,9 @@ const Tasks = () => {
           <option value="high">High</option>
         </select>
         <select value={filterStatus} onChange={(e) => {
-          setFilterStatus(e.target.value);
-          setPage(1);
-        }}
+              setFilterStatus(e.target.value);
+              setPage(1);
+            }}
           className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
           <option value="">All Statuses</option>
           <option value="todo">To Do</option>
@@ -443,7 +443,7 @@ const Tasks = () => {
             onClick={() => setPage(page + 1)}
             disabled={page >= meta.pages}
             className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            >
             Next
           </button>
 
