@@ -61,7 +61,7 @@ const Signup = () => {
                 <line x1="22" y1="11" x2="16" y2="11" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white">Create account</h1>
+            <h1 className="text-2xl font-bold text-text">Create account</h1>
             <p className="text-text-muted text-sm mt-1">Join TaskFlow — manage your tasks effortlessly</p>
           </div>
 

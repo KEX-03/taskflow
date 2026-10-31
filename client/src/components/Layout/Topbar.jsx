@@ -35,7 +35,7 @@ const Topbar = () => {
           aria-controls="mobile-navigation"
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg
-            text-text-secondary hover:text-white hover:bg-surface-raised"
+            text-text-secondary hover:text-text hover:bg-surface-raised focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500"
         >
           {isMenuOpen ? (
             <svg

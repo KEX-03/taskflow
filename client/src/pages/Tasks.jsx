@@ -30,10 +30,10 @@ const Modal = ({ open, onClose, title, children }) => {
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
-        <div className="flex items-center justify-between p-5 border-b border-slate-800">
-          <h3 id={titleId} className="text-base font-semibold text-white">{title}</h3>
-          <button type="button" aria-label="Close dialog" onClick={onClose} className="text-slate-500 hover:text-white transition-colors text-xl leading-none">×</button>
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
+        <div className="flex items-center justify-between p-5 border-b border-border-subtle">
+          <h3 id={titleId} className="text-base font-semibold text-text">{title}</h3>
+          <button type="button" aria-label="Close dialog" onClick={onClose} className="text-text-muted hover:text-text focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors text-xl leading-none">×</button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -154,7 +154,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
           />
           {form.dueDate && (
             <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
-              className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Clear</button>
+              className="px-3 py-2 text-xs font-medium rounded-lg text-text-label bg-surface-raised hover:bg-border-subtle transition-colors">Clear</button>
           )}
         </div>
       </div>
@@ -171,7 +171,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
           {form.tags.map((tag) => (
             <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2.5 py-1 text-xs text-primary-400">
               #{tag}
-              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="ml-1 hover:text-white">×</button>
+              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="ml-1 hover:text-text">×</button>
             </span>
           ))}
         </div>
@@ -313,7 +313,7 @@ const Tasks = () => {
       {/* ── Header ──────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-white">Tasks</h1>
+          <h1 className="text-xl font-bold text-text">Tasks</h1>
           <p className="text-slate-500 text-sm">{meta.total} task{meta.total !== 1 ? "s" : ""} found</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
@@ -354,7 +354,7 @@ const Tasks = () => {
         {filterTag && (
           <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-2 text-sm text-primary-400">
             #{filterTag}
-            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="hover:text-white">×</button>
+            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="hover:text-text">×</button>
           </span>
         )}
       </div>
@@ -371,7 +371,7 @@ const Tasks = () => {
           {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
-              <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
+              <h2 className="text-lg font-semibold text-text mb-2">You don't have any tasks yet</h2>
               <p className="text-slate-500 text-sm mb-5">Create your first task to get started.</p>
               <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
                 <span className="text-lg leading-none">+</span> Create your first task
@@ -387,9 +387,9 @@ const Tasks = () => {
       ) : (
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
-            <div key={task._id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-start gap-4 hover:border-slate-700 transition-colors animate-fade-in">
+            <div key={task._id} className="bg-surface-card border border-border-subtle rounded-xl p-4 flex items-start gap-4 hover:border-border transition-colors animate-fade-in">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">{task.title}</p>
+                <p className="text-sm font-semibold text-text">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
                 {task.dueDate && (
                   <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
@@ -414,7 +414,7 @@ const Tasks = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors" title="Edit">
+                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface-raised transition-colors" title="Edit">
                   <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 </button>
                 <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">

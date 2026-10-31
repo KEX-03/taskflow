@@ -6,12 +6,12 @@ import Spinner from "../components/Shared/Spinner.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
 
 const StatCard = ({ title, value, icon, color, sub }) => (
-  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 animate-slide-up">
+  <div className="bg-surface-card border border-border-subtle rounded-xl p-5 animate-slide-up">
     <div className="flex items-center justify-between mb-3">
       <span className="text-sm text-slate-400 font-medium">{title}</span>
       <div className={`w-9 h-9 rounded-lg ${color} flex items-center justify-center`}>{icon}</div>
     </div>
-    <p className="text-3xl font-bold text-white">{value}</p>
+    <p className="text-3xl font-bold text-text">{value}</p>
     {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
   </div>
 );
@@ -68,7 +68,7 @@ const Dashboard = () => {
     <div className="flex-1 p-6 overflow-y-auto">
       {/* ── Greeting ─────────────────────── */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-text">
           {greeting}, <span className="text-primary-400">{user?.name?.split(" ")[0]}</span> 👋
         </h1>
         <p className="text-slate-500 text-sm mt-1">Here's what's going on with your tasks.</p>
@@ -91,9 +91,9 @@ const Dashboard = () => {
       </div>
 
       {/* ── Recent Tasks ─────────────────── */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <div className="bg-surface-card border border-border-subtle rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-white">Recent Tasks</h2>
+          <h2 className="text-base font-semibold text-text">Recent Tasks</h2>
           <Link to="/tasks" className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors">View all →</Link>
         </div>
         {recentTasks.length === 0 ? (
@@ -103,7 +103,7 @@ const Dashboard = () => {
             {recentTasks.map((task) => (
               <div key={task._id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800/50 transition-colors">
                 <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${priorityDot[task.priority]}`} />
-                <p className="text-sm text-slate-200 flex-1 truncate">{task.title}</p>
+                <p className="text-sm text-text flex-1 truncate">{task.title}</p>
                 <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${statusColor[task.status]}`}>
                   {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                 </span>

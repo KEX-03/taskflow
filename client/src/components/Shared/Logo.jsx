@@ -16,7 +16,7 @@ const Logo = ({ collapsed }) => {
         </svg>
       </div>
       {!collapsed && (
-        <span className="text-lg font-bold text-white">TaskFlow</span>
+        <span className="text-lg font-bold text-text">TaskFlow</span>
       )}
     </div>
   );

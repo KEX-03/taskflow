@@ -60,7 +60,7 @@ const Login = () => {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white">Welcome back</h1>
+            <h1 className="text-2xl font-bold text-text">Welcome back</h1>
             <p className="text-text-muted text-sm mt-1">Sign in to your TaskFlow account</p>
           </div>
 

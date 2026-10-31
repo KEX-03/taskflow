@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useTheme } from "../../context/ThemeContext.jsx";
 import Logo from "../Shared/Logo.jsx";
 
 const navItems = [
@@ -40,6 +41,7 @@ const navItems = [
 
 const Sidebar = ({ mobileOpen = false }) => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -69,7 +71,7 @@ const Sidebar = ({ mobileOpen = false }) => {
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
-                  : "text-text-secondary hover:text-white hover:bg-surface-raised"
+                  : "text-text-secondary hover:text-text hover:bg-surface-raised"
               }`
             }
           >
@@ -87,14 +89,35 @@ const Sidebar = ({ mobileOpen = false }) => {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.name}</p>
+              <p className="text-sm font-medium text-text truncate">{user?.name}</p>
               <p className="text-xs text-text-muted truncate">{user?.email}</p>
             </div>
           )}
         </div>
         <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+          aria-pressed={theme === "light"}
+          title={`Current theme: ${theme}`}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-text hover:bg-surface-raised focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
+        >
+          {theme === "light" ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0" aria-hidden="true">
+              <path d="M12 3v2" /><path d="M12 19v2" /><path d="m4.22 4.22 1.42 1.42" /><path d="m18.36 18.36 1.42 1.42" />
+              <path d="M3 12h2" /><path d="M19 12h2" /><path d="m4.22 19.78 1.42-1.42" /><path d="m18.36 5.64 1.42-1.42" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 shrink-0" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+            </svg>
+          )}
+          {!collapsed && <span>{theme === "light" ? "Light mode" : "Dark mode"}</span>}
+        </button>
+        <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -110,7 +133,7 @@ const Sidebar = ({ mobileOpen = false }) => {
         type="button"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         onClick={() => setCollapsed(!collapsed)}
-        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full items-center justify-center text-text-secondary hover:text-text hover:border-border-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
         style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
       >
         {collapsed ? "›" : "‹"}
