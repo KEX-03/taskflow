@@ -4,7 +4,11 @@ import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
-
+import {
+  formatDueDate,
+  isOverdue,
+  isDueToday,
+} from "../utils/dates.js";
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
   const titleId = useId();
@@ -188,16 +192,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   );
 };
 
-// ── Due date, e.g. "31 Oct 2026" ────────────
-// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
-// local midnight keeps the same day in every timezone; new Date() on the
-// full value would show 30 Oct west of UTC.
-const formatDueDate = (dueDate) =>
-  new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
   const { addToast } = useToast();
+  const [, setDateRefresh] = useState(0);
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -222,7 +220,43 @@ const Tasks = () => {
   }, []);
 
   usePageTitle("Tasks");
+  useEffect(() => {
+  let midnightTimer;
 
+  const scheduleMidnightRefresh = () => {
+    clearTimeout(midnightTimer);
+
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+
+    const delay = nextMidnight.getTime() - now.getTime();
+
+    midnightTimer = setTimeout(() => {
+      setDateRefresh((value) => value + 1);
+      scheduleMidnightRefresh();
+    }, delay);
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      setDateRefresh((value) => value + 1);
+      scheduleMidnightRefresh();
+    }
+  };
+
+  scheduleMidnightRefresh();
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+    clearTimeout(midnightTimer);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, []);
   const fetchTasks = useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -387,12 +421,20 @@ const Tasks = () => {
       ) : (
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
-            <div key={task._id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-start gap-4 hover:border-slate-700 transition-colors animate-fade-in">
+            <div key={task._id} className={`bg-slate-900 border ${isOverdue(task) ? "border-red-500/40" : "border-slate-800 hover:border-slate-700"} rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
                 {task.dueDate && (
-                  <p className="text-xs text-slate-400 mt-1"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    <p className="text-xs text-slate-400"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                    {isOverdue(task) && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">Overdue</span>
+                    )}
+                    {isDueToday(task) && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-amber-400 bg-amber-400/10">Due today</span>
+                    )}
+                  </div>
                 )}
                 {task.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
