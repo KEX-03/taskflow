@@ -4,11 +4,8 @@ import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
-import {
-  formatDueDate,
-  isOverdue,
-  isDueToday,
-} from "../utils/dates.js";
+import { formatDueDate, isOverdue, isDueToday } from "../utils/dates.js";
+
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
   const titleId = useId();
@@ -220,43 +217,37 @@ const Tasks = () => {
   }, []);
 
   usePageTitle("Tasks");
+
+  // Re-render at local midnight and when the tab is shown again, so the
+  // Overdue / Due today badges move on to the new day without a reload
   useEffect(() => {
-  let midnightTimer;
+    let midnightTimer;
 
-  const scheduleMidnightRefresh = () => {
-    clearTimeout(midnightTimer);
+    const scheduleMidnightRefresh = () => {
+      clearTimeout(midnightTimer);
+      const now = new Date();
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      midnightTimer = setTimeout(() => {
+        setDateRefresh((value) => value + 1);
+        scheduleMidnightRefresh();
+      }, nextMidnight - now);
+    };
 
-    const now = new Date();
-    const nextMidnight = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1
-    );
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        setDateRefresh((value) => value + 1);
+        scheduleMidnightRefresh();
+      }
+    };
 
-    const delay = nextMidnight.getTime() - now.getTime();
+    scheduleMidnightRefresh();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      clearTimeout(midnightTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
-    midnightTimer = setTimeout(() => {
-      setDateRefresh((value) => value + 1);
-      scheduleMidnightRefresh();
-    }, delay);
-  };
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
-      setDateRefresh((value) => value + 1);
-      scheduleMidnightRefresh();
-    }
-  };
-
-  scheduleMidnightRefresh();
-
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  return () => {
-    clearTimeout(midnightTimer);
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-  };
-}, []);
   const fetchTasks = useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
