@@ -87,6 +87,8 @@ client/src/
 │   └── Shared/        Toast (pop-up messages), Spinner, Logo
 └── utils/
     ├── api.js         Axios instance + token and 401 interceptors
+    ├── dates.js       Due date display, and the Overdue / Due today checks
+    ├── usePageTitle.js  Sets the browser tab title, like "Tasks — TaskFlow"
     └── validation.js  Form checks for signup and login
 ```
 

@@ -20,7 +20,7 @@
 
 - **Sign up and log in** with secure password hashing and JWT (token-based) authentication
 - **Dashboard** with task counts by status and your most recent tasks
-- **Tasks**: create, edit and delete, with optional due dates, search and filters by priority and status
+- **Tasks**: create, edit and delete, with optional due dates (overdue tasks are highlighted) and tags, search and filters by priority, status and tag
 - **Profile**: update your name, bio and avatar, and change your password
 - **Works on phones**: on small screens, the sidebar becomes a menu
 - **Protected pages**: logged-out visitors are sent to the login page
@@ -138,7 +138,7 @@ taskflow/
 │   │   ├── pages/           One file per page (Login, Dashboard, Tasks, ...)
 │   │   ├── components/      Shared UI (Sidebar, Toast, Spinner, ...)
 │   │   ├── context/         AuthContext: who is logged in
-│   │   └── utils/           Axios API client and form validation
+│   │   └── utils/           Axios API client, form validation, date helpers
 │   ├── vercel.json          Lets Vercel serve every page route
 │   └── .env.example         Client settings, explained
 ├── docs/                    Architecture overview, deployment guide and images
