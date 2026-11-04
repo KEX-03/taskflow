@@ -1,5 +1,9 @@
 
-// Format a due date as "31 Oct 2026"
+
+// ── Due date, e.g. "31 Oct 2026" ─────────────
+// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
+// local midnight keeps the same day in every timezone; new Date() on the
+// full value would show 30 Oct west of UTC.
 export const formatDueDate = (dueDate) =>
   new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString(
     "en-GB",

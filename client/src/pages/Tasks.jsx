@@ -53,8 +53,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     priority: initial.priority || "medium",
     status: initial.status || "todo",
     dueDate: initial.dueDate ? initial.dueDate.slice(0, 10) : "",
+    tags: Array.isArray(initial.tags) ? initial.tags : [],
   });
   const [error, setError] = useState("");
+  const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -62,12 +64,35 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     setError("");
   };
 
+  // Same rules as the API: trimmed, lowercased, no duplicates, up to 5 tags of 1–20 characters
+  const addTag = () => {
+    const tag = tagInput.trim().toLowerCase();
+    if (!tag) return;
+    if (tag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
+    if (form.tags.includes(tag)) { setTagInput(""); setError(""); return; }
+    if (form.tags.length >= 5) { setError("You can add a maximum of 5 tags."); return; }
+    setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
+    setTagInput("");
+    setError("");
+  };
+
+  const removeTag = (tag) => {
+    setForm((prev) => ({ ...prev, tags: prev.tags.filter((item) => item !== tag) }));
+    setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) { setError("Title is required."); return; }
+    // Text still in the tag box is saved as a tag too, so nothing typed is lost
+    const pendingTag = tagInput.trim().toLowerCase();
+    if (pendingTag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
+    const tags = [...new Set([...form.tags, ...(pendingTag ? [pendingTag] : [])])];
+    if (tags.length > 5) { setError("You can add a maximum of 5 tags."); return; }
     setLoading(true);
+    setError("");
     try {
-      await onSave({ ...form, dueDate: form.dueDate || null });
+      await onSave({ ...form, tags, dueDate: form.dueDate || null });
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -119,13 +144,42 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
       <div>
         <label htmlFor="task-due-date" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Due date</label>
         <div className="flex items-center gap-2">
-          <input id="task-due-date" name="dueDate" type="date" value={form.dueDate} onChange={handleChange}
-            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg" />
+          <input
+            id="task-due-date"
+            name="dueDate"
+            type="date"
+            value={form.dueDate}
+            onChange={handleChange}
+            onClick={(e) => {
+              // Open the calendar when clicking anywhere on the field, not just the icon
+              try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
+            }}
+            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
+          />
           {form.dueDate && (
             <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
               className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Clear</button>
           )}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="task-tags" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Tags</label>
+        <input id="task-tags" value={tagInput} onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); }
+          }}
+          placeholder="Type a tag and press Enter…"
+          className="w-full px-3 py-2 text-sm rounded-lg" />
+        <div className="flex flex-wrap gap-2 mt-2">
+          {form.tags.map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2.5 py-1 text-xs text-primary-400">
+              #{tag}
+              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="ml-1 hover:text-white">×</button>
+            </span>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500 mt-1">Press Enter or comma to add a tag. Maximum 5 tags, 20 characters each.</p>
       </div>
 
       <div className="flex gap-3 pt-2">
@@ -138,6 +192,13 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   );
 };
 
+// ── Due date, e.g. "31 Oct 2026" ────────────
+// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
+// local midnight keeps the same day in every timezone; new Date() on the
+// full value would show 30 Oct west of UTC.
+const formatDueDate = (dueDate) =>
+  new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
   const { addToast } = useToast();
@@ -146,6 +207,7 @@ const Tasks = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
@@ -178,6 +240,7 @@ const Tasks = () => {
       if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
+      if (filterTag) params.set("tag", filterTag);
       params.set("page", page);
       const { data } = await api.get(`/tasks?${params}`, {
         signal: controller.signal,
@@ -198,7 +261,7 @@ const Tasks = () => {
         setLoading(false);
       }
     }
-  }, [debouncedSearch, filterPriority, filterStatus, page]);
+  }, [debouncedSearch, filterPriority, filterStatus, filterTag, page]);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
@@ -292,6 +355,12 @@ const Tasks = () => {
           <option value="in-progress">In Progress</option>
           <option value="done">Done</option>
         </select>
+        {filterTag && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-2 text-sm text-primary-400">
+            #{filterTag}
+            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="hover:text-white">×</button>
+          </span>
+        )}
       </div>
 
       {/* ── Task List ───────────────────── */}
@@ -303,7 +372,7 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !debouncedSearch && !filterPriority && !filterStatus ? (
+          {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
             <>
               <div className="text-5xl mb-4" aria-hidden="true">📝</div>
               <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
@@ -315,91 +384,73 @@ const Tasks = () => {
           ) : (
             <>
               <p className="text-slate-500 text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setFilterTag(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
             </>
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-2">{tasks.map((task) => (
-  <div
-    key={task._id}
-    className={`bg-slate-900 ${
-      isOverdue(task)
-        ? "border border-red-500/40 hover:border-red-500/40"
-        : "border border-slate-800 hover:border-slate-700"
-    } rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}
-  >
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-white">{task.title}</p>
+        <div className="flex flex-col gap-2">
+          {tasks.map((task) => (
+<div
+  key={task._id}
+  className={`bg-slate-900 ${
+    isOverdue(task)
+      ? "border border-red-500/40 hover:border-red-500/40"
+      : "border border-slate-800 hover:border-slate-700"
+  } rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}
+>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white">{task.title}</p>
+                {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
+                 {task.dueDate && (
+  <div className="flex items-center gap-2 flex-wrap mt-1">
+    <p className="text-xs text-slate-400">
+      <span aria-hidden="true">📅 </span>
+      Due {formatDueDate(task.dueDate)}
+    </p>
 
-      {task.description && (
-        <p className="text-xs text-slate-500 mt-0.5 truncate">
-          {task.description}
-        </p>
-      )}
+    {isOverdue(task) && (
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">
+        Overdue
+      </span>
+    )}
 
-      {task.dueDate && (
-        <div className="flex items-center gap-2 flex-wrap mt-1">
-          <p className="text-xs text-slate-400">
-            <span aria-hidden="true">📅 </span>
-            Due {formatDueDate(task.dueDate)}
-          </p>
-
-          {isOverdue(task) && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">
-              Overdue
-            </span>
-          )}
-
-          {isDueToday(task) && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full text-yellow-400 bg-yellow-400/10">
-              Due today
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="flex gap-2 mt-2">
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
-          {task.status === "in-progress"
-            ? "In Progress"
-            : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-        </span>
-
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-        </span>
-      </div>
-    </div>
-
-    <div className="flex items-center gap-2 shrink-0">
-      <button
-        aria-label="Edit task"
-        onClick={() => setEditTask(task)}
-        className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
-        title="Edit"
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-        </svg>
-      </button>
-
-      <button
-        aria-label="Delete task"
-        onClick={() => setDeleteId(task._id)}
-        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
-        title="Delete"
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <polyline points="3 6 5 6 21 6" />
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        </svg>
-      </button>
-    </div>
+    {isDueToday(task) && (
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-yellow-400 bg-yellow-400/10">
+        Due today
+      </span>
+    )}
   </div>
-))}
-
+)}
+                {task.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {task.tags.map((tag) => (
+                      <button key={tag} type="button" onClick={() => { setFilterTag(tag); setPage(1); }}
+                        className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 hover:bg-primary-500/20 transition-colors">
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2 mt-2">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
+                    {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
+                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors" title="Edit">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                </button>
+                <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
