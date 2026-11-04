@@ -195,6 +195,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
   const { addToast } = useToast();
+  const [, setDateRefresh] = useState(0);
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -219,7 +220,43 @@ const Tasks = () => {
   }, []);
 
   usePageTitle("Tasks");
+  useEffect(() => {
+  let midnightTimer;
 
+  const scheduleMidnightRefresh = () => {
+    clearTimeout(midnightTimer);
+
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+
+    const delay = nextMidnight.getTime() - now.getTime();
+
+    midnightTimer = setTimeout(() => {
+      setDateRefresh((value) => value + 1);
+      scheduleMidnightRefresh();
+    }, delay);
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      setDateRefresh((value) => value + 1);
+      scheduleMidnightRefresh();
+    }
+  };
+
+  scheduleMidnightRefresh();
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+    clearTimeout(midnightTimer);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, []);
   const fetchTasks = useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
