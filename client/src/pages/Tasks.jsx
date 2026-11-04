@@ -192,13 +192,6 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   );
 };
 
-// ── Due date, e.g. "31 Oct 2026" ────────────
-// The API sends "2026-10-31T00:00:00.000Z". Reading only the date part as
-// local midnight keeps the same day in every timezone; new Date() on the
-// full value would show 30 Oct west of UTC.
-const formatDueDate = (dueDate) =>
-  new Date(`${dueDate.slice(0, 10)}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
   const { addToast } = useToast();
@@ -391,37 +384,21 @@ const Tasks = () => {
       ) : (
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
-<div
-  key={task._id}
-  className={`bg-slate-900 ${
-    isOverdue(task)
-      ? "border border-red-500/40 hover:border-red-500/40"
-      : "border border-slate-800 hover:border-slate-700"
-  } rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}
->
+            <div key={task._id} className={`bg-slate-900 border ${isOverdue(task) ? "border-red-500/40" : "border-slate-800 hover:border-slate-700"} rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{task.title}</p>
                 {task.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>}
-                 {task.dueDate && (
-  <div className="flex items-center gap-2 flex-wrap mt-1">
-    <p className="text-xs text-slate-400">
-      <span aria-hidden="true">📅 </span>
-      Due {formatDueDate(task.dueDate)}
-    </p>
-
-    {isOverdue(task) && (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">
-        Overdue
-      </span>
-    )}
-
-    {isDueToday(task) && (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-yellow-400 bg-yellow-400/10">
-        Due today
-      </span>
-    )}
-  </div>
-)}
+                {task.dueDate && (
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    <p className="text-xs text-slate-400"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                    {isOverdue(task) && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">Overdue</span>
+                    )}
+                    {isDueToday(task) && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-amber-400 bg-amber-400/10">Due today</span>
+                    )}
+                  </div>
+                )}
                 {task.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {task.tags.map((tag) => (
