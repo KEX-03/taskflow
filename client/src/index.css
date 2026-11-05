@@ -29,12 +29,14 @@
   --color-emerald-400: #34d399;
   --color-emerald-500: #10b981;
   --color-emerald-600: #059669;
+  --color-green-500: #22c55e;
 
   /* Semantic tokens map UI roles to the current dark palette.
      Future themes can change these mappings without editing components. */
   --color-surface: var(--color-slate-950);
   --color-surface-raised: var(--color-slate-800);
   --color-surface-card: var(--color-slate-900);
+  --color-surface-hover: var(--color-slate-700);
 
   --color-border: var(--color-slate-700);
   --color-border-subtle: var(--color-slate-800);
