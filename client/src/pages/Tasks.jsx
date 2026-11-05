@@ -4,7 +4,7 @@ import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
-import { formatDueDate, isOverdue, isDueToday } from "../utils/dates.js";
+import { formatDueDate, isOverdue, isDueToday, isPastDate } from "../utils/dates.js";
 
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
@@ -55,6 +55,15 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   const [error, setError] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const originalDueDate = initial.dueDate
+  ? initial.dueDate.slice(0, 10)
+  : "";
+
+const showPastDateHint =
+  Boolean(form.dueDate) &&
+  isPastDate(form.dueDate) &&
+  (!initial._id || form.dueDate !== originalDueDate);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -138,27 +147,34 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         </div>
       </div>
 
-      <div>
-        <label htmlFor="task-due-date" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Due date</label>
-        <div className="flex items-center gap-2">
-          <input
-            id="task-due-date"
-            name="dueDate"
-            type="date"
-            value={form.dueDate}
-            onChange={handleChange}
-            onClick={(e) => {
-              // Open the calendar when clicking anywhere on the field, not just the icon
-              try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
-            }}
-            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
-          />
-          {form.dueDate && (
-            <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
-              className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Clear</button>
-          )}
-        </div>
-      </div>
+<div>
+  <label htmlFor="task-due-date" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Due date</label>
+  <div className="flex items-center gap-2">
+    <input
+      id="task-due-date"
+      name="dueDate"
+      type="date"
+      value={form.dueDate}
+      onChange={handleChange}
+      aria-describedby={showPastDateHint ? "task-due-date-hint" : undefined}
+      onClick={(e) => {
+        // Open the calendar when clicking anywhere on the field, not just the icon
+        try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
+      }}
+      className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
+    />
+    {form.dueDate && (
+      <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
+        className="px-3 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors">Clear</button>
+    )}
+  </div>
+
+  {showPastDateHint && (
+    <p id="task-due-date-hint" className="text-xs text-amber-400 mt-1.5">
+      This date is in the past.
+    </p>
+  )}
+</div>
 
       <div>
         <label htmlFor="task-tags" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Tags</label>

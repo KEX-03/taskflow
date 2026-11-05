@@ -16,13 +16,22 @@ const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+// Check whether a date is before today in the user's local timezone
+export const isPastDate = (date) => {
+  if (!date) {
+    return false;
+  }
+
+  return date.slice(0, 10) < getTodayDate();
+};
+
 // Check whether a task is overdue
 export const isOverdue = (task) => {
   if (!task.dueDate || task.status === "done") {
     return false;
   }
 
-  return task.dueDate.slice(0, 10) < getTodayDate();
+  return isPastDate(task.dueDate);
 };
 
 // Check whether a task is due today
