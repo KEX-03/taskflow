@@ -18,8 +18,7 @@
     "express-rate-limit": "^8.7.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
-    "morgan": "^1.10.0",
-    "taskflow": "file:.."
+    "morgan": "^1.10.0"
   },
   "license": "MIT",
   "devDependencies": {
