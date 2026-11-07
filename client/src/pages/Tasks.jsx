@@ -5,6 +5,7 @@ import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
 import { formatDueDate, isOverdue, isDueToday } from "../utils/dates.js";
+import Tooltip from "../components/Shared/Tooltip.jsx";
 
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
@@ -447,12 +448,16 @@ const Tasks = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-surface-raised transition-colors" title="Edit">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                </button>
-                <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors" title="Delete">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                </button>
+                <Tooltip text="Edit task">
+                  <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-surface-raised transition-colors">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                  </button>
+                </Tooltip>
+                <Tooltip text="Delete task">
+                  <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                  </button>
+                </Tooltip>
               </div>
             </div>
           ))}
