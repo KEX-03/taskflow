@@ -16,7 +16,8 @@ const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-// Check whether a date is in the past
+// Check whether a date ("2026-10-31", or the API's full value) is before today.
+// isOverdue uses it too, so the form's hint and the Overdue badge always agree.
 export const isPastDate = (date) => {
   if (!date) {
     return false;

@@ -56,15 +56,14 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
   const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
   };
 
-  const originalDueDate = initial.dueDate
-    ? initial.dueDate.slice(0, 10)
-    : "";
-
+  // Hint for a past due date. When editing, only if the date was changed,
+  // so opening an overdue task to edit its title shows no hint.
+  const originalDueDate = initial.dueDate ? initial.dueDate.slice(0, 10) : "";
   const showPastDateHint =
     Boolean(form.dueDate) &&
     isPastDate(form.dueDate) &&
@@ -156,7 +155,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
             type="date"
             value={form.dueDate}
             onChange={handleChange}
-  aria-describedby="task-due-date-hint"
+            aria-describedby="task-due-date-hint"
             onClick={(e) => {
               // Open the calendar when clicking anywhere on the field, not just the icon
               try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
@@ -168,15 +167,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
               className="px-3 py-2 text-xs font-medium rounded-lg text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Clear</button>
           )}
         </div>
-        <p
-  id="task-due-date-hint"
-  aria-live="polite"
-  className={`text-xs text-amber-400${
-    showPastDateHint ? " mt-1.5" : ""
-  }`}
->
-  {showPastDateHint ? "This date is in the past." : ""}
-</p>
+        {/* Always on the page, so screen readers announce the hint when it appears */}
+        <p id="task-due-date-hint" aria-live="polite" className={`text-xs text-amber-400 ${showPastDateHint ? "mt-1.5" : ""}`}>
+          {showPastDateHint ? "This date is in the past." : ""}
+        </p>
       </div>
 
       <div>
