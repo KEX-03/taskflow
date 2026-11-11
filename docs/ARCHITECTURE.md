@@ -20,7 +20,7 @@ Every request to the server passes through the same steps, in the order they're 
 
 ```mermaid
 flowchart LR
-    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>logging · CORS · JSON body"]
+    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>security headers · logging · CORS · JSON body"]
     M --> R["Route<br/>routes/tasks.js"]
     R --> P{"protect<br/>valid token?"}
     P -->|no| E401["401 Unauthorized"]
@@ -32,7 +32,7 @@ flowchart LR
     EH -.->|"400 / 500 JSON"| B
 ```
 
-1. **Middleware** runs first for every request: `morgan` logs it (in production with a compact format, and without the health checks), `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`, plus `FRONTEND_ORIGIN_PATTERN` for preview URLs), and `express.json()` turns the JSON body into `req.body`.
+1. **Middleware** runs first for every request: `helmet` adds standard security headers to the response (like `X-Content-Type-Options: nosniff`), `morgan` logs it (in production with a compact format, and without the health checks), `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`, plus `FRONTEND_ORIGIN_PATTERN` for preview URLs), and `express.json()` turns the JSON body into `req.body`.
 2. **Route** ([`routes/`](../server/src/routes)): matches the method and URL (like `PUT /tasks/:id`) and decides which functions run.
 3. **`protect` middleware** ([`middleware/auth.js`](../server/src/middleware/auth.js)): on protected routes, checks the login token. If it's missing or invalid, the request stops here with **401**. If it's valid, it loads the user into `req.user`.
 4. **Controller** ([`controllers/`](../server/src/controllers)): the actual logic. It validates input, talks to the model, and sends a JSON response like `{ "success": true, "task": { ... } }`.

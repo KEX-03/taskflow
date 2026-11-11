@@ -11,7 +11,9 @@ const { parseAllowedOrigins } = require("./utils/cors");
 
 const app = express();
 
-// Set security-related HTTP headers on API responses.
+// ── Security headers ─────────────────────────
+// Helmet adds standard headers that tell browsers to be careful with our
+// responses, like X-Content-Type-Options: nosniff and X-Frame-Options.
 app.use(helmet());
 
 // Hosts like Render put a proxy in front of the server, so every request

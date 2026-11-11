@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The API sends the standard security headers that tell browsers to be careful with its responses, like `X-Content-Type-Options: nosniff` and `X-Frame-Options`, using [Helmet](https://helmetjs.github.io/) ([#104](https://github.com/KEX-03/taskflow/pull/104)). Thanks to [@avika269](https://github.com/avika269)!
 - Picking a due date before today in the New/Edit Task form shows a short hint under the field, "This date is in the past.", which screen readers announce too. It's only a hint, so the task can still be saved. When editing, it only shows if you change the date, so opening an overdue task to fix its title shows no hint ([#106](https://github.com/KEX-03/taskflow/pull/106)). Thanks to [@the-coder-aadi](https://github.com/the-coder-aadi)!
 - Overdue tasks stand out on the Tasks page: a task whose due date is before today (in your own timezone) and isn't Done gets a red "Overdue" badge and a red border, and a task due today gets an amber "Due today" badge. The badges move on to the new day at midnight, even if the page stays open ([#100](https://github.com/KEX-03/taskflow/pull/100)). Thanks to [@maansi1004](https://github.com/maansi1004)!
 - Tags in the app: add up to 5 tags of up to 20 characters in the New/Edit Task form, see them on the task cards, and click one to show only the tasks with that tag ([#95](https://github.com/KEX-03/taskflow/pull/95)). Thanks to [@sunnyrockk](https://github.com/sunnyrockk)!
