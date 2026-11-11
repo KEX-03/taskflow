@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const helmet = require("helmet");
 require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
@@ -9,6 +10,9 @@ const { errorHandler } = require("./utils/errorHandler");
 const { parseAllowedOrigins } = require("./utils/cors");
 
 const app = express();
+
+// Set security-related HTTP headers on API responses.
+app.use(helmet());
 
 // Hosts like Render put a proxy in front of the server, so every request
 // would seem to come from the proxy's IP. Trusting the first proxy lets
