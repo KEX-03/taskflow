@@ -16,13 +16,23 @@ const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+// Check whether a date ("2026-10-31", or the API's full value) is before today.
+// isOverdue uses it too, so the form's hint and the Overdue badge always agree.
+export const isPastDate = (date) => {
+  if (!date) {
+    return false;
+  }
+
+  return date.slice(0, 10) < getTodayDate();
+};
+
 // Check whether a task is overdue
 export const isOverdue = (task) => {
   if (!task.dueDate || task.status === "done") {
     return false;
   }
 
-  return task.dueDate.slice(0, 10) < getTodayDate();
+  return isPastDate(task.dueDate);
 };
 
 // Check whether a task is due today

@@ -170,6 +170,8 @@ Login allows 10 failed attempts and signup 10 requests per 15 minutes per IP add
 
 **Try it in Postman:** import [`postman_collection.json`](postman_collection.json). After you run *Signup* or *Login*, the token is saved and used by every other request automatically.
 
+Every response includes standard security headers, like `X-Content-Type-Options: nosniff` and `X-Frame-Options`, set by [Helmet](https://helmetjs.github.io/).
+
 ## Deployment
 
 TaskFlow runs on free plans of MongoDB Atlas, Render and Vercel. The [deployment guide](docs/DEPLOYMENT.md) walks through every setting and environment variable.

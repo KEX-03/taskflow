@@ -4,7 +4,7 @@ import api from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
 import TaskSkeleton from "../components/Shared/TaskSkeleton.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
-import { formatDueDate, isOverdue, isDueToday } from "../utils/dates.js";
+import { formatDueDate, isOverdue, isDueToday, isPastDate } from "../utils/dates.js";
 import Tooltip from "../components/Shared/Tooltip.jsx";
 
 // ── Modal Component ───────────────────────
@@ -61,6 +61,14 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
   };
+
+  // Hint for a past due date. When editing, only if the date was changed,
+  // so opening an overdue task to edit its title shows no hint.
+  const originalDueDate = initial.dueDate ? initial.dueDate.slice(0, 10) : "";
+  const showPastDateHint =
+    Boolean(form.dueDate) &&
+    isPastDate(form.dueDate) &&
+    (!initial._id || form.dueDate !== originalDueDate);
 
   // Same rules as the API: trimmed, lowercased, no duplicates, up to 5 tags of 1–20 characters
   const addTag = () => {
@@ -148,6 +156,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
             type="date"
             value={form.dueDate}
             onChange={handleChange}
+            aria-describedby="task-due-date-hint"
             onClick={(e) => {
               // Open the calendar when clicking anywhere on the field, not just the icon
               try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
@@ -159,6 +168,10 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
               className="px-3 py-2 text-xs font-medium rounded-lg text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Clear</button>
           )}
         </div>
+        {/* Always on the page, so screen readers announce the hint when it appears */}
+        <p id="task-due-date-hint" aria-live="polite" className={`text-xs text-amber-400 ${showPastDateHint ? "mt-1.5" : ""}`}>
+          {showPastDateHint ? "This date is in the past." : ""}
+        </p>
       </div>
 
       <div>

@@ -20,7 +20,7 @@ Every request to the server passes through the same steps, in the order they're 
 
 ```mermaid
 flowchart LR
-    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>logging · CORS · JSON body"]
+    B["Browser<br/>(React app)"] -->|"HTTP request<br/>PUT /api/v1/tasks/42"| M["Middleware<br/>security headers · logging · CORS · JSON body"]
     M --> R["Route<br/>routes/tasks.js"]
     R --> P{"protect<br/>valid token?"}
     P -->|no| E401["401 Unauthorized"]
@@ -32,7 +32,7 @@ flowchart LR
     EH -.->|"400 / 500 JSON"| B
 ```
 
-1. **Middleware** runs first for every request: `morgan` logs it (in production with a compact format, and without the health checks), `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`, plus `FRONTEND_ORIGIN_PATTERN` for preview URLs), and `express.json()` turns the JSON body into `req.body`.
+1. **Middleware** runs first for every request: `helmet` adds standard security headers to the response (like `X-Content-Type-Options: nosniff`), `morgan` logs it (in production with a compact format, and without the health checks), `cors` tells the browser which frontend origins may read the response (`FRONTEND_ORIGIN`, plus `FRONTEND_ORIGIN_PATTERN` for preview URLs), and `express.json()` turns the JSON body into `req.body`.
 2. **Route** ([`routes/`](../server/src/routes)): matches the method and URL (like `PUT /tasks/:id`) and decides which functions run.
 3. **`protect` middleware** ([`middleware/auth.js`](../server/src/middleware/auth.js)): on protected routes, checks the login token. If it's missing or invalid, the request stops here with **401**. If it's valid, it loads the user into `req.user`.
 4. **Controller** ([`controllers/`](../server/src/controllers)): the actual logic. It validates input, talks to the model, and sends a JSON response like `{ "success": true, "task": { ... } }`.
@@ -87,7 +87,7 @@ client/src/
 │   └── Shared/        Toast (pop-up messages), Spinner, Logo
 └── utils/
     ├── api.js         Axios instance + token and 401 interceptors
-    ├── dates.js       Due date display, and the Overdue / Due today checks
+    ├── dates.js       Due date display, and the past date / Overdue / Due today checks
     ├── usePageTitle.js  Sets the browser tab title, like "Tasks — TaskFlow"
     └── validation.js  Form checks for signup and login
 ```
@@ -99,7 +99,7 @@ client/src/
 - **Pages** own their data: each one calls the API through `utils/api.js` when it loads and keeps the results in its own state (`useState`). There's no global data store besides the logged-in user.
 - **Context** shares the logged-in user with every component through the `useAuth()` hook, and `useToast()` shows success and error messages.
 - **Validation** happens twice: `utils/validation.js` gives instant feedback in forms, but **the server is the source of truth** and checks everything again, because anyone can call the API directly.
-- **Styling** uses Tailwind CSS utility classes directly in the JSX. Theme colors and animations are defined in [`src/index.css`](../client/src/index.css). Backgrounds, borders and text use named colours (theme tokens) like `bg-surface-card`, `border-border-subtle` and `text-text-muted`, so a light theme can change them in one place. Use these instead of `slate-*` classes in new code; some pages still use `slate-*` until they're moved over.
+- **Styling** uses Tailwind CSS utility classes directly in the JSX. Theme colors and animations are defined in [`src/index.css`](../client/src/index.css). Backgrounds, borders and text use named colours (theme tokens) like `bg-surface-card`, `border-border-subtle` and `text-text-muted`, so a light theme can change them in one place. Use these instead of `slate-*` classes in new code. Only `slate-200` (Dashboard) and `slate-600` (Profile, and the task description counter) are still used, because no token matches those shades yet.
 
 In production, the client is a static site on Vercel, and [`client/vercel.json`](../client/vercel.json) sends every URL to `index.html` so React Router can show the right page. See the [deployment guide](DEPLOYMENT.md) for how the three parts are hosted.
 
