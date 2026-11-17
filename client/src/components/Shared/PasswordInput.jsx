@@ -24,8 +24,9 @@ const PasswordInput = ({
         onChange={onChange}
         placeholder={placeholder}
         {...rest}
-        className={`w-full ${className} pr-12 text-sm rounded-lg transition-colors ${hasError ? "border-red-500 ring-1 ring-red-500" : ""
-          }`}
+        className={`w-full ${className} pr-12 text-sm rounded-lg transition-colors ${
+          hasError ? "border-red-500 ring-1 ring-red-500" : ""
+        }`}
       />
       <div className="absolute inset-y-0 right-0 flex">
         <Tooltip text={isVisible ? "Hide password" : "Show password"}>

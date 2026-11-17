@@ -35,7 +35,7 @@ const Modal = ({ open, onClose, title, children }) => {
       <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
         <div className="flex items-center justify-between p-5 border-b border-border-subtle">
           <h3 id={titleId} className="text-base font-semibold text-white">{title}</h3>
-          <Tooltip text="Close" side="left">
+          <Tooltip text="Close dialog" side="left">
             <button
               type="button"
               aria-label="Close dialog"
@@ -130,8 +130,9 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
         <textarea id="task-description" name="description" value={form.description} maxLength={1000} onChange={handleChange} placeholder="Optional…" rows={3}
           aria-describedby="task-description-counter"
           className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
-        <p id="task-description-counter" className={`text-xs mt-1 ${form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
-          }`}>
+        <p id="task-description-counter" className={`text-xs mt-1 ${
+          form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
+        }`}>
           {form.description.length} / 1000<span className="sr-only"> characters used</span>
         </p>
       </div>

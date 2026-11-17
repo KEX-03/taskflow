@@ -1,6 +1,11 @@
-
 import React, { useEffect, useState } from "react";
 
+// A short label for an icon-only button, shown on hover and on keyboard focus.
+// Pass the button's aria-label as `text`. The label itself is aria-hidden, so
+// screen readers read the aria-label once instead of both.
+//
+// `className` replaces the wrapper's default classes. Keep it positioned
+// (relative or absolute), because the label is placed against it.
 const Tooltip = ({
   text,
   children,
@@ -8,14 +13,20 @@ const Tooltip = ({
   className = "relative inline-flex",
   style,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  // Hover and focus are tracked separately, so the label stays while either
+  // one is still active (e.g. the mouse leaves a button you tabbed to).
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  // Escape hides the label until the mouse or focus comes back.
+  const [isDismissed, setIsDismissed] = useState(false);
+  const isVisible = (isHovered || isFocused) && !isDismissed;
 
   useEffect(() => {
     if (!isVisible) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsVisible(false);
+        setIsDismissed(true);
       }
     };
 
@@ -26,9 +37,23 @@ const Tooltip = ({
     };
   }, [isVisible]);
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    setIsDismissed(false);
+  };
+
+  const handleFocus = (event) => {
+    // Only keyboard focus counts. Clicking a button focuses it too, and the
+    // label shouldn't stay after the mouse has moved away.
+    if (!event.target.matches(":focus-visible")) return;
+    setIsFocused(true);
+    setIsDismissed(false);
+  };
+
   const handleBlur = (event) => {
+    // Only count it as leaving when focus moves outside the wrapper.
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      setIsVisible(false);
+      setIsFocused(false);
     }
   };
 
@@ -42,9 +67,9 @@ const Tooltip = ({
     <span
       className={className}
       style={style}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onFocus={() => setIsVisible(true)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={handleFocus}
       onBlur={handleBlur}
     >
       {children}

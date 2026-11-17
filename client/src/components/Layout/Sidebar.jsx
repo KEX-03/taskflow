@@ -49,10 +49,25 @@ const Sidebar = ({ mobileOpen = false }) => {
     navigate("/login");
   };
 
+  const logoutButton = (
+    <button
+      onClick={handleLogout}
+      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+      {!collapsed && <span>Logout</span>}
+    </button>
+  );
+
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-full" : ""} ${collapsed ? "w-16" : "w-64"
-        }`}
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-full" : ""} ${
+        collapsed ? "w-16" : "w-64"
+      }`}
     >
       {/* ── Logo ─────────────────────────── */}
       <div className="hidden md:block">
@@ -66,9 +81,10 @@ const Sidebar = ({ mobileOpen = false }) => {
             <NavLink
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                  ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
-                  : "text-text-secondary hover:text-white hover:bg-surface-raised"
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
+                    : "text-text-secondary hover:text-white hover:bg-surface-raised"
                 }`
               }
             >
@@ -102,60 +118,16 @@ const Sidebar = ({ mobileOpen = false }) => {
             </div>
           )}
         </div>
-        {collapsed ? (
-          <Tooltip text="Logout" side="right">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
-            >
-              {/* Existing logout SVG */}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-            </button>
-          </Tooltip>
-        ) : (
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
-          >
-            {/* Same existing logout SVG */}
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-4 h-4"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span>Logout</span>
-          </button>
-        )}
+        {collapsed ? <Tooltip text="Logout" side="right">{logoutButton}</Tooltip> : logoutButton}
       </div>
 
       {/* ── Collapse toggle ──────────────── */}
+      {/* The wrapper carries the positioning, so the tooltip sits next to the button. */}
       <Tooltip
         text={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         side="right"
         className="hidden md:block absolute top-1/2 -translate-y-1/2"
-        style={{
-          left: collapsed ? "52px" : "244px",
-        }}
+        style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
       >
         <button
           type="button"

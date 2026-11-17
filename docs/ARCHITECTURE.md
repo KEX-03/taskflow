@@ -84,7 +84,7 @@ client/src/
 ├── context/           AuthContext: user, token, login/signup/logout
 ├── components/
 │   ├── Layout/        Sidebar, Topbar (small-screen menu), ProtectedRoute
-│   └── Shared/        Toast (pop-up messages), Spinner, Logo
+│   └── Shared/        Toast (pop-up messages), Tooltip (labels for icon buttons), Spinner, Logo
 └── utils/
     ├── api.js         Axios instance + token and 401 interceptors
     ├── dates.js       Due date display, and the past date / Overdue / Due today checks
