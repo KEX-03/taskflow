@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Logo from "../Shared/Logo.jsx";
+import Tooltip from "../Shared/Tooltip.jsx";
 
 const navItems = [
   {
@@ -50,9 +51,8 @@ const Sidebar = ({ mobileOpen = false }) => {
 
   return (
     <aside
-      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-full" : ""} ${
-        collapsed ? "w-16" : "w-64"
-      }`}
+      className={`flex flex-col bg-surface-card border-r border-border-subtle transition-all duration-300 ${mobileOpen ? "h-full" : ""} ${collapsed ? "w-16" : "w-64"
+        }`}
     >
       {/* ── Logo ─────────────────────────── */}
       <div className="hidden md:block">
@@ -61,22 +61,32 @@ const Sidebar = ({ mobileOpen = false }) => {
 
       {/* ── Nav Links ────────────────────── */}
       <nav className="flex-1 py-4 flex flex-col gap-1 px-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                isActive
+        {navItems.map((item) => {
+          const navLink = (
+            <NavLink
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
                   ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
                   : "text-text-secondary hover:text-white hover:bg-surface-raised"
-              }`
-            }
-          >
-            {item.icon}
-            {!collapsed && <span>{item.label}</span>}
-          </NavLink>
-        ))}
+                }`
+              }
+            >
+              {item.icon}
+              {!collapsed && <span>{item.label}</span>}
+            </NavLink>
+          );
+
+          return collapsed ? (
+            <Tooltip key={item.to} text={item.label} side="right">
+              {navLink}
+            </Tooltip>
+          ) : (
+            <React.Fragment key={item.to}>
+              {navLink}
+            </React.Fragment>
+          );
+        })}
       </nav>
 
       {/* ── User + Logout ────────────────── */}
@@ -92,29 +102,70 @@ const Sidebar = ({ mobileOpen = false }) => {
             </div>
           )}
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          {!collapsed && <span>Logout</span>}
-        </button>
+        {collapsed ? (
+          <Tooltip text="Logout" side="right">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
+            >
+              {/* Existing logout SVG */}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors"
+          >
+            {/* Same existing logout SVG */}
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-4 h-4"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>Logout</span>
+          </button>
+        )}
       </div>
 
       {/* ── Collapse toggle ──────────────── */}
-      <button
-        type="button"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        onClick={() => setCollapsed(!collapsed)}
-        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
-        style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
+      <Tooltip
+        text={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        side="right"
+        className="hidden md:block absolute top-1/2 -translate-y-1/2"
+        style={{
+          left: collapsed ? "52px" : "244px",
+        }}
       >
-        {collapsed ? "›" : "‹"}
-      </button>
+        <button
+          type="button"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+        >
+          {collapsed ? "›" : "‹"}
+        </button>
+      </Tooltip>
     </aside>
   );
 };
