@@ -149,15 +149,23 @@ const Sidebar = ({ mobileOpen = false }) => {
       </div>
 
       {/* ── Collapse toggle ──────────────── */}
-      <button
-        type="button"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        onClick={() => setCollapsed(!collapsed)}
-        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-raised border border-border rounded-full items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
-        style={{ left: collapsed ? "calc(4rem - 12px)" : "calc(16rem - 12px)" }}
+      <Tooltip
+        text={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        side="right"
+        className="hidden md:block absolute top-1/2 -translate-y-1/2"
+        style={{
+          left: collapsed ? "52px" : "244px",
+        }}
       >
-        {collapsed ? "›" : "‹"}
-      </button>
+        <button
+          type="button"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+        >
+          {collapsed ? "›" : "‹"}
+        </button>
+      </Tooltip>
     </aside>
   );
 };
