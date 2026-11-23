@@ -96,6 +96,14 @@
       "name": "Tasks (CRUD)",
       "item": [
         {
+          "name": "Get Task Stats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks/stats", "host": ["{{baseUrl}}"], "path": ["api","v1","tasks","stats"] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
           "name": "Create Task",
           "request": {
             "method": "POST",

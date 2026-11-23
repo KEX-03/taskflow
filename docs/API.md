@@ -395,7 +395,35 @@ curl -X PUT http://localhost:5000/api/v1/me \
 
 ---
 
-### 7. List Tasks
+### 7. Get Task Stats
+
+Returns the authenticated user's total task count and counts by status.
+
+- **Method / URL**: `GET /tasks/stats`
+- **Authentication**: 🔒 Required (`Bearer <token>`)
+
+#### Example Request
+```bash
+curl -X GET http://localhost:5000/api/v1/tasks/stats \
+  -H "Authorization: Bearer <your_jwt_token>"
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "stats": {
+    "total": 55,
+    "todo": 30,
+    "inProgress": 7,
+    "done": 18
+  }
+}
+```
+
+---
+
+### 8. List Tasks
 
 Lists tasks belonging to the authenticated user with optional search, filters, and pagination.
 
@@ -445,7 +473,7 @@ curl -X GET "http://localhost:5000/api/v1/tasks?status=in-progress&priority=high
 
 ---
 
-### 8. Create Task
+### 9. Create Task
 
 Creates a new task associated with the authenticated user.
 
@@ -519,7 +547,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 
 ---
 
-### 9. Get Single Task
+### 10. Get Single Task
 
 Retrieves a specific task by its MongoDB ID.
 
@@ -563,7 +591,7 @@ curl -X GET http://localhost:5000/api/v1/tasks/670c5c189a421ef8841a0105 \
 
 ---
 
-### 10. Update Task
+### 11. Update Task
 
 Updates one or more fields of an existing task.
 
@@ -654,7 +682,7 @@ To remove the due date, send `null`:
 
 ---
 
-### 11. Delete Task
+### 12. Delete Task
 
 Deletes a task by ID. Users can only delete tasks they own.
 

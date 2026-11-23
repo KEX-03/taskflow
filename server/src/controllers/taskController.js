@@ -109,6 +109,33 @@ const getTasks = async (req, res) => {
   });
 };
 
+// ── GET /api/v1/tasks/stats ──────────────────
+const getTaskStats = async (req, res) => {
+  const [counts] = await Task.aggregate([
+    { $match: { owner: req.user._id } },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: 1 },
+        todo: { $sum: { $cond: [{ $eq: ["$status", "todo"] }, 1, 0] } },
+        inProgress: { $sum: { $cond: [{ $eq: ["$status", "in-progress"] }, 1, 0] } },
+        done: { $sum: { $cond: [{ $eq: ["$status", "done"] }, 1, 0] } },
+      },
+    },
+  ]);
+
+  const stats = counts
+    ? {
+        total: counts.total,
+        todo: counts.todo,
+        inProgress: counts.inProgress,
+        done: counts.done,
+      }
+    : { total: 0, todo: 0, inProgress: 0, done: 0 };
+
+  res.json({ success: true, stats });
+};
+
 // ── GET /api/v1/tasks/:id ────────────────────
 const getTask = async (req, res) => {
   const { id } = req.params;
@@ -187,4 +214,4 @@ const deleteTask = async (req, res) => {
   res.json({ success: true, message: "Task deleted." });
 };
 
-module.exports = { createTask, getTasks, getTask, updateTask, deleteTask };
+module.exports = { createTask, getTasks, getTaskStats, getTask, updateTask, deleteTask };

@@ -238,10 +238,13 @@ The stats example only reads existing data, so it doesn't need this step.
 // ── GET /api/v1/tasks/stats ──────────────────
 const getTaskStats = async (req, res) => {
   const owner = req.user._id;
-  const [todo, inProgress, done] = await Promise.all(
-    STATUSES.map((status) => Task.countDocuments({ owner, status }))
-  );
-  res.json({ success: true, stats: { todo, inProgress, done } });
+  const [total, todo, inProgress, done] = await Promise.all([
+    Task.countDocuments({ owner }),
+    Task.countDocuments({ owner, status: "todo" }),
+    Task.countDocuments({ owner, status: "in-progress" }),
+    Task.countDocuments({ owner, status: "done" }),
+  ]);
+  res.json({ success: true, stats: { total, todo, inProgress, done } });
 };
 ```
 

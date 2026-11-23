@@ -77,6 +77,38 @@ test("GET /api/v1/tasks without a token returns 401", async () => {
   assert.equal(data.success, false);
 });
 
+test("GET /api/v1/tasks/stats requires authentication and counts only the user's tasks", async () => {
+  const unauthorizedRes = await fetch(`${baseUrl}/api/v1/tasks/stats`);
+  assert.equal(unauthorizedRes.status, 401);
+  assert.equal((await unauthorizedRes.json()).success, false);
+
+  const emptyRes = await fetch(`${baseUrl}/api/v1/tasks/stats`, {
+    headers: { Authorization: `Bearer ${user2Token}` },
+  });
+  assert.equal(emptyRes.status, 200);
+  assert.deepEqual(await emptyRes.json(), {
+    success: true,
+    stats: { total: 0, todo: 0, inProgress: 0, done: 0 },
+  });
+
+  const tasks = Array.from({ length: 55 }, (_, index) => ({
+    title: `Stats task ${index + 1}`,
+    status: index < 30 ? "todo" : index < 37 ? "in-progress" : "done",
+    owner: user2._id,
+  }));
+  tasks.push({ title: "Another user's task", status: "done", owner: user1._id });
+  await Task.insertMany(tasks);
+
+  const res = await fetch(`${baseUrl}/api/v1/tasks/stats`, {
+    headers: { Authorization: `Bearer ${user2Token}` },
+  });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), {
+    success: true,
+    stats: { total: 55, todo: 30, inProgress: 7, done: 18 },
+  });
+});
+
 test("creating a task returns 201 with default priority and status", async () => {
   const res = await fetch(`${baseUrl}/api/v1/tasks`, {
     method: "POST",
