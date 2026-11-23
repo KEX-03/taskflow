@@ -8,15 +8,125 @@ import { formatDueDate, isOverdue, isDueToday, isPastDate } from "../utils/dates
 import Tooltip from "../components/Shared/Tooltip.jsx";
 
 // ── Modal Component ───────────────────────
-const Modal = ({ open, onClose, title, children }) => {
+const Modal = ({ open, onClose, title, children, initialFocusRef, fallbackFocusRef, triggerRef }) => {
   const titleId = useId();
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
+  const wasOpenRef = useRef(false);
+  const onCloseRef = useRef(onClose);
 
   useEffect(() => {
-    if (!open) return;
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!open) {
+      if (wasOpenRef.current) {
+        wasOpenRef.current = false;
+        const prev = triggerRef ? triggerRef.current : previousFocusRef.current;
+        previousFocusRef.current = null;
+        if (prev && document.contains(prev)) {
+          prev.focus();
+        } else if (fallbackFocusRef?.current && document.contains(fallbackFocusRef.current)) {
+          fallbackFocusRef.current.focus();
+        }
+      }
+      return;
+    }
+
+    wasOpenRef.current = true;
+
+    // Only record previous focus if currently outside the dialog
+    if (
+      !previousFocusRef.current ||
+      (dialogRef.current && dialogRef.current.contains(previousFocusRef.current))
+    ) {
+      if (
+        document.activeElement &&
+        (!dialogRef.current || !dialogRef.current.contains(document.activeElement))
+      ) {
+        previousFocusRef.current = document.activeElement;
+        if (triggerRef) {
+          triggerRef.current = document.activeElement;
+        }
+      }
+    }
+
+    const isFocusableVisible = (el) => {
+      if (el.disabled || el.hasAttribute("disabled") || el.getAttribute("tabindex") === "-1") {
+        return false;
+      }
+      if (el.closest('[aria-hidden="true"]') || el.closest("[hidden]")) {
+        return false;
+      }
+      if (typeof el.checkVisibility === "function") {
+        return el.checkVisibility({ checkOpacity: false, checkVisibilityCSS: true });
+      }
+      return (
+        (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0) &&
+        (typeof window.getComputedStyle !== "function" || window.getComputedStyle(el).visibility !== "hidden")
+      );
+    };
+
+    if (initialFocusRef?.current) {
+      initialFocusRef.current.focus();
+    } else if (dialogRef.current) {
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(isFocusableVisible);
+
+      if (focusable.length > 0) {
+        focusable[0].focus();
+      } else {
+        dialogRef.current.focus();
+      }
+    }
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current?.();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        if (!dialogRef.current) return;
+
+        const focusableElements = Array.from(
+          dialogRef.current.querySelectorAll(
+            'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter(isFocusableVisible);
+
+        if (focusableElements.length === 0) {
+          event.preventDefault();
+          dialogRef.current.focus();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          if (
+            document.activeElement === firstElement ||
+            document.activeElement === dialogRef.current ||
+            !dialogRef.current.contains(document.activeElement)
+          ) {
+            event.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (
+            document.activeElement === lastElement ||
+            document.activeElement === dialogRef.current ||
+            !dialogRef.current.contains(document.activeElement)
+          ) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -25,14 +135,21 @@ const Modal = ({ open, onClose, title, children }) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, onClose]);
+  }, [open, initialFocusRef, fallbackFocusRef, triggerRef]);
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up outline-none"
+      >
         <div className="flex items-center justify-between p-5 border-b border-border-subtle">
           <h3 id={titleId} className="text-base font-semibold text-white">{title}</h3>
           <Tooltip text="Close dialog" side="left">
@@ -53,7 +170,7 @@ const Modal = ({ open, onClose, title, children }) => {
 };
 
 // ── Task Form inside modal ─────────────────
-const TaskForm = ({ initial = {}, onSave, onClose }) => {
+const TaskForm = ({ initial = {}, onSave, onClose, initialFocusRef }) => {
   const [form, setForm] = useState({
     title: initial.title || "",
     description: initial.description || "",
@@ -121,7 +238,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 
       <div>
         <label htmlFor="task-title" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Title</label>
-        <input id="task-title" name="title" value={form.title} maxLength={200} onChange={handleChange} placeholder="Task title…"
+        <input ref={initialFocusRef} id="task-title" name="title" value={form.title} maxLength={200} onChange={handleChange} placeholder="Task title…"
           className="w-full px-3 py-2 text-sm rounded-lg" />
       </div>
 
@@ -234,6 +351,11 @@ const Tasks = () => {
     pages: 0,
   });
   const abortControllerRef = useRef(null);
+  const deleteTriggerRef = useRef(null);
+  const newTaskTitleRef = useRef(null);
+  const editTaskTitleRef = useRef(null);
+  const deleteCancelRef = useRef(null);
+  const newTaskButtonRef = useRef(null);
 
   useEffect(() => () => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -348,6 +470,7 @@ const Tasks = () => {
   const handleDelete = async () => {
     await api.delete(`/tasks/${deleteId}`);
     addToast("Task deleted.", "info");
+    deleteTriggerRef.current = null;
     setDeleteId(null);
     fetchTasks();
   };
@@ -364,7 +487,7 @@ const Tasks = () => {
           <h1 className="text-xl font-bold text-white">Tasks</h1>
           <p className="text-text-muted text-sm">{meta.total} task{meta.total !== 1 ? "s" : ""} found</p>
         </div>
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+        <button ref={newTaskButtonRef} onClick={() => setModalOpen(true)} className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
           <span className="text-lg leading-none">+</span> New Task
         </button>
       </div>
@@ -512,20 +635,20 @@ const Tasks = () => {
       )}
 
       {/* ── Create Modal ──────────────── */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="New Task">
-        <TaskForm onSave={handleCreate} onClose={() => setModalOpen(false)} />
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="New Task" initialFocusRef={newTaskTitleRef} fallbackFocusRef={newTaskButtonRef}>
+        <TaskForm initialFocusRef={newTaskTitleRef} onSave={handleCreate} onClose={() => setModalOpen(false)} />
       </Modal>
 
       {/* ── Edit Modal ────────────────── */}
-      <Modal open={!!editTask} onClose={() => setEditTask(null)} title="Edit Task">
-        {editTask && <TaskForm initial={editTask} onSave={handleUpdate} onClose={() => setEditTask(null)} />}
+      <Modal open={!!editTask} onClose={() => setEditTask(null)} title="Edit Task" initialFocusRef={editTaskTitleRef} fallbackFocusRef={newTaskButtonRef}>
+        {editTask && <TaskForm initial={editTask} initialFocusRef={editTaskTitleRef} onSave={handleUpdate} onClose={() => setEditTask(null)} />}
       </Modal>
 
       {/* ── Delete Confirm Modal ──────── */}
-      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Task">
+      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Task" initialFocusRef={deleteCancelRef} fallbackFocusRef={newTaskButtonRef} triggerRef={deleteTriggerRef}>
         <p className="text-text-secondary text-sm mb-5">Are you sure you want to delete this task? This action cannot be undone.</p>
         <div className="flex gap-3">
-          <button type="button" onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Cancel</button>
+          <button ref={deleteCancelRef} type="button" onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Cancel</button>
           <button type="button" aria-label="Delete task" onClick={handleDelete} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">Delete</button>
         </div>
       </Modal>
