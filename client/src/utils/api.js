@@ -34,6 +34,9 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Remember which session sent the request, so a late 401 from an old token
+  // cannot log out a newer session that signed in while this one was in flight.
+  config._authToken = token;
   return config;
 });
 
@@ -42,12 +45,17 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      // Several requests can expire together: run the logout/toast only once.
-      if (unauthorizedHandler && !unauthorizedHandled && !isAuthRequest(err.config)) {
-        unauthorizedHandled = true;
-        unauthorizedHandler();
+      // A request from a previous session may answer 401 after the user has
+      // signed in again. Leave the new session's storage and handler alone.
+      const isCurrentSession = err.config?._authToken === localStorage.getItem("token");
+      if (isCurrentSession) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        // Several requests can expire together: run the logout/toast only once.
+        if (unauthorizedHandler && !unauthorizedHandled && !isAuthRequest(err.config)) {
+          unauthorizedHandled = true;
+          unauthorizedHandler();
+        }
       }
     }
     return Promise.reject(err);
