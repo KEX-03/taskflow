@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { Link } from "react-router";
 import api from "../utils/api.js";
-import Spinner from "../components/Shared/Spinner.jsx";
 import usePageTitle from "../utils/usePageTitle.js";
 
 const StatCard = ({ title, value, icon, color, sub }) => (
@@ -32,31 +31,37 @@ const getGreeting = (hour) => {
 const Dashboard = () => {
   const { user } = useAuth();
   const greeting = getGreeting(new Date().getHours());
-  const [stats, setStats] = useState({ total: 0, todo: 0, inProgress: 0, done: 0 });
-  const [recentTasks, setRecentTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
+  const [statsError, setStatsError] = useState("");
+  const [recentTasks, setRecentTasks] = useState(null);
+  const [tasksError, setTasksError] = useState("");
 
   usePageTitle("Dashboard");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       try {
-        const [statsResponse, tasksResponse] = await Promise.all([
-          api.get("/tasks/stats"),
-          api.get("/tasks?limit=5"),
-        ]);
-        setStats(statsResponse.data.stats);
-        setRecentTasks(tasksResponse.data.tasks);
+        const { data } = await api.get("/tasks/stats");
+        setStats(data.stats);
       } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load dashboard stats:", err);
+        setStatsError("Could not load task statistics. Please refresh the page.");
       }
     };
-    fetchData();
-  }, []);
 
-  if (loading) return <div className="flex-1 flex items-center justify-center"><Spinner size="lg" /></div>;
+    const fetchRecentTasks = async () => {
+      try {
+        const { data } = await api.get("/tasks?limit=5");
+        setRecentTasks(data.tasks);
+      } catch (err) {
+        console.error("Failed to load recent tasks:", err);
+        setTasksError("Could not load recent tasks. Please refresh the page.");
+      }
+    };
+
+    fetchStats();
+    fetchRecentTasks();
+  }, []);
 
   const statusColor = { todo: "text-text-secondary bg-surface-raised", "in-progress": "text-yellow-400 bg-yellow-400/10", done: "text-emerald-400 bg-emerald-400/10" };
   const priorityDot = { low: "bg-emerald-500", medium: "bg-yellow-500", high: "bg-red-500" };
@@ -72,17 +77,18 @@ const Dashboard = () => {
       </div>
 
       {/* ── Stat Cards ───────────────────── */}
+      {statsError && <p role="alert" className="text-red-400 text-sm mb-3">{statsError}</p>}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Total Tasks" value={stats.total} color="bg-primary-600/15" sub="All tasks" icon={
+        <StatCard title="Total Tasks" value={stats?.total ?? "—"} color="bg-primary-600/15" sub="All tasks" icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-primary-500"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
         } />
-        <StatCard title="To Do" value={stats.todo} color="bg-surface-hover/50" sub="Pending" icon={
+        <StatCard title="To Do" value={stats?.todo ?? "—"} color="bg-surface-hover/50" sub="Pending" icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-text-secondary"><circle cx="12" cy="12" r="10" /></svg>
         } />
-        <StatCard title="In Progress" value={stats.inProgress} color="bg-yellow-500/15" sub="Working on" icon={
+        <StatCard title="In Progress" value={stats?.inProgress ?? "—"} color="bg-yellow-500/15" sub="Working on" icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-yellow-500"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
         } />
-        <StatCard title="Done" value={stats.done} color="bg-emerald-500/15" sub="Completed" icon={
+        <StatCard title="Done" value={stats?.done ?? "—"} color="bg-emerald-500/15" sub="Completed" icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
         } />
       </div>
@@ -93,7 +99,11 @@ const Dashboard = () => {
           <h2 className="text-base font-semibold text-white">Recent Tasks</h2>
           <Link to="/tasks" className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors">View all →</Link>
         </div>
-        {recentTasks.length === 0 ? (
+        {tasksError ? (
+          <p role="alert" className="text-red-400 text-sm">{tasksError}</p>
+        ) : recentTasks === null ? (
+          <p className="text-text-muted text-sm text-center py-8">Loading recent tasks...</p>
+        ) : recentTasks.length === 0 ? (
           <p className="text-text-muted text-sm text-center py-8">No tasks yet. <Link to="/tasks" className="text-primary-400 hover:underline">Create one →</Link></p>
         ) : (
           <div className="flex flex-col gap-2">
