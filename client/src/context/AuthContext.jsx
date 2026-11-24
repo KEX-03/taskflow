@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import api, { setUnauthorizedHandler } from "../utils/api.js";
 import { useToast } from "../components/Shared/Toast.jsx";
@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
-  const sessionExpiredRef = useRef(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -22,7 +21,6 @@ export const AuthProvider = ({ children }) => {
     }
     try {
       const { data } = await api.get("/me");
-      sessionExpiredRef.current = false;
       setUser(data.user);
       setToken(savedToken);
     } catch {
@@ -50,12 +48,11 @@ export const AuthProvider = ({ children }) => {
   // ── Expired session — same logout as the button, then redirect and toast ──
   // The handler is only registered while a user is logged in, so a failed
   // login/signup (or the /me check on page load) never shows this message.
+  // api.js calls it at most once per session, even if several requests fail.
   useEffect(() => {
     if (loading || !token) return undefined;
 
     const handleUnauthorized = () => {
-      if (sessionExpiredRef.current) return;
-      sessionExpiredRef.current = true;
       logout();
       addToast("Your session has expired. Please log in again.", "error");
       navigate("/login", { replace: true });
@@ -68,7 +65,6 @@ export const AuthProvider = ({ children }) => {
   // ── Signup ──────────────────────────────
   const signup = async ({ name, email, password }) => {
     const { data } = await api.post("/auth/signup", { name, email, password });
-    sessionExpiredRef.current = false;
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);
@@ -78,7 +74,6 @@ export const AuthProvider = ({ children }) => {
   // ── Login ───────────────────────────────
   const login = async ({ email, password }) => {
     const { data } = await api.post("/auth/login", { email, password });
-    sessionExpiredRef.current = false;
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);

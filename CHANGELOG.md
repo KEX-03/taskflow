@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- When your login expires while you're using the app, you're logged out and sent to the login page with the message "Your session has expired. Please log in again.", instead of staying on a page whose requests silently fail. The message shows once, even if several requests fail together. A wrong password or an existing email still shows the form's own error, and a late reply from a request sent before you logged in again can't log you out ([#109](https://github.com/KEX-03/taskflow/pull/109)). Thanks to [@ayushnandi718-dev](https://github.com/ayushnandi718-dev)!
 - The task search waits until you stop typing before asking the server, instead of sending a request on every keystroke, and a slow response for an older search can no longer replace the results for the current one ([#56](https://github.com/KEX-03/taskflow/pull/56)). Thanks to [@Saurabh-Singh33](https://github.com/Saurabh-Singh33)!
 - The auto-merge commit message now also picks up a "What does this PR do?" section written with a `###` heading, and keeps sub-headings inside that section. Before, a `###` heading left only the "Closes #N" line in the commit.
 - Password fields in Microsoft Edge no longer show two eye icons: Edge's built-in reveal button is hidden, and the Profile page's password fields now have the same show/hide toggle as Login and Signup ([#50](https://github.com/KEX-03/taskflow/pull/50)).

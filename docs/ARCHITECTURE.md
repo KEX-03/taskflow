@@ -51,7 +51,7 @@ TaskFlow uses **JSON Web Tokens (JWT)**: after you log in, the server gives the 
 3. **The client stores it.** [`AuthContext`](../client/src/context/AuthContext.jsx) saves the token in the browser's `localStorage` and keeps the user in React state.
 4. **The Axios interceptor attaches it.** Before every request, [`utils/api.js`](../client/src/utils/api.js) adds the header `Authorization: Bearer <token>`.
 5. **The server checks it.** `protect` verifies the token's signature and expiry, then loads the user from the database.
-6. **The 401 handler clears it.** If any response is **401** (token expired, invalid, or the user was deleted), the Axios response interceptor removes the token from `localStorage`. The next time the app loads, you're sent to the login page.
+6. **The 401 handler clears it.** If any response is **401** (token expired, invalid, or the user was deleted), the Axios response interceptor removes the token from `localStorage` and calls the handler that `AuthContext` registers with `setUnauthorizedHandler`. That handler logs you out, sends you to `/login` and shows "Your session has expired. Please log in again." once, however many requests failed. Three cases are left alone: login and signup, where a 401 means wrong details and the form shows its own error; the `GET /me` check on startup (step 7); and a late 401 for a request sent with an older token, so it can't log out a session that started after it.
 7. **Returning visits.** When the app starts, `AuthContext` calls `GET /me` with the saved token. If it works, you're logged in; if not, the token is cleared.
 8. **Logout** simply deletes the token on the client. Because the server keeps no session, there's nothing to delete there; `POST /auth/logout` exists only so the client has a clean call to make.
 
@@ -92,7 +92,7 @@ client/src/
     └── validation.js  Form checks for signup and login
 ```
 
-- **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `AuthProvider` (who is logged in) and `ToastProvider` (messages). Then it lists the routes:
+- **`App.jsx`** wraps everything in three providers: `BrowserRouter` (URLs), `ToastProvider` (messages) and, inside it, `AuthProvider` (who is logged in), which needs the toasts for the session-expired message. Then it lists the routes:
   - `/login` and `/signup` use `AuthRoute`, which sends already logged-in users to the dashboard.
   - `/dashboard`, `/tasks` and `/profile` use `ProtectedRoute`, which sends logged-out users to `/login`, and `DashLayout`, which adds the sidebar. On small screens, `DashLayout` shows a top bar instead, whose menu button opens the same sidebar as a drawer.
   - `/` redirects to `/login`. Any other URL shows the `NotFound` page ("Page not found"), with a button to the Dashboard or to Login, depending on whether you're logged in.
