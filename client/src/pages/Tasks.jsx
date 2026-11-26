@@ -10,13 +10,73 @@ import Tooltip from "../components/Shared/Tooltip.jsx";
 // ── Modal Component ───────────────────────
 const Modal = ({ open, onClose, title, children }) => {
   const titleId = useId();
+  const modalRef = useRef(null);
+  const previousFocusRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  // Keep the latest onClose function without restarting the effect.
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
 
+    // Remember the button or element that opened this modal.
+    previousFocusRef.current = document.activeElement;
+
+    const modal = modalRef.current;
+
+    // Focus the element marked for initial focus, or the first focusable element.
+    const initialElement =
+      modal?.querySelector("[data-modal-autofocus]") ||
+      modal?.querySelector(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+
+    initialElement?.focus();
+
     const handleKeyDown = (event) => {
+      // Close the modal when Escape is pressed.
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
+        return;
+      }
+
+      // Handle Tab and Shift + Tab.
+      if (event.key !== "Tab") return;
+
+      const focusableElements = Array.from(
+        modal.querySelectorAll(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => element.getClientRects().length > 0);
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      // Shift + Tab: move from the first element to the last.
+      if (event.shiftKey) {
+        if (
+          document.activeElement === firstElement ||
+          !modal.contains(document.activeElement)
+        ) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      } 
+      // Tab: move from the last element to the first.
+      else {
+        if (
+          document.activeElement === lastElement ||
+          !modal.contains(document.activeElement)
+        ) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
     };
 
@@ -24,17 +84,38 @@ const Modal = ({ open, onClose, title, children }) => {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+
+      // Return focus to the element that opened the modal.
+      if (previousFocusRef.current?.isConnected) {
+        previousFocusRef.current.focus();
+      }
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+        onClick={onClose}
+      />
+
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up"
+      >
         <div className="flex items-center justify-between p-5 border-b border-border-subtle">
-          <h3 id={titleId} className="text-base font-semibold text-white">{title}</h3>
+          <h3
+            id={titleId}
+            className="text-base font-semibold text-white"
+          >
+            {title}
+          </h3>
+
           <Tooltip text="Close dialog" side="left">
             <button
               type="button"
@@ -46,6 +127,7 @@ const Modal = ({ open, onClose, title, children }) => {
             </button>
           </Tooltip>
         </div>
+
         <div className="p-5">{children}</div>
       </div>
     </div>
