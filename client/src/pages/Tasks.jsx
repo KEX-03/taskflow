@@ -14,8 +14,12 @@ const Modal = ({ open, onClose, title, children }) => {
   const previousFocusRef = useRef(null);
   const onCloseRef = useRef(onClose);
 
-  // Keep the latest onClose function without restarting the effect.
+  useEffect(() => {
   onCloseRef.current = onClose;
+}, [onClose]);
+
+  // Keep the latest onClose function without restarting the effect.
+  
 
   useEffect(() => {
     if (!open) return;
