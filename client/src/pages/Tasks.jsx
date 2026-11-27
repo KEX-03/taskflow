@@ -8,33 +8,113 @@ import { formatDueDate, isOverdue, isDueToday, isPastDate } from "../utils/dates
 import Tooltip from "../components/Shared/Tooltip.jsx";
 
 // ── Modal Component ───────────────────────
-const Modal = ({ open, onClose, title, children }) => {
+const Modal = ({ open, onClose, title, children, fallbackFocusRef }) => {
   const titleId = useId();
+  const modalRef = useRef(null);
+  const previousFocusRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  // Keep the latest onClose function without restarting the focus effect.
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
+    // Remember the button or element that opened this modal.
+    previousFocusRef.current = document.activeElement;
+    const modal = modalRef.current;
+    // Focus the element marked for initial focus, or the first focusable element.
+    const initialElement =
+      modal?.querySelector("[data-modal-autofocus]") ||
+      modal?.querySelector(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+
+    initialElement?.focus();
 
     const handleKeyDown = (event) => {
+      // Close the modal when Escape is pressed.
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
+        return;
+      }
+
+      // Handle Tab and Shift + Tab.
+      if (event.key !== "Tab") return;
+
+      const focusableElements = Array.from(
+        modal.querySelectorAll(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => element.getClientRects().length > 0);
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      // Shift + Tab: move from the first element to the last.
+      if (event.shiftKey) {
+        if (
+          document.activeElement === firstElement ||
+          !modal.contains(document.activeElement)
+        ) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      }
+      // Tab: move from the last element to the first.
+      else {
+        if (
+          document.activeElement === lastElement ||
+          !modal.contains(document.activeElement)
+        ) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      // Restore focus to the element that opened the modal.
+      if (previousFocusRef.current?.isConnected) {
+        previousFocusRef.current.focus();
+      } else {
+        // If the original button was removed, focus the persistent New Task button.
+        fallbackFocusRef?.current?.focus();
+      }
     };
-  }, [open, onClose]);
+  }, [open, fallbackFocusRef]);
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+        onClick={onClose}
+      />
+
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md shadow-2xl animate-slide-up"
+      >
         <div className="flex items-center justify-between p-5 border-b border-border-subtle">
-          <h3 id={titleId} className="text-base font-semibold text-white">{title}</h3>
+          <h3
+            id={titleId}
+            className="text-base font-semibold text-white"
+          >
+            {title}
+          </h3>
+
           <Tooltip text="Close dialog" side="left">
             <button
               type="button"
@@ -46,6 +126,7 @@ const Modal = ({ open, onClose, title, children }) => {
             </button>
           </Tooltip>
         </div>
+
         <div className="p-5">{children}</div>
       </div>
     </div>
@@ -62,6 +143,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     dueDate: initial.dueDate ? initial.dueDate.slice(0, 10) : "",
     tags: Array.isArray(initial.tags) ? initial.tags : [],
   });
+
   const [error, setError] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,41 +153,78 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
     setError("");
   };
 
-  // Hint for a past due date. When editing, only if the date was changed,
-  // so opening an overdue task to edit its title shows no hint.
+  // Hint for a past due date. When editing, only if the date was changed.
   const originalDueDate = initial.dueDate ? initial.dueDate.slice(0, 10) : "";
+
   const showPastDateHint =
     Boolean(form.dueDate) &&
     isPastDate(form.dueDate) &&
     (!initial._id || form.dueDate !== originalDueDate);
 
-  // Same rules as the API: trimmed, lowercased, no duplicates, up to 5 tags of 1–20 characters
+  // Same rules as the API: trimmed, lowercased, no duplicates, up to 5 tags of 1–20 characters.
   const addTag = () => {
     const tag = tagInput.trim().toLowerCase();
+
     if (!tag) return;
-    if (tag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
-    if (form.tags.includes(tag)) { setTagInput(""); setError(""); return; }
-    if (form.tags.length >= 5) { setError("You can add a maximum of 5 tags."); return; }
+
+    if (tag.length > 20) {
+      setError("Each tag must be 1–20 characters long.");
+      return;
+    }
+
+    if (form.tags.includes(tag)) {
+      setTagInput("");
+      setError("");
+      return;
+    }
+
+    if (form.tags.length >= 5) {
+      setError("You can add a maximum of 5 tags.");
+      return;
+    }
+
     setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
     setTagInput("");
     setError("");
   };
 
   const removeTag = (tag) => {
-    setForm((prev) => ({ ...prev, tags: prev.tags.filter((item) => item !== tag) }));
+    setForm((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((item) => item !== tag),
+    }));
+
     setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) { setError("Title is required."); return; }
-    // Text still in the tag box is saved as a tag too, so nothing typed is lost
+
+    if (!form.title.trim()) {
+      setError("Title is required.");
+      return;
+    }
+
+    // Text still in the tag box is saved as a tag too.
     const pendingTag = tagInput.trim().toLowerCase();
-    if (pendingTag.length > 20) { setError("Each tag must be 1–20 characters long."); return; }
-    const tags = [...new Set([...form.tags, ...(pendingTag ? [pendingTag] : [])])];
-    if (tags.length > 5) { setError("You can add a maximum of 5 tags."); return; }
+
+    if (pendingTag.length > 20) {
+      setError("Each tag must be 1–20 characters long.");
+      return;
+    }
+
+    const tags = [
+      ...new Set([...form.tags, ...(pendingTag ? [pendingTag] : [])]),
+    ];
+
+    if (tags.length > 5) {
+      setError("You can add a maximum of 5 tags.");
+      return;
+    }
+
     setLoading(true);
     setError("");
+
     try {
       await onSave({ ...form, tags, dueDate: form.dueDate || null });
     } catch (err) {
@@ -117,38 +236,101 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
+      {error && (
+        <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+          {error}
+        </p>
+      )}
 
       <div>
-        <label htmlFor="task-title" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Title</label>
-        <input id="task-title" name="title" value={form.title} maxLength={200} onChange={handleChange} placeholder="Task title…"
-          className="w-full px-3 py-2 text-sm rounded-lg" />
+        <label
+          htmlFor="task-title"
+          className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+        >
+          Title
+        </label>
+
+        <input
+          id="task-title"
+          name="title"
+          value={form.title}
+          maxLength={200}
+          onChange={handleChange}
+          placeholder="Task title…"
+          className="w-full px-3 py-2 text-sm rounded-lg"
+        />
       </div>
 
       <div>
-        <label htmlFor="task-description" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Description</label>
-        <textarea id="task-description" name="description" value={form.description} maxLength={1000} onChange={handleChange} placeholder="Optional…" rows={3}
+        <label
+          htmlFor="task-description"
+          className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+        >
+          Description
+        </label>
+
+        <textarea
+          id="task-description"
+          name="description"
+          value={form.description}
+          maxLength={1000}
+          onChange={handleChange}
+          placeholder="Optional…"
+          rows={3}
           aria-describedby="task-description-counter"
-          className="w-full px-3 py-2 text-sm rounded-lg resize-none" />
-        <p id="task-description-counter" className={`text-xs mt-1 ${
-          form.description.length >= 950 ? "text-amber-400" : "text-slate-600"
-        }`}>
-          {form.description.length} / 1000<span className="sr-only"> characters used</span>
+          className="w-full px-3 py-2 text-sm rounded-lg resize-none"
+        />
+
+        <p
+          id="task-description-counter"
+          className={`text-xs mt-1 ${
+            form.description.length >= 950
+              ? "text-amber-400"
+              : "text-slate-600"
+          }`}
+        >
+          {form.description.length} / 1000
+          <span className="sr-only"> characters used</span>
         </p>
       </div>
 
       <div className="flex gap-3">
         <div className="flex-1">
-          <label htmlFor="task-priority" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Priority</label>
-          <select id="task-priority" name="priority" value={form.priority} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
+          <label
+            htmlFor="task-priority"
+            className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+          >
+            Priority
+          </label>
+
+          <select
+            id="task-priority"
+            name="priority"
+            value={form.priority}
+            onChange={handleChange}
+            className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer"
+          >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
         </div>
+
         <div className="flex-1">
-          <label htmlFor="task-status" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Status</label>
-          <select id="task-status" name="status" value={form.status} onChange={handleChange} className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer">
+          <label
+            htmlFor="task-status"
+            className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+          >
+            Status
+          </label>
+
+          <select
+            id="task-status"
+            name="status"
+            value={form.status}
+            onChange={handleChange}
+            className="w-full px-3 py-2 text-sm rounded-lg cursor-pointer"
+          >
             <option value="todo">To Do</option>
             <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
@@ -157,7 +339,13 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
       </div>
 
       <div>
-        <label htmlFor="task-due-date" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Due date</label>
+        <label
+          htmlFor="task-due-date"
+          className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+        >
+          Due date
+        </label>
+
         <div className="flex items-center gap-2">
           <input
             id="task-due-date"
@@ -167,45 +355,114 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
             onChange={handleChange}
             aria-describedby="task-due-date-hint"
             onClick={(e) => {
-              // Open the calendar when clicking anywhere on the field, not just the icon
-              try { e.currentTarget.showPicker?.(); } catch { /* picker already open or not supported */ }
+              // Open the calendar when clicking anywhere on the field.
+              try {
+                e.currentTarget.showPicker?.();
+              } catch {
+                // Picker already open or not supported.
+              }
             }}
             className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-200"
           />
+
           {form.dueDate && (
-            <button type="button" onClick={() => handleChange({ target: { name: "dueDate", value: "" } })} aria-label="Clear due date"
-              className="px-3 py-2 text-xs font-medium rounded-lg text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Clear</button>
+            <button
+              type="button"
+              onClick={() =>
+                handleChange({
+                  target: { name: "dueDate", value: "" },
+                })
+              }
+              aria-label="Clear due date"
+              className="px-3 py-2 text-xs font-medium rounded-lg text-text-label bg-surface-raised hover:bg-surface-hover transition-colors"
+            >
+              Clear
+            </button>
           )}
         </div>
-        {/* Always on the page, so screen readers announce the hint when it appears */}
-        <p id="task-due-date-hint" aria-live="polite" className={`text-xs text-amber-400 ${showPastDateHint ? "mt-1.5" : ""}`}>
+
+        <p
+          id="task-due-date-hint"
+          aria-live="polite"
+          className={`text-xs text-amber-400 ${
+            showPastDateHint ? "mt-1.5" : ""
+          }`}
+        >
           {showPastDateHint ? "This date is in the past." : ""}
         </p>
       </div>
 
       <div>
-        <label htmlFor="task-tags" className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Tags</label>
-        <input id="task-tags" value={tagInput} onChange={(e) => setTagInput(e.target.value)}
+        <label
+          htmlFor="task-tags"
+          className="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide"
+        >
+          Tags
+        </label>
+
+        <input
+          id="task-tags"
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); }
+            if (e.key === "Enter" || e.key === ",") {
+              e.preventDefault();
+              addTag();
+            }
           }}
           placeholder="Type a tag and press Enter…"
-          className="w-full px-3 py-2 text-sm rounded-lg" />
+          className="w-full px-3 py-2 text-sm rounded-lg"
+        />
+
         <div className="flex flex-wrap gap-2 mt-2">
           {form.tags.map((tag) => (
-            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2.5 py-1 text-xs text-primary-400">
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2.5 py-1 text-xs text-primary-400"
+            >
               #{tag}
-              <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)} className="ml-1 hover:text-white">×</button>
+
+              <button
+                type="button"
+                aria-label={`Remove tag ${tag}`}
+                onClick={() => removeTag(tag)}
+                className="ml-1 hover:text-white"
+              >
+                ×
+              </button>
             </span>
           ))}
         </div>
-        <p className="text-xs text-text-muted mt-1">Press Enter or comma to add a tag. Maximum 5 tags, 20 characters each.</p>
+
+        <p className="text-xs text-text-muted mt-1">
+          Press Enter or comma to add a tag. Maximum 5 tags, 20 characters each.
+        </p>
       </div>
 
       <div className="flex gap-3 pt-2">
-        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Cancel</button>
-        <button type="submit" disabled={loading} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-          {loading ? <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving…</> : (initial._id ? "Update Task" : "Create Task")}
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Saving…
+            </>
+          ) : initial._id ? (
+            "Update Task"
+          ) : (
+            "Create Task"
+          )}
         </button>
       </div>
     </form>
@@ -215,6 +472,7 @@ const TaskForm = ({ initial = {}, onSave, onClose }) => {
 // ── Main Tasks Page ────────────────────────
 const Tasks = () => {
   const { addToast } = useToast();
+
   const [, setDateRefresh] = useState(0);
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
@@ -227,29 +485,45 @@ const Tasks = () => {
   const [editTask, setEditTask] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [page, setPage] = useState(1);
+
   const [meta, setMeta] = useState({
     total: 0,
     page: 1,
     limit: 20,
     pages: 0,
   });
+
   const abortControllerRef = useRef(null);
 
-  useEffect(() => () => {
-    if (abortControllerRef.current) abortControllerRef.current.abort();
-  }, []);
+  // Persistent fallback target when the original opener is removed.
+  const newTaskButtonRef = useRef(null);
+
+  useEffect(
+    () => () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    },
+    []
+  );
 
   usePageTitle("Tasks");
 
-  // Re-render at local midnight and when the tab is shown again, so the
-  // Overdue / Due today badges move on to the new day without a reload
+  // Re-render at local midnight and when the tab is shown again.
   useEffect(() => {
     let midnightTimer;
 
     const scheduleMidnightRefresh = () => {
       clearTimeout(midnightTimer);
+
       const now = new Date();
-      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1
+      );
+
       midnightTimer = setTimeout(() => {
         setDateRefresh((value) => value + 1);
         scheduleMidnightRefresh();
@@ -264,10 +538,16 @@ const Tasks = () => {
     };
 
     scheduleMidnightRefresh();
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       clearTimeout(midnightTimer);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
     };
   }, []);
 
@@ -275,17 +555,22 @@ const Tasks = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
     setLoading(true);
+
     try {
       const params = new URLSearchParams();
+
       if (debouncedSearch) params.set("search", debouncedSearch);
       if (filterPriority) params.set("priority", filterPriority);
       if (filterStatus) params.set("status", filterStatus);
       if (filterTag) params.set("tag", filterTag);
+
       params.set("page", page);
+
       const { data } = await api.get(`/tasks?${params}`, {
         signal: controller.signal,
       });
@@ -294,11 +579,13 @@ const Tasks = () => {
 
       setTasks(data.tasks);
       setMeta(data.meta);
+
       if (data.meta.pages > 0 && page > data.meta.pages) {
         setPage(data.meta.pages);
       }
     } catch (err) {
       if (axios.isCancel(err) || err?.name === "CanceledError") return;
+
       console.error(err);
     } finally {
       if (abortControllerRef.current === controller) {
@@ -307,20 +594,23 @@ const Tasks = () => {
     }
   }, [debouncedSearch, filterPriority, filterStatus, filterTag, page]);
 
-  useEffect(() => { fetchTasks(); }, [fetchTasks]);
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
-  // Debounce the search. This runs after the fetch effect above, so when the debounced
-  // value changes, that effect has already started the new request.
+  // Debounce the search.
   useEffect(() => {
     if (search === debouncedSearch) {
-      // Nothing to do on page load or once the debounced value has caught up, unless typing
-      // cancelled a request and the text was then changed back (no new fetch would follow)
-      if (abortControllerRef.current?.signal.aborted) fetchTasks();
+      if (abortControllerRef.current?.signal.aborted) {
+        fetchTasks();
+      }
+
       return;
     }
 
-    // The search text changed, so a request still on its way is for an older search
-    if (abortControllerRef.current) abortControllerRef.current.abort();
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
 
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -333,28 +623,43 @@ const Tasks = () => {
   // ── CRUD handlers ──────────────────────
   const handleCreate = async (form) => {
     await api.post("/tasks", form);
+
     addToast("Task created!", "success");
+
     setModalOpen(false);
     fetchTasks();
   };
 
   const handleUpdate = async (form) => {
     await api.put(`/tasks/${editTask._id}`, form);
+
     addToast("Task updated!", "success");
+
     setEditTask(null);
     fetchTasks();
   };
 
   const handleDelete = async () => {
     await api.delete(`/tasks/${deleteId}`);
+
     addToast("Task deleted.", "info");
+
     setDeleteId(null);
     fetchTasks();
   };
 
   // ── Badges ─────────────────────────────
-  const statusBadge = { todo: "text-text-secondary bg-surface-raised", "in-progress": "text-yellow-400 bg-yellow-400/10", done: "text-emerald-400 bg-emerald-400/10" };
-  const priorityBadge = { low: "text-emerald-400 bg-emerald-400/10", medium: "text-yellow-400 bg-yellow-400/10", high: "text-red-400 bg-red-400/10" };
+  const statusBadge = {
+    todo: "text-text-secondary bg-surface-raised",
+    "in-progress": "text-yellow-400 bg-yellow-400/10",
+    done: "text-emerald-400 bg-emerald-400/10",
+  };
+
+  const priorityBadge = {
+    low: "text-emerald-400 bg-emerald-400/10",
+    medium: "text-yellow-400 bg-yellow-400/10",
+    high: "text-red-400 bg-red-400/10",
+  };
 
   return (
     <div className="flex-1 p-6 overflow-y-auto">
@@ -362,9 +667,17 @@ const Tasks = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-white">Tasks</h1>
-          <p className="text-text-muted text-sm">{meta.total} task{meta.total !== 1 ? "s" : ""} found</p>
+
+          <p className="text-text-muted text-sm">
+            {meta.total} task{meta.total !== 1 ? "s" : ""} found
+          </p>
         </div>
-        <button onClick={() => setModalOpen(true)} className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+
+        <button
+          ref={newTaskButtonRef}
+          onClick={() => setModalOpen(true)}
+          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+        >
           <span className="text-lg leading-none">+</span> New Task
         </button>
       </div>
@@ -372,37 +685,71 @@ const Tasks = () => {
       {/* ── Search + Filters ────────────── */}
       <div className="flex flex-wrap gap-3 mb-5">
         <div className="flex-1 min-w-[180px] relative">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tasks…"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg" />
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg"
+          />
         </div>
-        <select value={filterPriority} onChange={(e) => {
-          setFilterPriority(e.target.value);
-          setPage(1);
-        }}
-          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
+
+        <select
+          value={filterPriority}
+          onChange={(e) => {
+            setFilterPriority(e.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]"
+        >
           <option value="">All Priorities</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
-        <select value={filterStatus} onChange={(e) => {
-          setFilterStatus(e.target.value);
-          setPage(1);
-        }}
-          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]">
+
+        <select
+          value={filterStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 text-sm rounded-lg cursor-pointer min-w-[120px]"
+        >
           <option value="">All Statuses</option>
           <option value="todo">To Do</option>
           <option value="in-progress">In Progress</option>
           <option value="done">Done</option>
         </select>
+
         {filterTag && (
           <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-2 text-sm text-primary-400">
             #{filterTag}
-            <button type="button" aria-label="Clear tag filter" onClick={() => { setFilterTag(""); setPage(1); }} className="hover:text-white">×</button>
+
+            <button
+              type="button"
+              aria-label="Clear tag filter"
+              onClick={() => {
+                setFilterTag("");
+                setPage(1);
+              }}
+              className="hover:text-white"
+            >
+              ×
+            </button>
           </span>
         )}
       </div>
@@ -416,68 +763,176 @@ const Tasks = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          {!search && !debouncedSearch && !filterPriority && !filterStatus && !filterTag ? (
+          {!search &&
+          !debouncedSearch &&
+          !filterPriority &&
+          !filterStatus &&
+          !filterTag ? (
             <>
-              <div className="text-5xl mb-4" aria-hidden="true">📝</div>
-              <h2 className="text-lg font-semibold text-white mb-2">You don't have any tasks yet</h2>
-              <p className="text-text-muted text-sm mb-5">Create your first task to get started.</p>
-              <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
-                <span className="text-lg leading-none">+</span> Create your first task
+              <div className="text-5xl mb-4" aria-hidden="true">
+                📝
+              </div>
+
+              <h2 className="text-lg font-semibold text-white mb-2">
+                You don't have any tasks yet
+              </h2>
+
+              <p className="text-text-muted text-sm mb-5">
+                Create your first task to get started.
+              </p>
+
+              <button
+                onClick={() => setModalOpen(true)}
+                className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              >
+                <span className="text-lg leading-none">+</span>
+                Create your first task
               </button>
             </>
           ) : (
             <>
-              <p className="text-text-muted text-sm">No tasks match your filters.</p>
-              <button onClick={() => { setSearch(""); setDebouncedSearch(""); setFilterPriority(""); setFilterStatus(""); setFilterTag(""); setPage(1); }} className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors">Clear filters</button>
+              <p className="text-text-muted text-sm">
+                No tasks match your filters.
+              </p>
+
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setDebouncedSearch("");
+                  setFilterPriority("");
+                  setFilterStatus("");
+                  setFilterTag("");
+                  setPage(1);
+                }}
+                className="text-primary-400 hover:text-primary-300 text-sm mt-2 transition-colors"
+              >
+                Clear filters
+              </button>
             </>
           )}
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
-            <div key={task._id} className={`bg-surface-card border ${isOverdue(task) ? "border-red-500/40" : "border-border-subtle hover:border-border"} rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}>
+            <div
+              key={task._id}
+              className={`bg-surface-card border ${
+                isOverdue(task)
+                  ? "border-red-500/40"
+                  : "border-border-subtle hover:border-border"
+              } rounded-xl p-4 flex items-start gap-4 transition-colors animate-fade-in`}
+            >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">{task.title}</p>
-                {task.description && <p className="text-xs text-text-muted mt-0.5 truncate">{task.description}</p>}
+                <p className="text-sm font-semibold text-white">
+                  {task.title}
+                </p>
+
+                {task.description && (
+                  <p className="text-xs text-text-muted mt-0.5 truncate">
+                    {task.description}
+                  </p>
+                )}
+
                 {task.dueDate && (
                   <div className="flex items-center gap-2 flex-wrap mt-1">
-                    <p className="text-xs text-text-secondary"><span aria-hidden="true">📅 </span>Due {formatDueDate(task.dueDate)}</p>
+                    <p className="text-xs text-text-secondary">
+                      <span aria-hidden="true">📅 </span>
+                      Due {formatDueDate(task.dueDate)}
+                    </p>
+
                     {isOverdue(task) && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">Overdue</span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-red-400 bg-red-400/10">
+                        Overdue
+                      </span>
                     )}
+
                     {isDueToday(task) && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-amber-400 bg-amber-400/10">Due today</span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full text-amber-400 bg-amber-400/10">
+                        Due today
+                      </span>
                     )}
                   </div>
                 )}
+
                 {task.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {task.tags.map((tag) => (
-                      <button key={tag} type="button" onClick={() => { setFilterTag(tag); setPage(1); }}
-                        className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 hover:bg-primary-500/20 transition-colors">
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setFilterTag(tag);
+                          setPage(1);
+                        }}
+                        className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 hover:bg-primary-500/20 transition-colors"
+                      >
                         #{tag}
                       </button>
                     ))}
                   </div>
                 )}
+
                 <div className="flex gap-2 mt-2">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}>
-                    {task.status === "in-progress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge[task.status]}`}
+                  >
+                    {task.status === "in-progress"
+                      ? "In Progress"
+                      : task.status.charAt(0).toUpperCase() +
+                        task.status.slice(1)}
                   </span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}>
-                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityBadge[task.priority]}`}
+                  >
+                    {task.priority.charAt(0).toUpperCase() +
+                      task.priority.slice(1)}
                   </span>
                 </div>
               </div>
+
               <div className="flex items-center gap-2 shrink-0">
                 <Tooltip text="Edit task">
-                  <button aria-label="Edit task" onClick={() => setEditTask(task)} className="p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-surface-raised transition-colors">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                  <button
+                    aria-label="Edit task"
+                    onClick={() => setEditTask(task)}
+                    className="p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-surface-raised transition-colors"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
                   </button>
                 </Tooltip>
+
                 <Tooltip text="Delete task">
-                  <button aria-label="Delete task" onClick={() => setDeleteId(task._id)} className="p-1.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                  <button
+                    aria-label="Delete task"
+                    onClick={() => setDeleteId(task._id)}
+                    className="p-1.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
                   </button>
                 </Tooltip>
               </div>
@@ -489,7 +944,6 @@ const Tasks = () => {
       {/* ── Pagination Controls ─────────── */}
       {meta.pages > 1 && (
         <div className="flex items-center justify-between mt-6">
-
           <button
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
@@ -498,7 +952,9 @@ const Tasks = () => {
             Previous
           </button>
 
-          <span className="text-text-muted text-sm">Page {page} of {meta.pages}</span>
+          <span className="text-text-muted text-sm">
+            Page {page} of {meta.pages}
+          </span>
 
           <button
             onClick={() => setPage(page + 1)}
@@ -507,26 +963,66 @@ const Tasks = () => {
           >
             Next
           </button>
-
         </div>
       )}
 
       {/* ── Create Modal ──────────────── */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="New Task">
-        <TaskForm onSave={handleCreate} onClose={() => setModalOpen(false)} />
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="New Task"
+        fallbackFocusRef={newTaskButtonRef}
+      >
+        <TaskForm
+          onSave={handleCreate}
+          onClose={() => setModalOpen(false)}
+        />
       </Modal>
 
       {/* ── Edit Modal ────────────────── */}
-      <Modal open={!!editTask} onClose={() => setEditTask(null)} title="Edit Task">
-        {editTask && <TaskForm initial={editTask} onSave={handleUpdate} onClose={() => setEditTask(null)} />}
+      <Modal
+        open={!!editTask}
+        onClose={() => setEditTask(null)}
+        title="Edit Task"
+        fallbackFocusRef={newTaskButtonRef}
+      >
+        {editTask && (
+          <TaskForm
+            initial={editTask}
+            onSave={handleUpdate}
+            onClose={() => setEditTask(null)}
+          />
+        )}
       </Modal>
 
       {/* ── Delete Confirm Modal ──────── */}
-      <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Task">
-        <p className="text-text-secondary text-sm mb-5">Are you sure you want to delete this task? This action cannot be undone.</p>
+      <Modal
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        title="Delete Task"
+        fallbackFocusRef={newTaskButtonRef}
+      >
+        <p className="text-text-secondary text-sm mb-5">
+          Are you sure you want to delete this task? This action cannot be undone.
+        </p>
+
         <div className="flex gap-3">
-          <button type="button" onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors">Cancel</button>
-          <button type="button" aria-label="Delete task" onClick={handleDelete} className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">Delete</button>
+          <button
+            type="button"
+            onClick={() => setDeleteId(null)}
+            className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-text-label bg-surface-raised hover:bg-surface-hover transition-colors"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            aria-label="Delete task"
+            onClick={handleDelete}
+            className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
         </div>
       </Modal>
     </div>
