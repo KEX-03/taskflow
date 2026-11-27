@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Logo from "../Shared/Logo.jsx";
@@ -44,6 +44,19 @@ const Sidebar = ({ mobileOpen = false }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
+  const [theme, setTheme] = useState(
+  () => localStorage.getItem("theme") || "dark"
+);
+
+useEffect(() => {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+}, [theme]);
+
+const toggleTheme = () => {
+  setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+};
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -84,7 +97,7 @@ const Sidebar = ({ mobileOpen = false }) => {
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-primary-600 text-white shadow-md shadow-primary-600/20"
-                    : "text-text-secondary hover:text-white hover:bg-surface-raised"
+                    : "text-text-secondary hover:text-text hover:bg-surface-raised"
                 }`
               }
             >
@@ -107,19 +120,43 @@ const Sidebar = ({ mobileOpen = false }) => {
 
       {/* ── User + Logout ────────────────── */}
       <div className="border-t border-border-subtle p-3">
-        <div className="flex items-center gap-3 px-2 py-2 rounded-lg mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-            {user?.name?.[0]?.toUpperCase() || "U"}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-              <p className="text-xs text-text-muted truncate">{user?.email}</p>
-            </div>
-          )}
-        </div>
-        {collapsed ? <Tooltip text="Logout" side="right">{logoutButton}</Tooltip> : logoutButton}
+  <div className="flex items-center gap-3 px-2 py-2 rounded-lg mb-2">
+    <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+      {user?.name?.[0]?.toUpperCase() || "U"}
+    </div>
+
+    {!collapsed && (
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-text truncate">
+          {user?.name}
+        </p>
+        <p className="text-xs text-text-muted truncate">
+          {user?.email}
+        </p>
       </div>
+    )}
+  </div>
+
+  {/* Theme Toggle Button */}
+  <button
+    onClick={toggleTheme}
+    className="w-full flex items-center gap-3 px-3 py-2 mb-2 rounded-lg text-sm text-text-secondary hover:bg-surface-raised transition-colors"
+  >
+    <span>{theme === "dark" ? "☀️" : "🌙"}</span>
+    {!collapsed && (
+      <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+    )}
+  </button>
+
+  {/* Logout Button */}
+  {collapsed ? (
+    <Tooltip text="Logout" side="right">
+      {logoutButton}
+    </Tooltip>
+  ) : (
+    logoutButton
+  )}
+</div>
 
       {/* ── Collapse toggle ──────────────── */}
       {/* The wrapper carries the positioning, so the tooltip sits next to the button. */}
@@ -133,7 +170,7 @@ const Sidebar = ({ mobileOpen = false }) => {
           type="button"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           onClick={() => setCollapsed((prev) => !prev)}
-          className="w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-white hover:border-border-muted transition-colors"
+          className="w-6 h-6 bg-surface-raised border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-text hover:border-border-muted transition-colors"
         >
           {collapsed ? "›" : "‹"}
         </button>
