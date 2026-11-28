@@ -37,7 +37,7 @@ jobs:
       - run: npm run lint --prefix server
       # The release and merge scripts in .github/scripts are linted with the server's config
       - run: npx eslint .github/scripts --config server/eslint.config.js
-      - run: npm test
+      - run: npm test --prefix server
 
   build:
     name: Client build
