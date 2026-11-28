@@ -36,7 +36,7 @@ jobs:
       - run: npm ci --prefix server
       - run: npm run lint --prefix server
       # The release and merge scripts in .github/scripts are linted with the server's config
-      - run: npm run lint:scripts
+      - run: npm run lint:scripts --prefix server
       - run: npm test
 
   build:
